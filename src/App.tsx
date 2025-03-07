@@ -1,15 +1,12 @@
 import "./App.css";
-import { Button, HStack } from "@chakra-ui/react";
+import Login from "./pages/Login/Login";
 
 function App() {
-  return (
-    <>
-      <HStack>
-        <Button>Click me</Button>
-        <Button>Click me</Button>
-      </HStack>
-    </>
-  );
+	return (
+		<>
+			<Login />
+		</>
+	);
 }
 
 export default App;

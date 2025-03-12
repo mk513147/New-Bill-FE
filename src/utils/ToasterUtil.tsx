@@ -1,4 +1,5 @@
 import { Toaster, toaster } from "@/components/ui/toaster";
+
 type ToastType = "success" | "error" | "warning" | "info";
 
 const ToasterUtil = () => {

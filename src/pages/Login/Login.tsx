@@ -50,7 +50,7 @@ const Login = () => {
 				toastFunc(`Failed to set session.`, `error`);
 			}
 		} catch (error: any) {
-			console.error("Login error:", error.response?.data || error.message);
+			console.error("Login error:", error.message);
 			toastFunc(`Invalid credentials. Please try again.`, `error`);
 		} finally {
 			setLoading(false);

@@ -15,7 +15,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Field } from "@/components/ui/field";
 import { useState } from "react";
 // import { Toaster, toaster } from "@/components/ui/toaster";
-import { ToasterUtil, Toaster } from "@/utils/ToasterUtil";
+import { ToasterUtil, Toaster } from "@/components/ToasterUtil";
 
 interface FormValues {
 	emailId: String;

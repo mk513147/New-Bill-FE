@@ -31,26 +31,22 @@ const Login = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<FormValues>({
-		defaultValues: {
-			emailId: "sujeet@example.com",
-			password: "Kaushal@123",
-		},
-	});
+	} = useForm<FormValues>();
 
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 		setLoading(true);
+		console.log(data);
+
 		try {
 			const response = await API.post("auth/login", data);
 			const json = response.data;
 			if (json.statusCode === 200) {
 				localStorage.setItem("isLoggedIn", "true");
 				navigate("/dashboard");
-			} else {
-				toastFunc(`Failed to set session.`, `error`);
+				toastFunc(`Logged In Successfully!!.`, `success`);
 			}
 		} catch (error: any) {
-			console.error("Login error:", error.message);
+			console.error("Login error:", error.response.data);
 			toastFunc(`Invalid credentials. Please try again.`, `error`);
 		} finally {
 			setLoading(false);

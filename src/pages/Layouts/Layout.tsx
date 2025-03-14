@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import DockNav from "@/components/dockNav";
+import DockNav from "@/components/DockNav.tsx";
 
 const Layout = () => {
 	const navigate = useNavigate();

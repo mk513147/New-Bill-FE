@@ -5,7 +5,7 @@ import { FaUsers, FaSignOutAlt } from "react-icons/fa";
 import { AiOutlineProduct } from "react-icons/ai";
 import { FaDungeon, FaShop } from "react-icons/fa6";
 import { useState } from "react";
-import { API } from "@/apiCall/api";
+import { API } from "@/apiCall/api.ts";
 
 const navItems = [
 	{ label: "Home", icon: <FaDungeon />, path: "/dashboard" },

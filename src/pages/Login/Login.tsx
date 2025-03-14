@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Field } from "@/components/ui/field";
 import { useState } from "react";
-// import { Toaster, toaster } from "@/components/ui/toaster";
+
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
 
 interface FormValues {
@@ -40,10 +40,10 @@ const Login = () => {
 			if (data.statusCode === 200) {
 				localStorage.setItem("isLoggedIn", "true");
 				navigate("/dashboard");
-				toastFunc(`Logged In Successfully!!.`, `success`);
+				console.log(`Logged In Successfully!!.`);
 			}
 		} catch (error: any) {
-			console.error("Login error:", error.response.data);
+			console.error("Login error:", error.message);
 			toastFunc(`Invalid credentials. Please try again.`, `error`);
 		} finally {
 			setLoading(false);

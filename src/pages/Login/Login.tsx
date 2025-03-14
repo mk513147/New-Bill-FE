@@ -1,21 +1,25 @@
 import {
 	Flex,
-	Heading,
+	Text,
 	Box,
 	Spinner,
 	Center,
 	Button,
 	Input,
 	Stack,
+	Image,
+	Link,
+	Field,
 } from "@chakra-ui/react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { API } from "@/apiCall/api.ts";
 import { useNavigate } from "react-router-dom";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Field } from "@/components/ui/field";
+import "@/styles/loginForm.css";
 import { useState } from "react";
 
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
+import loginImage from "@/assets/login_illustration.jpeg";
 
 interface FormValues {
 	emailId: String;
@@ -60,75 +64,120 @@ const Login = () => {
 				</Box>
 			)}
 			<Flex
-				minH="100vh"
-				align="center"
-				justify={"center"}
-				bg={"gray.900"}
-				gap={"4"}
-				zIndex={5}
+				width="100vw"
+				height="100vh"
+				backgroundColor="black"
+				alignItems="center"
+				justifyContent="center"
 			>
-				<Flex
-					p={2}
-					bg={"gray.800"}
-					rounded={"md"}
-					boxShadow={"md"}
-					w={"350px"}
-					h={"400px"}
-					gap={4}
-					direction={"column"}
-					align={"center"}
-					justify={"space-evenly"}
-				>
-					<Heading fontSize={"3xl"} textAlign={"center"} color={"white"}>
-						Login
-					</Heading>
-					<form onSubmit={handleSubmit(onSubmit)}>
-						<Stack gap={"4"} align={"flex-start"} maxW={"sm"}>
-							<Field
-								invalid={!!errors.emailId}
-								errorText={errors.emailId?.message}
+				<Flex width="full" height="full" overflow="hidden">
+					{/* Left Section - Form */}
+					<Flex
+						width="50%"
+						direction="column"
+						justifyContent="center"
+						alignItems="center"
+						color="white"
+					>
+						<Text
+							fontSize="7xl"
+							textAlign="left"
+							fontWeight="normal"
+							mb={15}
+							lineHeight="shorter"
+							width="60%"
+						>
+							We Just Make It Easier!
+						</Text>
+						<form onSubmit={handleSubmit(onSubmit)} className="login-form">
+							<Stack
+								gap="10"
+								align="center"
+								width="60%"
+								height="400px"
+								justify="center"
+								borderBottomWidth="2px"
+								borderBottomColor="gray.500"
 							>
-								<Input
-									{...register("emailId", {
-										required: "emailId is required",
-									})}
-									variant="outline"
-									placeholder="emailId"
-									size="lg"
-									borderColor="gray.300"
-								/>
-							</Field>
+								<Field.Root invalid={!!errors.emailId}>
+									<Field.Label fontSize="lg" fontWeight="normal">
+										Email :
+									</Field.Label>
+									<Input
+										{...register("emailId", {
+											required: "Email Id is required",
+										})}
+										variant="outline"
+										placeholder="Email"
+										size="lg"
+										borderColor="gray.600"
+										width="100%"
+									/>
+									<Field.ErrorText>{errors.emailId?.message}</Field.ErrorText>
+								</Field.Root>
 
-							<Field
-								invalid={!!errors.password}
-								errorText={errors.password?.message}
-							>
-								<PasswordInput
-									{...register("password", {
-										required: "Password is required",
-									})}
-									variant="outline"
-									placeholder="Password"
-									size="lg"
-									borderColor="gray.300"
-								/>
-							</Field>
+								<Field.Root invalid={!!errors.password}>
+									<Field.Label fontSize="lg" fontWeight="normal">
+										Password :
+									</Field.Label>
+									<PasswordInput
+										{...register("password", {
+											required: "Password is required",
+										})}
+										type="password"
+										variant="outline"
+										placeholder="Password"
+										size="lg"
+										borderColor="gray.600"
+									/>
+									<Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+								</Field.Root>
+								<Button
+									type="submit"
+									bgColor="#65D68F"
+									color="white"
+									mt={4}
+									w="full"
+									_hover={{ bgColor: "#4FBC77" }}
+									letterSpacing="widest"
+									fontSize="xl"
+								>
+									LOGIN
+								</Button>
+							</Stack>
+						</form>
+						<Link
+							mt={4}
+							color="gray.400"
+							fontSize="sm"
+							textAlign="center"
+							textDecoration="underline"
+						>
+							Forgot password
+						</Link>
+					</Flex>
 
-							<Button
-								type="submit"
-								bgColor="teal.400"
-								mt={4}
-								w="full"
-								_hover={{ bgColor: "teal.300" }}
-								transition="backgrounds"
-								transitionDuration="slowest"
-							>
-								Submit
-							</Button>
-						</Stack>
-					</form>
+					{/* Right Section - Image */}
+					<Box
+						width="50%"
+						backgroundColor="#black"
+						display="flex"
+						alignItems="center"
+						justifyContent="center"
+						p={15}
+					>
+						<Image
+							src={loginImage}
+							alt="Login Illustration"
+							objectFit="cover"
+							width="90%"
+							height="90%"
+							borderRadius="lg"
+						/>
+					</Box>
 				</Flex>
 			</Flex>
+
 			<Toaster />
 		</>
 	);

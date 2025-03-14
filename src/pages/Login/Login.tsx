@@ -35,10 +35,9 @@ const Login = () => {
 
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 		setLoading(true);
-		console.log(data);
-
 		try {
 			const response = await API.post("auth/login", data);
+			console.log(response.data);
 			const json = response.data;
 			if (json.statusCode === 200) {
 				localStorage.setItem("isLoggedIn", "true");

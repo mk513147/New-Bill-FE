@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-	baseURL: import.meta.env.REACT_APP_API_URL,
+	baseURL: import.meta.env.VITE_APP_API_URL,
 
 	headers: {
 		"Content-Type": "application/json",
@@ -10,7 +10,7 @@ export const API = axios.create({
 });
 
 export const authAPI = axios.create({
-	baseURL: import.meta.env.REACT_APP_API_URL,
+	baseURL: import.meta.env.VITE_APP_API_URL,
 
 	headers: {
 		Accept: "application/json",

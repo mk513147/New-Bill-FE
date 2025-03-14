@@ -19,7 +19,7 @@ import "@/styles/loginForm.css";
 import { useState } from "react";
 
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
-import loginImage from "@/assets/login_illustration.jpeg";
+import loginImage from "@/assets/login_illustration.svg";
 
 interface FormValues {
 	emailId: String;

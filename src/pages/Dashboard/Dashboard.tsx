@@ -20,7 +20,7 @@ function Dashboard() {
         <Heading size="md" mb={5}>
           Dashboard
         </Heading>
-        <VStack align="start" spacing={4}>
+        <VStack align="start" gap={4}>
           <Text cursor="pointer">Home</Text>
           <Text cursor="pointer">Analytics</Text>
           <Text cursor="pointer">Reports</Text>

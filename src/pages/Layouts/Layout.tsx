@@ -1,5 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import DockNav from "@/components/dockNav";
 
 const Layout = () => {
 	const navigate = useNavigate();
@@ -13,7 +14,12 @@ const Layout = () => {
 		}
 	}, []);
 
-	return <Outlet />;
+	return (
+		<>
+			<DockNav />
+			<Outlet />
+		</>
+	);
 };
 
 export default Layout;

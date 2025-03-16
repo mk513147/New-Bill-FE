@@ -1,6 +1,4 @@
 import {
-	Flex,
-	Text,
 	Box,
 	Spinner,
 	Center,
@@ -10,6 +8,8 @@ import {
 	Image,
 	Link,
 	Field,
+	Heading,
+	Flex,
 } from "@chakra-ui/react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { API } from "@/apiCall/api.ts";
@@ -66,7 +66,11 @@ const Login = () => {
 			<Flex
 				width="100vw"
 				height="100vh"
-				backgroundColor="black"
+				// backgroundColor="black"
+				backgroundGradient="to-b"
+				gradientFrom="#2e026d"
+				gradientVia="#000000"
+				gradientTo="black"
 				alignItems="center"
 				justifyContent="center"
 			>
@@ -79,25 +83,28 @@ const Login = () => {
 						alignItems="center"
 						color="white"
 					>
-						<Text
-							fontSize="7xl"
-							textAlign="left"
-							fontWeight="normal"
-							mb={15}
-							lineHeight="shorter"
-							width="60%"
-						>
-							We Just Make It Easier!
-						</Text>
+						<Flex justifyContent="center" alignItems="center" width="100%">
+							<Heading
+								size={{ md: "6xl", lg: "6xl", sm: "4xl" }}
+								textAlign="left"
+								width="70%"
+								fontWeight="normal"
+								lineHeight="shorter"
+								letterSpacing="wider"
+							>
+								NEW BILL
+							</Heading>
+						</Flex>
 						<form onSubmit={handleSubmit(onSubmit)} className="login-form">
 							<Stack
-								gap="10"
 								align="center"
-								width="60%"
-								height="400px"
+								width="70%"
+								height="sm"
 								justify="center"
-								borderBottomWidth="2px"
+								gap={10}
+								borderBottomWidth="1px"
 								borderBottomColor="gray.500"
+								mt={10}
 							>
 								<Field.Root invalid={!!errors.emailId}>
 									<Field.Label fontSize="lg" fontWeight="normal">
@@ -111,7 +118,6 @@ const Login = () => {
 										placeholder="Email"
 										size="lg"
 										borderColor="gray.600"
-										width="100%"
 									/>
 									<Field.ErrorText>{errors.emailId?.message}</Field.ErrorText>
 								</Field.Root>
@@ -136,7 +142,7 @@ const Login = () => {
 									type="submit"
 									bgColor="#65D68F"
 									color="white"
-									mt={4}
+									mt={8}
 									w="full"
 									_hover={{ bgColor: "#4FBC77" }}
 									letterSpacing="widest"
@@ -147,11 +153,12 @@ const Login = () => {
 							</Stack>
 						</form>
 						<Link
-							mt={4}
+							mt={2}
 							color="gray.400"
 							fontSize="sm"
-							textAlign="center"
+							textAlign="left"
 							textDecoration="underline"
+							position="relative"
 						>
 							Forgot password
 						</Link>

@@ -9,6 +9,7 @@ import {
 	Field,
 	Heading,
 	Flex,
+	Text,
 } from "@chakra-ui/react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { API } from "@/apiCall/api.ts";

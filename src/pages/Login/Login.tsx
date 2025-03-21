@@ -101,7 +101,7 @@ const Login = () => {
 						stroke="none"
 						stroke-width="0"
 						fill="url(#gradient1)"
-						fill-opacity="1"
+						fill-opacity="0.8"
 						className="transition-all duration-300 ease-in-out delay-150 path-1"
 					></path>
 				</svg>
@@ -135,7 +135,7 @@ const Login = () => {
 						stroke="none"
 						stroke-width="0"
 						fill="url(#gradient)"
-						fill-opacity="0.8"
+						fill-opacity="1"
 					></path>
 				</svg>
 			</Box>
@@ -153,7 +153,8 @@ const Login = () => {
 					direction="column"
 					justifyContent="center"
 					alignItems="center"
-					bg="white"
+					bgColor="whiteAlpha.300"
+					backdropFilter="blur(1px)"
 					p={8}
 					borderRadius="lg"
 					boxShadow="xl"
@@ -171,15 +172,17 @@ const Login = () => {
 					<form onSubmit={handleSubmit(onSubmit)} className="login-form">
 						<Stack align="center" width="100%" justify="center" gap={4}>
 							<Field.Root invalid={!!errors.emailId} width="100%">
-								<Field.Label fontSize="md" fontWeight="medium" color="gray.600">
+								<Field.Label fontSize="md" fontWeight="medium" color="gray.200">
 									Email :
 								</Field.Label>
 								<Input
 									{...register("emailId", { required: "Email Id is required" })}
 									variant="outline"
 									placeholder="Email"
+									_placeholder={{ color: "gray.100" }}
 									size="lg"
-									color="gray.800"
+									color="gray.100"
+									bgColor="blackAlpha.300"
 									borderColor="teal.300"
 									_focus={{ outlineColor: "teal.500" }}
 								/>
@@ -187,7 +190,7 @@ const Login = () => {
 							</Field.Root>
 
 							<Field.Root invalid={!!errors.password} width="100%">
-								<Field.Label fontSize="md" fontWeight="medium" color="gray.600">
+								<Field.Label fontSize="md" fontWeight="medium" color="gray.200">
 									Password :
 								</Field.Label>
 								<PasswordInput
@@ -197,8 +200,10 @@ const Login = () => {
 									type="password"
 									variant="outline"
 									placeholder="Password"
+									_placeholder={{ color: "gray.100" }}
 									size="lg"
-									color="gray.800"
+									color="gray.100"
+									bgColor="blackAlpha.300"
 									borderColor="teal.300"
 									_focus={{ outlineColor: "teal.500" }}
 								/>
@@ -207,21 +212,18 @@ const Login = () => {
 
 							<Button
 								type="submit"
-								bgGradient="to-r"
-								gradientFrom="teal.500"
-								gradientTo="teal.400"
-								color="white"
+								bgColor="#0074E4"
 								variant="solid"
+								color="white"
 								mt={4}
 								w="full"
 								_hover={{
-									bgGradient: "to-l",
-									gradientFrom: "teal.600",
-									gradientTo: "teal.500",
+									bgColor: "#3391FF",
 								}}
-								transition="background 0.3s ease-in-out"
+								transition="all 0.3s ease-in-out"
 								fontSize="xl"
 								borderRadius="full"
+								letterSpacing="widest"
 							>
 								LOGIN
 							</Button>
@@ -229,7 +231,7 @@ const Login = () => {
 					</form>
 					<Link
 						mt={4}
-						color="teal.600"
+						color="teal.800"
 						fontSize="sm"
 						textDecoration="underline"
 						_hover={{ color: "teal.700" }}

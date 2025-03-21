@@ -63,10 +63,14 @@ const Login = () => {
 			{/* Svg 1 */}
 			<Box
 				pos="absolute"
-				bg="transparent"
+				bgColor="blackAlpha.800"
+				// bgGradient="to-b"
+				// gradientFrom="gray.800"
+				// gradientTo="gray.600"
 				zIndex={-10}
 				width="100vw"
 				height="100vh"
+				pointerEvents="none"
 			>
 				<svg
 					width="100%"
@@ -164,7 +168,7 @@ const Login = () => {
 							size={{ md: "5xl", sm: "3xl" }}
 							textAlign="center"
 							fontWeight="medium"
-							color="teal.500"
+							color="teal.400"
 						>
 							LOGIN
 						</Heading>

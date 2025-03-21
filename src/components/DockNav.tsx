@@ -1,5 +1,4 @@
 import { Flex, IconButton, Center, Box, Spinner } from "@chakra-ui/react";
-import { useColorModeValue } from "@chakra-ui/color-mode";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaUsers, FaSignOutAlt } from "react-icons/fa";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -19,9 +18,6 @@ const DockNav = () => {
 	const toastFunc = ToasterUtil();
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
-	const bgColor = useColorModeValue("gray.900", "gray.800");
-	const iconColor = useColorModeValue("gray.400", "gray.300");
-	const hoverBorderColor = useColorModeValue("white", "gray.500");
 	const handleLogout = async () => {
 		setLoading(true);
 		try {
@@ -50,16 +46,18 @@ const DockNav = () => {
 				bottom={4}
 				left="50%"
 				transform="translateX(-50%)"
-				bg={bgColor}
-				py={2}
+				bg="white"
+				py={3}
 				px={4}
 				justifyContent="space-around"
 				alignItems="center"
-				boxShadow="lg"
+				boxShadow="xl"
 				zIndex={100}
-				borderRadius="lg"
-				width="80%"
-				maxW="400px"
+				borderRadius="full"
+				width="85%"
+				maxW="420px"
+				border="1px solid"
+				borderColor="gray.200"
 			>
 				{navItems.map(({ label, icon, path }) => (
 					<NavLink key={path} to={path} style={{ textDecoration: "none" }}>
@@ -67,10 +65,12 @@ const DockNav = () => {
 							<IconButton
 								aria-label={label}
 								onClick={() => navigate(path)}
-								color={isActive ? "white" : iconColor}
+								color={isActive ? "white" : "teal.500"}
+								bg={isActive ? "teal.500" : "transparent"}
 								variant="ghost"
-								_hover={{ border: "2px solid", borderColor: hoverBorderColor }}
+								_hover={{ bg: "teal.400" }}
 								size="lg"
+								borderRadius="full"
 							>
 								{icon}
 							</IconButton>
@@ -79,16 +79,18 @@ const DockNav = () => {
 				))}
 			</Flex>
 			<IconButton
-				position="absolute"
+				position="fixed"
 				bottom={4}
-				right={3}
-				py={2}
-				px={2}
+				right={5}
+				py={3}
+				px={3}
 				zIndex={100}
 				onClick={handleLogout}
-				variant="surface"
-				_hover={{ border: "2px solid", borderColor: hoverBorderColor }}
+				bg="teal.500"
+				color="white"
+				_hover={{ bg: "teal.600" }}
 				size="lg"
+				borderRadius="full"
 			>
 				<FaSignOutAlt />
 			</IconButton>

@@ -153,7 +153,8 @@ const Login = () => {
 				pointerEvents="auto"
 			>
 				<Flex
-					width={{ base: "90%", md: "30%" }}
+					width="30%"
+					// height="70%"
 					direction="column"
 					justifyContent="center"
 					alignItems="center"
@@ -165,10 +166,11 @@ const Login = () => {
 				>
 					<Flex justifyContent="center" alignItems="center" width="100%" mb={6}>
 						<Heading
-							size={{ md: "5xl", sm: "3xl" }}
+							size="5xl"
 							textAlign="center"
 							fontWeight="medium"
 							color="teal.400"
+							letterSpacing="widest"
 						>
 							LOGIN
 						</Heading>
@@ -182,18 +184,22 @@ const Login = () => {
 								<Input
 									{...register("emailId", { required: "Email Id is required" })}
 									variant="outline"
-									placeholder="Email"
-									_placeholder={{ color: "gray.100" }}
+									placeholder="example@gmail.com"
+									_placeholder={{ color: "gray.300" }}
 									size="lg"
 									color="gray.100"
 									bgColor="blackAlpha.300"
 									borderColor="teal.300"
 									_focus={{ outlineColor: "teal.500" }}
 								/>
-								<Field.ErrorText>{errors.emailId?.message}</Field.ErrorText>
+								<Box height="10px">
+									<Field.ErrorText fontSize="md" color="red.500">
+										{errors.emailId?.message}
+									</Field.ErrorText>
+								</Box>
 							</Field.Root>
 
-							<Field.Root invalid={!!errors.password} width="100%">
+							<Field.Root invalid={!!errors.password} width="100%" height="30%">
 								<Field.Label fontSize="md" fontWeight="medium" color="gray.200">
 									Password :
 								</Field.Label>
@@ -204,14 +210,18 @@ const Login = () => {
 									type="password"
 									variant="outline"
 									placeholder="Password"
-									_placeholder={{ color: "gray.100" }}
+									_placeholder={{ color: "gray.300" }}
 									size="lg"
 									color="gray.100"
 									bgColor="blackAlpha.300"
 									borderColor="teal.300"
 									_focus={{ outlineColor: "teal.500" }}
 								/>
-								<Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+								<Box height="10px">
+									<Field.ErrorText fontSize="md" color="red.500">
+										{errors.password?.message}
+									</Field.ErrorText>
+								</Box>
 							</Field.Root>
 
 							<Button
@@ -236,6 +246,7 @@ const Login = () => {
 					<Link
 						mt={4}
 						color="teal.800"
+						// onClick={() => navigate("/forgot-password")}
 						fontSize="sm"
 						textDecoration="underline"
 						_hover={{ color: "teal.700" }}

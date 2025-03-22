@@ -9,13 +9,13 @@ import {
 	Field,
 	Heading,
 	Flex,
+	defineStyle,
 } from "@chakra-ui/react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { API } from "@/apiCall/api.ts";
 import { useNavigate } from "react-router-dom";
-import { PasswordInput } from "@/components/ui/password-input";
 import "@/styles/loginForm.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
 
 interface FormValues {
@@ -36,6 +36,11 @@ const Login = () => {
 
 	const onSubmit: SubmitHandler<FormValues> = async (creds: any) => {
 		setLoading(true);
+		if (!(creds.emailId || creds.password)) {
+			toastFunc(`Please fill the form`, "error");
+			setLoading(false);
+			return;
+		}
 		try {
 			const { data } = await API.post("auth/login", creds);
 			if (data.statusCode === 200) {
@@ -51,10 +56,41 @@ const Login = () => {
 		}
 	};
 
+	useEffect(() => {
+		if (errors.emailId) {
+			toastFunc(errors.emailId?.message || "Fill the email", "error");
+		} else if (errors.password) {
+			toastFunc(errors.password?.message || "Fill the password", "error");
+		}
+	}, [errors.emailId]);
+
+	const floatingStyles = defineStyle({
+		pos: "absolute",
+		bg: "bg",
+		px: "0.5",
+		top: "-3",
+		insetStart: "2",
+		bgColor: "transparent",
+		fontWeight: "normal",
+		pointerEvents: "none",
+		transition: "position",
+		fontSize: "lg",
+		_peerPlaceholderShown: {
+			color: "gray.500",
+			top: "2.5",
+			insetStart: "3",
+		},
+		_peerFocusVisible: {
+			color: "teal.500",
+			top: "-6",
+			insetStart: "2",
+		},
+	});
+
 	return (
 		<>
 			{loading && (
-				<Box pos="absolute" inset="0" bg="whiteAlpha.700" zIndex={1000}>
+				<Box pos="absolute" inset="0" bg="whiteAlpha.600" zIndex={1000}>
 					<Center h="full">
 						<Spinner color="teal.500" size="xl" />
 					</Center>
@@ -63,7 +99,7 @@ const Login = () => {
 			{/* Svg 1 */}
 			<Box
 				pos="absolute"
-				bgColor="blackAlpha.800"
+				bgColor="white"
 				// bgGradient="to-b"
 				// gradientFrom="gray.800"
 				// gradientTo="gray.600"
@@ -139,7 +175,7 @@ const Login = () => {
 						stroke="none"
 						stroke-width="0"
 						fill="url(#gradient)"
-						fill-opacity="1"
+						fill-opacity="0.9"
 					></path>
 				</svg>
 			</Box>
@@ -154,11 +190,10 @@ const Login = () => {
 			>
 				<Flex
 					width="30%"
-					// height="70%"
 					direction="column"
 					justifyContent="center"
 					alignItems="center"
-					bgColor="whiteAlpha.300"
+					bgColor="whiteAlpha.800"
 					backdropFilter="blur(1px)"
 					p={8}
 					borderRadius="lg"
@@ -171,56 +206,53 @@ const Login = () => {
 							fontWeight="medium"
 							color="teal.400"
 							letterSpacing="widest"
+							mb={8}
 						>
 							LOGIN
 						</Heading>
 					</Flex>
 					<form onSubmit={handleSubmit(onSubmit)} className="login-form">
 						<Stack align="center" width="100%" justify="center" gap={4}>
-							<Field.Root invalid={!!errors.emailId} width="100%">
-								<Field.Label fontSize="md" fontWeight="medium" color="gray.200">
-									Email :
-								</Field.Label>
-								<Input
-									{...register("emailId", { required: "Email Id is required" })}
-									variant="outline"
-									placeholder="example@gmail.com"
-									_placeholder={{ color: "gray.300" }}
-									size="lg"
-									color="gray.100"
-									bgColor="blackAlpha.300"
-									borderColor="teal.300"
-									_focus={{ outlineColor: "teal.500" }}
-								/>
-								<Box height="10px">
-									<Field.ErrorText fontSize="md" color="red.500">
-										{errors.emailId?.message}
-									</Field.ErrorText>
+							<Field.Root width="100%" mb={6}>
+								<Box pos="relative" w="full">
+									<Input
+										{...register("emailId", {
+											required: "Email Id is required",
+										})}
+										variant="outline"
+										placeholder=""
+										className="peer"
+										size="lg"
+										color="gray.800"
+										bgColor="gray.200"
+										borderColor="teal.300"
+										_focus={{ outlineColor: "teal.500" }}
+									/>
+									<Field.Label css={floatingStyles} color="teal.400">
+										Email
+									</Field.Label>
 								</Box>
 							</Field.Root>
 
-							<Field.Root invalid={!!errors.password} width="100%" height="30%">
-								<Field.Label fontSize="md" fontWeight="medium" color="gray.200">
-									Password :
-								</Field.Label>
-								<PasswordInput
-									{...register("password", {
-										required: "Password is required",
-									})}
-									type="password"
-									variant="outline"
-									placeholder="Password"
-									_placeholder={{ color: "gray.300" }}
-									size="lg"
-									color="gray.100"
-									bgColor="blackAlpha.300"
-									borderColor="teal.300"
-									_focus={{ outlineColor: "teal.500" }}
-								/>
-								<Box height="10px">
-									<Field.ErrorText fontSize="md" color="red.500">
-										{errors.password?.message}
-									</Field.ErrorText>
+							<Field.Root width="100%" mb={6}>
+								<Box pos="relative" w="full">
+									<Input
+										{...register("password", {
+											required: "Password is required",
+										})}
+										type="password"
+										variant="outline"
+										placeholder=""
+										size="lg"
+										className="peer"
+										color="gray.800"
+										bgColor="gray.200"
+										borderColor="teal.300"
+										_focus={{ outlineColor: "teal.500" }}
+									/>
+									<Field.Label css={floatingStyles} color="teal.400">
+										Password
+									</Field.Label>
 								</Box>
 							</Field.Root>
 

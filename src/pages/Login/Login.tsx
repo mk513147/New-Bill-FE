@@ -59,7 +59,8 @@ const Login = () => {
 	useEffect(() => {
 		if (errors.emailId) {
 			toastFunc(errors.emailId?.message || "Fill the email", "error");
-		} else if (errors.password) {
+		}
+		if (errors.password) {
 			toastFunc(errors.password?.message || "Fill the password", "error");
 		}
 	}, [errors.emailId]);

@@ -11,11 +11,11 @@ import {
 	Flex,
 	defineStyle,
 } from "@chakra-ui/react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { API } from "@/apiCall/api.ts";
 import { useNavigate } from "react-router-dom";
 import "@/styles/loginForm.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
 
 interface FormValues {
@@ -28,19 +28,10 @@ const Login = () => {
 	const navigate = useNavigate();
 	const toastFunc = ToasterUtil();
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<FormValues>();
+	const { register, handleSubmit } = useForm<FormValues>();
 
 	const onSubmit: SubmitHandler<FormValues> = async (creds: any) => {
 		setLoading(true);
-		if (!(creds.emailId || creds.password)) {
-			toastFunc(`Please fill the form`, "error");
-			setLoading(false);
-			return;
-		}
 		try {
 			const { data } = await API.post("auth/login", creds);
 			if (data.statusCode === 200) {
@@ -56,14 +47,16 @@ const Login = () => {
 		}
 	};
 
-	useEffect(() => {
-		if (errors.emailId) {
-			toastFunc(errors.emailId?.message || "Fill the email", "error");
-		}
-		if (errors.password) {
-			toastFunc(errors.password?.message || "Fill the password", "error");
-		}
-	}, [errors.emailId]);
+	const onError = (errors: FieldErrors<FormValues>) => {
+		// if (errors.emailId) {
+		// 	toastFunc(errors.emailId.message || "Fill the required fields", "error");
+		// } else if (errors.password) {
+		// 	toastFunc(errors.password.message || "Fill the required fields", "error");
+		// }
+		Object.values(errors).forEach((error) => {
+			toastFunc(error?.message || "Fill the required fields", "error");
+		});
+	};
 
 	const floatingStyles = defineStyle({
 		pos: "absolute",
@@ -212,7 +205,10 @@ const Login = () => {
 							LOGIN
 						</Heading>
 					</Flex>
-					<form onSubmit={handleSubmit(onSubmit)} className="login-form">
+					<form
+						onSubmit={handleSubmit(onSubmit, onError)}
+						className="login-form"
+					>
 						<Stack align="center" width="100%" justify="center" gap={4}>
 							<Field.Root width="100%" mb={6}>
 								<Box pos="relative" w="full">
@@ -241,7 +237,7 @@ const Login = () => {
 										{...register("password", {
 											required: "Password is required",
 										})}
-										type="password"
+										// type="password"
 										variant="outline"
 										placeholder=""
 										size="lg"

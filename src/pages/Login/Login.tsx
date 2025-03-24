@@ -183,7 +183,7 @@ const Login = () => {
 				pointerEvents="auto"
 			>
 				<Flex
-					width={{md: "30%", sm: "80%"}}
+					width={{md: "30%", sm: "70%"}}
 					direction="column"
 					justifyContent="center"
 					alignItems="center"

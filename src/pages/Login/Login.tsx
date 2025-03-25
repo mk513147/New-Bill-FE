@@ -94,8 +94,9 @@ const Login = () => {
 				bgColor="white"
 				zIndex={-10}
 				width="100vw"
-				height="100vh"
+				height={{ base: "60vh", md: "75vh", lg: "100vh" }}
 				pointerEvents="none"
+				bottom={0}
 			>
 				<svg
 					width="100%"

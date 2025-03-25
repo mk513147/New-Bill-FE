@@ -17,6 +17,9 @@ import { useNavigate } from "react-router-dom";
 import "@/styles/loginForm.css";
 import { useState } from "react";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
+import { motion } from "framer-motion";
+
+const MotionPath = motion.path;
 
 interface FormValues {
 	emailId: String;
@@ -48,11 +51,6 @@ const Login = () => {
 	};
 
 	const onError = (errors: FieldErrors<FormValues>) => {
-		// if (errors.emailId) {
-		// 	toastFunc(errors.emailId.message || "Fill the required fields", "error");
-		// } else if (errors.password) {
-		// 	toastFunc(errors.password.message || "Fill the required fields", "error");
-		// }
 		Object.values(errors).forEach((error) => {
 			toastFunc(error?.message || "Fill the required fields", "error");
 		});
@@ -94,9 +92,6 @@ const Login = () => {
 			<Box
 				pos="absolute"
 				bgColor="white"
-				// bgGradient="to-b"
-				// gradientFrom="gray.800"
-				// gradientTo="gray.600"
 				zIndex={-10}
 				width="100vw"
 				height="100vh"
@@ -109,35 +104,51 @@ const Login = () => {
 					viewBox="0 0 1440 600"
 					preserveAspectRatio="none"
 					xmlns="http://www.w3.org/2000/svg"
-					className="transition duration-300 ease-in-out delay-150"
 				>
 					<defs>
 						<linearGradient id="gradient2" x1="0%" y1="50%" x2="100%" y2="50%">
 							<stop offset="5%" stop-color="#0693e3"></stop>
 							<stop offset="95%" stop-color="#8ED1FC"></stop>
 						</linearGradient>
-					</defs>
-					<path
-						d="M 0,600 L 0,150 C 101.77033492822966,100.26794258373205 203.54066985645932,50.5358851674641 302,75 C 400.4593301435407,99.4641148325359 495.6076555023925,198.12440191387563 582,224 C 668.3923444976075,249.87559808612437 746.0287081339712,202.96650717703352 849,189 C 951.9712918660288,175.03349282296648 1080.2775119617227,194.0095693779904 1183,193 C 1285.7224880382773,191.9904306220096 1362.8612440191387,170.9952153110048 1440,150 L 1440,600 L 0,600 Z"
-						stroke="none"
-						stroke-width="0"
-						fill="url(#gradient2)"
-						fill-opacity="0.53"
-					></path>
-					<defs>
 						<linearGradient id="gradient1" x1="0%" y1="50%" x2="100%" y2="50%">
 							<stop offset="5%" stop-color="#0693e3"></stop>
 							<stop offset="95%" stop-color="#8ED1FC"></stop>
 						</linearGradient>
 					</defs>
-					<path
-						d="M 0,600 L 0,350 C 105.77990430622009,342.8038277511962 211.55980861244018,335.60765550239233 313,339 C 414.4401913875598,342.39234449760767 511.5406698564593,356.3732057416268 587,337 C 662.4593301435407,317.6267942583732 716.2775119617226,264.89952153110045 822,283 C 927.7224880382774,301.10047846889955 1085.3492822966507,390.0287081339713 1197,413 C 1308.6507177033493,435.9712918660287 1374.3253588516745,392.9856459330143 1440,350 L 1440,600 L 0,600 Z"
+					<MotionPath
+						d="M 0,600 L 0,150 C 101.77,100.27 203.54,50.54 302,75 C 400.46,99.46 495.61,198.12 582,224 C 668.39,249.88 746.03,202.97 849,189 C 951.97,175.03 1080.28,194.01 1183,193 C 1285.72,191.99 1362.86,170.99 1440,150 L 1440,600 L 0,600 Z"
 						stroke="none"
-						stroke-width="0"
+						strokeWidth="0"
+						fill="url(#gradient2)"
+						initial={{ opacity: 0.5, y: 10 }}
+						animate={{
+							opacity: [0.5, 0.7, 0.5],
+							y: [5, -5, 5],
+						}}
+						transition={{
+							duration: 4,
+							repeat: Infinity,
+							repeatType: "mirror",
+							ease: "easeInOut",
+						}}
+					/>
+					<MotionPath
+						d="M 0,600 L 0,350 C 105.78,342.8 211.56,335.61 313,339 C 414.44,342.39 511.54,356.37 587,337 C 662.46,317.63 716.28,264.9 822,283 C 927.72,301.1 1085.35,390.03 1197,413 C 1308.65,435.97 1374.33,392.99 1440,350 L 1440,600 L 0,600 Z"
+						stroke="none"
+						strokeWidth="0"
 						fill="url(#gradient1)"
-						fill-opacity="0.8"
-						className="transition-all duration-300 ease-in-out delay-150 path-1"
-					></path>
+						initial={{ opacity: 0.8, y: 15 }}
+						animate={{
+							opacity: [0.8, 0.6, 0.8],
+							y: [3, -3, 3],
+						}}
+						transition={{
+							duration: 5,
+							repeat: Infinity,
+							repeatType: "mirror",
+							ease: "easeInOut",
+						}}
+					/>
 				</svg>
 			</Box>
 			{/* Svg 2 */}
@@ -146,7 +157,7 @@ const Login = () => {
 				bg="transparent"
 				zIndex={10}
 				width="100vw"
-				height="50vh"
+				height={{ base: "35vh", md: "40vh", lg: "50vh" }}
 				bottom={0}
 				pointerEvents="none"
 			>
@@ -167,9 +178,9 @@ const Login = () => {
 					<path
 						d="M 0,400 L 0,150 C 97.71428571428572,136.75 195.42857142857144,123.5 330,143 C 464.57142857142856,162.5 636.0000000000001,214.75 757,201 C 877.9999999999999,187.25 948.5714285714284,107.5 1054,88 C 1159.4285714285716,68.5 1299.7142857142858,109.25 1440,150 L 1440,400 L 0,400 Z"
 						stroke="none"
-						stroke-width="0"
+						strokeWidth="0"
 						fill="url(#gradient)"
-						fill-opacity="0.9"
+						fillOpacity="0.9"
 					></path>
 				</svg>
 			</Box>
@@ -183,7 +194,7 @@ const Login = () => {
 				pointerEvents="auto"
 			>
 				<Flex
-					width={{md: "30%", sm: "70%"}}
+					width={{ base: "85%", lg: "30%", md: "40%", sm: "65%" }}
 					direction="column"
 					justifyContent="center"
 					alignItems="center"

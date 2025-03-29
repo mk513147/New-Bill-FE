@@ -249,7 +249,7 @@ const Login = () => {
 										{...register("password", {
 											required: "Password is required",
 										})}
-										// type="password"
+										type="password"
 										variant="outline"
 										placeholder=""
 										size="lg"

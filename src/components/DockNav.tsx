@@ -1,16 +1,15 @@
 import { Flex, IconButton, Center, Box, Spinner } from "@chakra-ui/react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaUsers, FaSignOutAlt } from "react-icons/fa";
-import { AiOutlineProduct } from "react-icons/ai";
-import { FaDungeon, FaShop } from "react-icons/fa6";
+import { FaSignOutAlt } from "react-icons/fa";
+import { FaTableList, FaShop, FaUsers, FaUser } from "react-icons/fa6";
 import { useState } from "react";
 import { API } from "@/apiCall/api.ts";
 
 const navItems = [
-	{ label: "Home", icon: <FaDungeon />, path: "/dashboard" },
-	{ label: "Products", icon: <AiOutlineProduct />, path: "/products" },
-	{ label: "Customer", icon: <FaShop />, path: "/customer" },
-	{ label: "Profile", icon: <FaUsers />, path: "/profile" },
+	{ label: "Home", icon: <FaShop />, path: "/dashboard" },
+	{ label: "Products", icon: <FaTableList />, path: "/products" },
+	{ label: "Customer", icon: <FaUsers />, path: "/customer" },
+	{ label: "Profile", icon: <FaUser />, path: "/profile" },
 ];
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil";
 
@@ -54,7 +53,7 @@ const DockNav = () => {
 				boxShadow="xl"
 				zIndex={100}
 				borderRadius="full"
-				width="85%"
+				width="70%"
 				maxW="420px"
 				border="1px solid"
 				borderColor="gray.200"
@@ -68,8 +67,8 @@ const DockNav = () => {
 								color={isActive ? "white" : "teal.500"}
 								bg={isActive ? "teal.500" : "transparent"}
 								variant="ghost"
-								_hover={{ bg: "teal.400" }}
-								size="lg"
+								_hover={{ bg: "teal.400", color: "white" }}
+								size="xl"
 								borderRadius="full"
 							>
 								{icon}

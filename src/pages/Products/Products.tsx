@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 
 // interface Product {
 // 	id: number;
@@ -19,10 +19,19 @@ import { Box } from "@chakra-ui/react";
 
 function Products() {
 	return (
-		<Box bgColor="white" width="100vw" height="100vh">
-			<h1>Products page</h1>
-			<h2>Products page</h2>
-		</Box>
+		<Flex
+			bgColor="gray.100"
+			width="100vw"
+			height="100vh"
+			flexDirection={{ base: "row", md: "row", sm: "column" }}
+		>
+			<Flex flex="2" bgColor="white" shadow="xl"></Flex>
+			<Flex flex="8">
+				<Flex></Flex>
+				<Flex></Flex>
+				<Flex></Flex>
+			</Flex>
+		</Flex>
 	);
 }
 

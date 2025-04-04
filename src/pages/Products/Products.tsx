@@ -6,9 +6,14 @@ import {
 	InputGroup,
 	Stack,
 	Text,
+	ButtonGroup,
 	Heading,
+	IconButton,
+	Pagination,
 	Button,
+	Table,
 } from "@chakra-ui/react";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { IoIosSearch } from "react-icons/io";
 import { FaFilter, FaPrint, FaPlusCircle } from "react-icons/fa";
 
@@ -18,14 +23,14 @@ import { FaFilter, FaPrint, FaPlusCircle } from "react-icons/fa";
 // 	category: string;
 // }
 
-// const products: Product[] = [
-// 	{ id: 1, name: "Laptop", category: "Electronics" },
-// 	{ id: 2, name: "Smartphone", category: "Electronics" },
-// 	{ id: 3, name: "Sofa", category: "Furniture" },
-// 	{ id: 4, name: "Table", category: "Furniture" },
-// 	{ id: 5, name: "Shoes", category: "Fashion" },
-// 	{ id: 6, name: "T-Shirt", category: "Fashion" },
-// ];
+const products = [
+	{ id: 1, name: "Laptop", category: "Electronics", price: 200 },
+	{ id: 2, name: "Smartphone", category: "Electronics", price: 300 },
+	{ id: 3, name: "Sofa", category: "Furniture", price: 100 },
+	{ id: 4, name: "Table", category: "Furniture", price: 700 },
+	{ id: 5, name: "Shoes", category: "Fashion", price: 500 },
+	{ id: 6, name: "T-Shirt", category: "Fashion", price: 400 },
+];
 
 // const categories: string[] = ["All", "Electronics", "Furniture", "Fashion"];
 
@@ -107,7 +112,82 @@ function Products() {
 						</Button>
 					</HStack>
 				</Flex>
-				<Flex></Flex>
+				<Flex>
+					<Stack
+						width="full"
+						gap="5"
+						bgColor="white"
+						shadow="sm"
+						rounded="lg"
+						overflow="hidden"
+						pb="2"
+					>
+						<Table.Root size="lg" stickyHeader color="gray.500">
+							<Table.Header>
+								<Table.Row
+									bgColor="white"
+									borderBottomColor="gray.200"
+									borderBottomWidth="3px"
+								>
+									<Table.ColumnHeader color="gray.600">
+										Product
+									</Table.ColumnHeader>
+									<Table.ColumnHeader color="gray.600">
+										Category
+									</Table.ColumnHeader>
+									<Table.ColumnHeader color="gray.600" textAlign="end">
+										Price
+									</Table.ColumnHeader>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{products.map((item) => (
+									<Table.Row
+										key={item.id}
+										bgColor="whiteAlpha.100"
+										borderBottomColor="gray.200"
+										borderBottomWidth="3px"
+									>
+										<Table.Cell color="gray.700">{item.name}</Table.Cell>
+										<Table.Cell>{item.category}</Table.Cell>
+										<Table.Cell textAlign="end">{item.price}</Table.Cell>
+									</Table.Row>
+								))}
+							</Table.Body>
+						</Table.Root>
+
+						<Pagination.Root count={products.length * 5} pageSize={5} page={1}>
+							<ButtonGroup
+								variant="ghost"
+								size="sm"
+								wrap="wrap"
+								color="gray.500"
+							>
+								<Pagination.PrevTrigger asChild>
+									<IconButton>
+										<LuChevronLeft color="gray.500" />
+									</IconButton>
+								</Pagination.PrevTrigger>
+
+								<Pagination.Items
+									render={(page) => (
+										<IconButton
+											variant={{ base: "ghost", _selected: "outline" }}
+										>
+											{page.value}
+										</IconButton>
+									)}
+								/>
+
+								<Pagination.NextTrigger asChild>
+									<IconButton>
+										<LuChevronRight color="gray.500" />
+									</IconButton>
+								</Pagination.NextTrigger>
+							</ButtonGroup>
+						</Pagination.Root>
+					</Stack>
+				</Flex>
 			</Flex>
 		</Flex>
 	);

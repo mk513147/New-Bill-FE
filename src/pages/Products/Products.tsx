@@ -16,6 +16,7 @@ import {
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { IoIosSearch } from "react-icons/io";
 import { FaFilter, FaPrint, FaPlusCircle } from "react-icons/fa";
+import "@/styles/products.css";
 
 // interface Product {
 // 	id: number;
@@ -30,6 +31,12 @@ const products = [
 	{ id: 4, name: "Table", category: "Furniture", price: 700 },
 	{ id: 5, name: "Shoes", category: "Fashion", price: 500 },
 	{ id: 6, name: "T-Shirt", category: "Fashion", price: 400 },
+	{ id: 7, name: "Laptop", category: "Electronics", price: 200 },
+	{ id: 8, name: "Smartphone", category: "Electronics", price: 300 },
+	{ id: 9, name: "Sofa", category: "Furniture", price: 100 },
+	{ id: 10, name: "Table", category: "Furniture", price: 700 },
+	{ id: 11, name: "Shoes", category: "Fashion", price: 500 },
+	{ id: 12, name: "T-Shirt", category: "Fashion", price: 400 },
 ];
 
 // const categories: string[] = ["All", "Electronics", "Furniture", "Fashion"];
@@ -42,12 +49,12 @@ function Products() {
 			height="100vh"
 			flexDirection={{ base: "column", md: "row", sm: "column" }}
 		>
-			<Flex
+			{/* <Flex
 				width={{ base: "full", md: "20%", sm: "full" }}
 				height={{ base: "10%", md: "full", sm: "10%" }}
 				bgColor="white"
 				shadow="xl"
-			></Flex>
+			></Flex> */}
 			<Flex
 				width={{ base: "full", md: "80%", sm: "full" }}
 				height={{ base: "90%", md: "full", sm: "90%" }}
@@ -122,39 +129,47 @@ function Products() {
 						overflow="hidden"
 						pb="2"
 					>
-						<Table.Root size="lg" stickyHeader color="gray.500">
-							<Table.Header>
-								<Table.Row
-									bgColor="white"
-									borderBottomColor="gray.200"
-									borderBottomWidth="3px"
-								>
-									<Table.ColumnHeader color="gray.600">
-										Product
-									</Table.ColumnHeader>
-									<Table.ColumnHeader color="gray.600">
-										Category
-									</Table.ColumnHeader>
-									<Table.ColumnHeader color="gray.600" textAlign="end">
-										Price
-									</Table.ColumnHeader>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{products.map((item) => (
+						<Table.ScrollArea rounded="md" height="sm">
+							<Table.Root
+								size="lg"
+								stickyHeader
+								color="gray.500"
+								height="5"
+								overflowY="scroll"
+							>
+								<Table.Header>
 									<Table.Row
-										key={item.id}
-										bgColor="whiteAlpha.100"
+										bgColor="white"
 										borderBottomColor="gray.200"
 										borderBottomWidth="3px"
 									>
-										<Table.Cell color="gray.700">{item.name}</Table.Cell>
-										<Table.Cell>{item.category}</Table.Cell>
-										<Table.Cell textAlign="end">{item.price}</Table.Cell>
+										<Table.ColumnHeader color="gray.600">
+											Product
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Category
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600" textAlign="end">
+											Price
+										</Table.ColumnHeader>
 									</Table.Row>
-								))}
-							</Table.Body>
-						</Table.Root>
+								</Table.Header>
+								<Table.Body>
+									{products.map((item) => (
+										<Table.Row
+											key={item.id}
+											bgColor="whiteAlpha.100"
+											borderBottomColor="gray.200"
+											borderBottomWidth="3px"
+										>
+											<Table.Cell color="gray.700">{item.name}</Table.Cell>
+											<Table.Cell>{item.category}</Table.Cell>
+											<Table.Cell textAlign="end">{item.price}</Table.Cell>
+										</Table.Row>
+									))}
+								</Table.Body>
+							</Table.Root>
+						</Table.ScrollArea>
 
 						<Pagination.Root count={products.length * 5} pageSize={5} page={1}>
 							<ButtonGroup

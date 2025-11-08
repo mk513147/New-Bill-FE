@@ -1,9 +1,6 @@
-import { Flex, IconButton, Center, Box, Spinner } from "@chakra-ui/react";
+import { Flex, IconButton } from "@chakra-ui/react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaSignOutAlt } from "react-icons/fa";
 import { FaTableList, FaShop, FaUsers, FaUser } from "react-icons/fa6";
-import { useState } from "react";
-import { API } from "@/apiCall/api.ts";
 
 const navItems = [
 	{ label: "Home", icon: <FaShop />, path: "/dashboard" },
@@ -11,35 +8,12 @@ const navItems = [
 	{ label: "Customer", icon: <FaUsers />, path: "/customer" },
 	{ label: "Profile", icon: <FaUser />, path: "/profile" },
 ];
-import { ToasterUtil, Toaster } from "@/components/ToasterUtil";
 
 const DockNav = () => {
-	const toastFunc = ToasterUtil();
-	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
-	const handleLogout = async () => {
-		setLoading(true);
-		try {
-			await API.post("/auth/logout");
-			localStorage.removeItem("isLoggedIn");
-			navigate("/login");
-		} catch (error: any) {
-			console.error("Logout error:", error.response?.data || error.message);
-			toastFunc("Failed to logout. Please try again.", "error");
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	return (
 		<>
-			{loading && (
-				<Box pos="absolute" inset="0" bg="bg/80" zIndex={1000}>
-					<Center h="full">
-						<Spinner color="teal.500" />
-					</Center>
-				</Box>
-			)}
 			<Flex
 				position="fixed"
 				bottom={4}
@@ -77,24 +51,6 @@ const DockNav = () => {
 					</NavLink>
 				))}
 			</Flex>
-			<IconButton
-				position="fixed"
-				bottom={4}
-				right={5}
-				py={3}
-				px={3}
-				zIndex={100}
-				onClick={handleLogout}
-				bg="teal.500"
-				color="white"
-				_hover={{ bg: "teal.600" }}
-				size="lg"
-				borderRadius="full"
-			>
-				<FaSignOutAlt />
-			</IconButton>
-
-			<Toaster />
 		</>
 	);
 };

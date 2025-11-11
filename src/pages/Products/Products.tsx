@@ -15,31 +15,49 @@ import {
 } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { IoIosSearch } from "react-icons/io";
-import { FaFilter, FaPrint, FaPlusCircle } from "react-icons/fa";
+import {
+	FaFilter,
+	FaPrint,
+	FaPlusCircle,
+	FaEdit,
+	FaTrash,
+} from "react-icons/fa";
 import "@/styles/products.css";
 
-// interface Product {
-// 	id: number;
-// 	name: string;
-// 	category: string;
-// }
-
 const products = [
-	{ id: 1, name: "Laptop", category: "Electronics", price: 200 },
-	{ id: 2, name: "Smartphone", category: "Electronics", price: 300 },
-	{ id: 3, name: "Sofa", category: "Furniture", price: 100 },
-	{ id: 4, name: "Table", category: "Furniture", price: 700 },
-	{ id: 5, name: "Shoes", category: "Fashion", price: 500 },
-	{ id: 6, name: "T-Shirt", category: "Fashion", price: 400 },
-	{ id: 7, name: "Laptop", category: "Electronics", price: 200 },
-	{ id: 8, name: "Smartphone", category: "Electronics", price: 300 },
-	{ id: 9, name: "Sofa", category: "Furniture", price: 100 },
-	{ id: 10, name: "Table", category: "Furniture", price: 700 },
-	{ id: 11, name: "Shoes", category: "Fashion", price: 500 },
-	{ id: 12, name: "T-Shirt", category: "Fashion", price: 400 },
+	{
+		id: 1,
+		name: "Laptop",
+		productQuantity: 10,
+		purchasePrice: 200,
+		sellingPrice: 250,
+		maxDiscount: 15,
+		minDiscount: 5,
+		category: "Electronics",
+		supplierInfo: "Tech World",
+		dateOfPurchase: "2025-11-01",
+		paymentStatus: "Paid",
+		discountOnBulk: "10% on 5+",
+		damagedItems: 0,
+		stock: 50,
+	},
+	{
+		id: 2,
+		name: "Shoes",
+		productQuantity: 20,
+		purchasePrice: 100,
+		sellingPrice: 150,
+		maxDiscount: 20,
+		minDiscount: 10,
+		category: "Fashion",
+		supplierInfo: "Nike India",
+		dateOfPurchase: "2025-10-25",
+		paymentStatus: "Pending",
+		discountOnBulk: "15% on 10+",
+		damagedItems: 1,
+		stock: 80,
+	},
 ];
-
-// const categories: string[] = ["All", "Electronics", "Furniture", "Fashion"];
 
 function Products() {
 	return (
@@ -49,12 +67,6 @@ function Products() {
 			height="100vh"
 			flexDirection={{ base: "column", md: "row", sm: "column" }}
 		>
-			{/* <Flex
-				width={{ base: "full", md: "20%", sm: "full" }}
-				height={{ base: "10%", md: "full", sm: "10%" }}
-				bgColor="white"
-				shadow="xl"
-			></Flex> */}
 			<Flex
 				width={{ base: "full", md: "80%", sm: "full" }}
 				height={{ base: "90%", md: "full", sm: "90%" }}
@@ -97,6 +109,7 @@ function Products() {
 						</Stack>
 					</HStack>
 				</Flex>
+
 				<Flex
 					justifyContent="space-between"
 					width="full"
@@ -119,6 +132,7 @@ function Products() {
 						</Button>
 					</HStack>
 				</Flex>
+
 				<Flex>
 					<Stack
 						width="full"
@@ -144,16 +158,50 @@ function Products() {
 										borderBottomWidth="3px"
 									>
 										<Table.ColumnHeader color="gray.600">
-											Product
+											Name
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Quantity
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Purchase Price
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Selling Price
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Max Discount
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Min Discount
 										</Table.ColumnHeader>
 										<Table.ColumnHeader color="gray.600">
 											Category
 										</Table.ColumnHeader>
-										<Table.ColumnHeader color="gray.600" textAlign="end">
-											Price
+										<Table.ColumnHeader color="gray.600">
+											Supplier Info
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Date of Purchase
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Payment Status
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Discount on Bulk
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Damaged Items
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Stock
+										</Table.ColumnHeader>
+										<Table.ColumnHeader color="gray.600">
+											Actions
 										</Table.ColumnHeader>
 									</Table.Row>
 								</Table.Header>
+
 								<Table.Body>
 									{products.map((item) => (
 										<Table.Row
@@ -163,8 +211,36 @@ function Products() {
 											borderBottomWidth="3px"
 										>
 											<Table.Cell color="gray.700">{item.name}</Table.Cell>
+											<Table.Cell>{item.productQuantity}</Table.Cell>
+											<Table.Cell>₹{item.purchasePrice}</Table.Cell>
+											<Table.Cell>₹{item.sellingPrice}</Table.Cell>
+											<Table.Cell>{item.maxDiscount}%</Table.Cell>
+											<Table.Cell>{item.minDiscount}%</Table.Cell>
 											<Table.Cell>{item.category}</Table.Cell>
-											<Table.Cell textAlign="end">{item.price}</Table.Cell>
+											<Table.Cell>{item.supplierInfo}</Table.Cell>
+											<Table.Cell>{item.dateOfPurchase}</Table.Cell>
+											<Table.Cell>{item.paymentStatus}</Table.Cell>
+											<Table.Cell>{item.discountOnBulk}</Table.Cell>
+											<Table.Cell>{item.damagedItems}</Table.Cell>
+											<Table.Cell>{item.stock}</Table.Cell>
+											<Table.Cell>
+												<HStack gap="2" justifyContent="center">
+													<IconButton
+														aria-label="Edit"
+														size="sm"
+														colorScheme="yellow"
+													>
+														<FaEdit />
+													</IconButton>
+													<IconButton
+														aria-label="Delete"
+														size="sm"
+														colorScheme="red"
+													>
+														<FaTrash />
+													</IconButton>
+												</HStack>
+											</Table.Cell>
 										</Table.Row>
 									))}
 								</Table.Body>

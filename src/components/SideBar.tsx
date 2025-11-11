@@ -26,6 +26,7 @@ const SideBar = () => {
 	const { loading, error } = useAppSelector((state) => state.auth);
 	if (error) {
 		toastFunc(error, "error");
+		console.log(error);
 	}
 
 	// const [loading, setLoading] = useState(false);

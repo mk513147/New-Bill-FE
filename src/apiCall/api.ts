@@ -15,7 +15,7 @@ export const authAPI = axios.create({
 	headers: {
 		Accept: "application/json",
 		"Content-Type": "application/json",
-		Authorization: `${localStorage.getItem("token")}`,
+		withCredentials: true,
 	},
 });
 
@@ -24,5 +24,4 @@ export const profileAPI = axios.create({
 	headers: {
 		"Content-Type": "application/json",
 	},
-	withCredentials: true,
 });

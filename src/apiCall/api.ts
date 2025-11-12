@@ -18,11 +18,3 @@ export const authAPI = axios.create({
 		withCredentials: true,
 	},
 });
-
-export const profileAPI = axios.create({
-	baseURL: import.meta.env.VITE_APP_API_URL,
-	headers: {
-		"Content-Type": "application/json",
-	},
-	withCredentials: true,
-});

@@ -9,6 +9,8 @@ import {
 } from "@chakra-ui/react";
 import { FaUpload } from "react-icons/fa";
 import "@/styles/products.css";
+import { profileAPI } from "../../apiCall/api";
+import { useEffect } from "react";
 
 interface ProfileData {
 	firstName: string;
@@ -30,6 +32,19 @@ function Profile() {
 		archiveDay: "30 Days",
 		profileImage: "./image",
 	};
+
+	const fetchUserProfile = async () => {
+		try {
+			const response = await profileAPI.get<ProfileData>("/auth/view");
+			console.log("Profile Data:", response.data);
+		} catch (error) {
+			console.error("Error fetching profile data:", error);
+		}
+	};
+
+	useEffect(() => {
+		fetchUserProfile();
+	});
 
 	return (
 		<Flex
@@ -74,6 +89,7 @@ function Profile() {
 						textAlign="left"
 						width="full"
 						fontSize="lg"
+						color={"gray.700"}
 						lineHeight="1.9"
 					>
 						<Text>

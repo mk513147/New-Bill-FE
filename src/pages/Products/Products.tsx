@@ -66,6 +66,7 @@ function Products() {
 			width="100vw"
 			height="100vh"
 			flexDirection={{ base: "column", md: "row", sm: "column" }}
+			overflow={"hidden"}
 		>
 			<Flex
 				width={{ base: "full", md: "80%", sm: "full" }}

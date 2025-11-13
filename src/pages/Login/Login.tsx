@@ -9,14 +9,16 @@ import {
 	Field,
 	Heading,
 	Flex,
-	defineStyle,
 } from "@chakra-ui/react";
+import { PasswordInput } from "@/components/ui/password-input";
+
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { API } from "@/apiCall/api.ts";
 import { useNavigate } from "react-router-dom";
 import "@/styles/loginForm.css";
 import { useState } from "react";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
+import logo from "@/assets/logo.png";
 
 interface FormValues {
 	emailId: String;
@@ -53,29 +55,6 @@ const Login = () => {
 		});
 	};
 
-	const floatingStyles = defineStyle({
-		pos: "absolute",
-		bg: "bg",
-		px: "0.5",
-		top: "-3",
-		insetStart: "2",
-		bgColor: "transparent",
-		fontWeight: "normal",
-		pointerEvents: "none",
-		transition: "position",
-		fontSize: "lg",
-		_peerPlaceholderShown: {
-			color: "gray.500",
-			top: "2.5",
-			insetStart: "3",
-		},
-		_peerFocusVisible: {
-			color: "teal.500",
-			top: "-6",
-			insetStart: "2",
-		},
-	});
-
 	return (
 		<>
 			{loading && (
@@ -89,9 +68,13 @@ const Login = () => {
 				<Flex
 					width={"45%"}
 					height={"100%"}
-					bgColor="blue.500"
+					bgColor="#0074E4"
+					alignItems={"center"}
+					justifyContent={"center"}
 					roundedRight="xl"
-				></Flex>
+				>
+					<img src={logo} alt="Logo" height="450px" width="450px" />
+				</Flex>
 				<Flex
 					width="55%"
 					height="100%"
@@ -108,24 +91,25 @@ const Login = () => {
 						bgColor="whiteAlpha.800"
 						backdropFilter="blur(1px)"
 						p={8}
-						borderRadius="lg"
-						boxShadow="xl"
 					>
 						<Flex
-							justifyContent="center"
-							alignItems="center"
+							direction="column"
+							justifyContent="flex-start"
 							width="100%"
-							mb={6}
+							mb={8}
 						>
 							<Heading
-								size="5xl"
-								textAlign="center"
+								size="4xl"
+								textAlign="left"
 								fontWeight="medium"
-								color="teal.400"
-								letterSpacing="widest"
-								mb={8}
+								color="gray.700"
+								letterSpacing="wide"
+								mb={4}
 							>
-								LOGIN
+								Welcome Back
+							</Heading>
+							<Heading size="md" color="gray.600">
+								Welcome back! Please enter your details.
 							</Heading>
 						</Flex>
 						<form
@@ -135,6 +119,9 @@ const Login = () => {
 							<Stack align="center" width="100%" justify="center" gap={4}>
 								<Field.Root width="100%" mb={6}>
 									<Box pos="relative" w="full">
+										<Field.Label color="gray.500" fontSize="md" mb={1}>
+											Email
+										</Field.Label>
 										<Input
 											{...register("emailId", {
 												required: "Email Id is required",
@@ -148,19 +135,19 @@ const Login = () => {
 											borderColor="teal.300"
 											_focus={{ outlineColor: "teal.500" }}
 										/>
-										<Field.Label css={floatingStyles} color="teal.400">
-											Email
-										</Field.Label>
 									</Box>
 								</Field.Root>
 
 								<Field.Root width="100%" mb={6}>
 									<Box pos="relative" w="full">
-										<Input
+										<Field.Label color="gray.500" fontSize="md" mb={1}>
+											Password
+										</Field.Label>
+										<PasswordInput
 											{...register("password", {
 												required: "Password is required",
 											})}
-											type="password"
+											// type="password"
 											variant="outline"
 											placeholder=""
 											size="lg"
@@ -170,9 +157,6 @@ const Login = () => {
 											borderColor="teal.300"
 											_focus={{ outlineColor: "teal.500" }}
 										/>
-										<Field.Label css={floatingStyles} color="teal.400">
-											Password
-										</Field.Label>
 									</Box>
 								</Field.Root>
 
@@ -188,7 +172,7 @@ const Login = () => {
 									}}
 									transition="all 0.3s ease-in-out"
 									fontSize="xl"
-									borderRadius="full"
+									borderRadius="lg"
 									letterSpacing="widest"
 								>
 									LOGIN

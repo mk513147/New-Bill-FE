@@ -11,38 +11,33 @@ import {
 	Spinner,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { API } from "@/apiCall/api";
 import { FaSignOutAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect } from "react";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil";
-// import { useAppDispatch, useAppSelector } from "../app/hooks";
-// import { logoutUser } from "../features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { logoutUser } from "../features/auth/authSlice";
 
 const SideBar = () => {
 	const toastFunc = ToasterUtil();
 	const navigate = useNavigate();
 
-	// const dispatch = useAppDispatch();
-	// const { loading, error } = useAppSelector((state) => state.auth);
-	// if (error) {
-	// 	toastFunc(error, "error");
-	// 	console.log(error);
-	// }
+	const dispatch = useAppDispatch();
+	const { loading, error, isAuthenticated } = useAppSelector(
+		(state) => state.auth
+	);
+	console.log("Auth state:", isAuthenticated);
 
-	const [loading, setLoading] = useState(false);
-	const handleLogout = async () => {
-		setLoading(true);
-		try {
-			await API.post("/auth/logout");
-			localStorage.removeItem("isLoggedIn");
+	useEffect(() => {
+		if (!isAuthenticated) {
+			console.log("Auth state:", isAuthenticated);
 			navigate("/login");
-		} catch (error: any) {
-			console.error("Logout error:", error.response?.data || error.message);
-			toastFunc("Failed to logout. Please try again.", "error");
-		} finally {
-			setLoading(false);
 		}
-	};
+		if (error) {
+			toastFunc(error, "error");
+			console.log(error);
+		}
+	}, [isAuthenticated, error]);
+
 	return (
 		<>
 			{loading && (
@@ -84,8 +79,8 @@ const SideBar = () => {
 						</Text>
 					</Stack>
 					<IconButton
-						// onClick={() => dispatch(logoutUser())}
-						onClick={handleLogout}
+						onClick={() => dispatch(logoutUser())}
+						// onClick={handleLogout}
 						disabled={loading}
 						bg="teal.500"
 						color="white"

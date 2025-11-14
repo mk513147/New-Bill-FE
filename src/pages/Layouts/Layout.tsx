@@ -5,16 +5,16 @@ import SideBar from "@/components/SideBar.tsx";
 import { Flex } from "@chakra-ui/react";
 
 const Layout = () => {
-	const navigate = useNavigate();
-	const isLoggedIn = localStorage.getItem("isLoggedIn");
+	// const navigate = useNavigate();
+	// const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-	useEffect(() => {
-		if (isLoggedIn) {
-			navigate("/dashboard");
-		} else {
-			navigate("/login");
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (isLoggedIn) {
+	// 		navigate("/dashboard");
+	// 	} else {
+	// 		navigate("/login");
+	// 	}
+	// }, []);
 
 	return (
 		<>

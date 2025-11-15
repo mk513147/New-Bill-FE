@@ -80,7 +80,6 @@ const SideBar = () => {
 					</Stack>
 					<IconButton
 						onClick={() => dispatch(logoutUser())}
-						// onClick={handleLogout}
 						disabled={loading}
 						bg="teal.500"
 						color="white"

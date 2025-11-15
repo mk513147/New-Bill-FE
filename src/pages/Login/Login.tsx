@@ -13,12 +13,12 @@ import {
 import { PasswordInput } from "@/components/ui/password-input";
 
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
-import { API } from "@/apiCall/api.ts";
-import { useNavigate } from "react-router-dom";
 import "@/styles/loginForm.css";
-import { useState } from "react";
+import { useEffect } from "react";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
 import logo from "@/assets/logo.png";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { loginUser } from "@/features/auth/authSlice";
 
 interface FormValues {
 	emailId: String;
@@ -26,27 +26,14 @@ interface FormValues {
 }
 
 const Login = () => {
-	const [loading, setLoading] = useState(false);
-	const navigate = useNavigate();
 	const toastFunc = ToasterUtil();
 
 	const { register, handleSubmit } = useForm<FormValues>();
+	const dispatch = useAppDispatch();
+	const { loading, error } = useAppSelector((state) => state.auth);
 
 	const onSubmit: SubmitHandler<FormValues> = async (creds: any) => {
-		setLoading(true);
-		try {
-			const { data } = await API.post("auth/login", creds);
-			if (data.statusCode === 200) {
-				localStorage.setItem("isLoggedIn", "true");
-				navigate("/dashboard");
-				console.log(`Logged In Successfully!!.`);
-			}
-		} catch (error: any) {
-			console.error("Login error:", error.message);
-			toastFunc(`Invalid credentials. Please try again.`, `error`);
-		} finally {
-			setLoading(false);
-		}
+		dispatch(loginUser(creds));
 	};
 
 	const onError = (errors: FieldErrors<FormValues>) => {
@@ -54,6 +41,12 @@ const Login = () => {
 			toastFunc(error?.message || "Fill the required fields", "error");
 		});
 	};
+
+	useEffect(() => {
+		if (error) {
+			toastFunc(error, "error");
+		}
+	}, [error]);
 
 	return (
 		<>

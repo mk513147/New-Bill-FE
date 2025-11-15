@@ -92,7 +92,7 @@ const Login = () => {
 							mb={8}
 						>
 							<Heading
-								size="4xl"
+								size="5xl"
 								textAlign="left"
 								fontWeight="medium"
 								color="gray.700"
@@ -101,7 +101,7 @@ const Login = () => {
 							>
 								Welcome Back
 							</Heading>
-							<Heading size="md" color="gray.600">
+							<Heading size="xl" color="gray.600">
 								Welcome back! Please enter your details.
 							</Heading>
 						</Flex>
@@ -109,10 +109,10 @@ const Login = () => {
 							onSubmit={handleSubmit(onSubmit, onError)}
 							className="login-form"
 						>
-							<Stack align="center" width="100%" justify="center" gap={4}>
+							<Stack align="center" width="100%" justify="center" gap={3}>
 								<Field.Root width="100%" mb={6}>
 									<Box pos="relative" w="full">
-										<Field.Label color="gray.500" fontSize="md" mb={1}>
+										<Field.Label color="gray.500" fontSize="lg" mb={1}>
 											Email
 										</Field.Label>
 										<Input
@@ -133,14 +133,13 @@ const Login = () => {
 
 								<Field.Root width="100%" mb={6}>
 									<Box pos="relative" w="full">
-										<Field.Label color="gray.500" fontSize="md" mb={1}>
+										<Field.Label color="gray.500" fontSize="lg" mb={1}>
 											Password
 										</Field.Label>
 										<PasswordInput
 											{...register("password", {
 												required: "Password is required",
 											})}
-											// type="password"
 											variant="outline"
 											placeholder=""
 											size="lg"

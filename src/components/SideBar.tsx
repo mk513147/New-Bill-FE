@@ -25,7 +25,6 @@ const SideBar = () => {
 	const { loading, error, isAuthenticated } = useAppSelector(
 		(state) => state.auth
 	);
-	console.log("Auth state:", isAuthenticated);
 
 	useEffect(() => {
 		if (!isAuthenticated) {

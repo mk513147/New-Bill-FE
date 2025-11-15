@@ -1,4 +1,3 @@
-// import RequireAuth from "@/features/hooks/requireAuth.tsx";
 import {
 	Dashboard,
 	Customer,

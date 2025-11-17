@@ -1,11 +1,24 @@
-import PageRouter from "./routes/PageRouter";
+import PageRouter from "./Routes/PageRouter.tsx";
+import { Provider as ReduxProvider } from "react-redux";
 
-function App() {
-	return (
-		<>
-			<PageRouter />
-		</>
-	);
-}
+import { store } from "./Redux/store.ts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ChakraProvider } from "@chakra-ui/react";
+import { theme } from "./Styles/theme.ts";
+
+const queryClient = new QueryClient();
+const App = () => {
+  return (
+    <>
+      <QueryClientProvider client={queryClient}>
+        <ReduxProvider store={store}>
+          <ChakraProvider theme={theme}>
+            <PageRouter />
+          </ChakraProvider>
+        </ReduxProvider>
+      </QueryClientProvider>
+    </>
+  );
+};
 
 export default App;

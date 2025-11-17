@@ -1,120 +1,131 @@
 import {
-	Avatar,
-	Box,
-	Button,
-	Flex,
-	Stack,
-	Text,
-	Heading,
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Stack,
+  Text,
+  Heading,
+  Divider,
+  Icon,
 } from "@chakra-ui/react";
-import { FaUpload } from "react-icons/fa";
-import "@/styles/products.css";
-import { API } from "../../apiCall/api";
-import { useEffect } from "react";
-
-interface ProfileData {
-	firstName: string;
-	lastName: string;
-	emailId: string;
-	mobileNumber: string;
-	shopName: string;
-	archiveDay: string;
-	profileImage?: string;
-}
+import { FaUpload, FaUser, FaEnvelope, FaPhone, FaStore } from "react-icons/fa";
+import { MdRestore } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 function Profile() {
-	const profile: ProfileData = {
-		firstName: "Kaushal",
-		lastName: "Raj",
-		emailId: "kaushal@example.com",
-		mobileNumber: "9876543210",
-		shopName: "Raj Electronics",
-		archiveDay: "30 Days",
-		profileImage: "./image",
-	};
+  const user = useSelector((state: any) => state.profile.profile);
 
-	const fetchUserProfile = async () => {
-		try {
-			const response = await API.get("/auth/view");
-			console.log("Profile Data:", response.data);
-		} catch (error) {
-			console.error("Error fetching profile data:", error);
-		}
-	};
+  return (
+    <Flex
+      bg="linear-gradient(135deg, #0074E4 0%, #00C2FF 100%)"
+      width="100vw"
+      height="100vh"
+      justifyContent="center"
+      alignItems="center"
+      p={6}
+    >
+      <Box
+        bg="whiteAlpha.900"
+        p={10}
+        rounded="3xl"
+        shadow="2xl"
+        width={{ base: "full", md: "70%", lg: "50%" }}
+        backdropFilter="blur(12px)"
+      >
+        <Stack gap={8} align="center" textAlign="center">
+          {/* Title */}
+          <Heading size="2xl" color="#0074E4" letterSpacing="wide">
+            My Profile
+          </Heading>
 
-	useEffect(() => {
-		fetchUserProfile();
-	});
+          {/* Profile Image + Upload Button */}
+          <Flex direction="column" alignItems="center" gap={4}>
+            <Avatar
+              size="2xl"
+              name={`${user?.firstName} ${user?.lastName}`}
+              src={user?.profileImage || ""}
+              bg="gray.300"
+              shadow="lg"
+            />
 
-	return (
-		<Flex
-			bgColor="gray.100"
-			width="100vw"
-			height="100vh"
-			justifyContent="center"
-			alignItems="center"
-			padding={6}
-		>
-			<Box
-				bg="white"
-				p={10}
-				rounded="2xl"
-				shadow="md"
-				width={{ base: "full", md: "60%", lg: "45%" }}
-			>
-				<Stack gap={8} align="center" textAlign="center">
-					<Heading size="2xl" color="#0074E4">
-						My Profile
-					</Heading>
+            <Button
+              variant="outline"
+              borderColor="#0074E4"
+              color="#0074E4"
+              _hover={{ bg: "#E5F3FF" }}
+              leftIcon={<FaUpload />}
+            >
+              Upload Image
+            </Button>
+          </Flex>
 
-					{/* Larger Profile Image */}
-					<Flex direction="column" alignItems="center" gap={4}>
-						<Avatar.Root size="2xl" bgColor="gray.200">
-							<Avatar.Image src={profile.profileImage || "./image"} />
-							<Avatar.Fallback name={profile.firstName} />
-						</Avatar.Root>
+          <Divider borderColor="gray.300" />
 
-						<Button variant="outline" colorScheme="blue" color={"gray.500"}>
-							<FaUpload style={{ marginRight: 8 }} />
-							Upload Image
-						</Button>
-					</Flex>
+          {/* Profile Details Card */}
+          <Box
+            w="full"
+            bg="white"
+            p={8}
+            rounded="2xl"
+            shadow="lg"
+            textAlign="left"
+            border="1px solid rgba(0,0,0,0.05)"
+          >
+            <Stack gap={5} fontSize="lg" color="gray.700">
+              {/* First Name */}
+              <Flex align="center" gap={4}>
+                <Icon as={FaUser} color="#0074E4" boxSize={6} />
+                <Text>
+                  <strong>First Name:</strong> {user?.firstName}
+                </Text>
+              </Flex>
 
-					{/* Profile Details */}
-					<Box
-						bg="gray.50"
-						p={6}
-						rounded="lg"
-						shadow="inner"
-						textAlign="left"
-						width="full"
-						fontSize="lg"
-						color={"gray.700"}
-						lineHeight="1.9"
-					>
-						<Text>
-							<strong>First Name:</strong> {profile.firstName}
-						</Text>
-						<Text>
-							<strong>Last Name:</strong> {profile.lastName}
-						</Text>
-						<Text>
-							<strong>Email ID:</strong> {profile.emailId}
-						</Text>
-						<Text>
-							<strong>Mobile Number:</strong> {profile.mobileNumber}
-						</Text>
-						<Text>
-							<strong>Shop Name:</strong> {profile.shopName}
-						</Text>
-						<Text>
-							<strong>Archive Day:</strong> {profile.archiveDay}
-						</Text>
-					</Box>
-				</Stack>
-			</Box>
-		</Flex>
-	);
+              {/* Last Name */}
+              <Flex align="center" gap={4}>
+                <Icon as={FaUser} color="#0074E4" boxSize={6} />
+                <Text>
+                  <strong>Last Name:</strong> {user?.lastName}
+                </Text>
+              </Flex>
+
+              {/* Email */}
+              <Flex align="center" gap={4}>
+                <Icon as={FaEnvelope} color="#0074E4" boxSize={6} />
+                <Text>
+                  <strong>Email:</strong> {user?.emailId}
+                </Text>
+              </Flex>
+
+              {/* Mobile Number */}
+              <Flex align="center" gap={4}>
+                <Icon as={FaPhone} color="#0074E4" boxSize={6} />
+                <Text>
+                  <strong>Mobile:</strong> {user?.mobileNumber}
+                </Text>
+              </Flex>
+
+              {/* Shop Name */}
+              <Flex align="center" gap={4}>
+                <Icon as={FaStore} color="#0074E4" boxSize={6} />
+                <Text>
+                  <strong>Shop Name:</strong> {user?.shopName}
+                </Text>
+              </Flex>
+
+              {/* Archive Day */}
+              <Flex align="center" gap={4}>
+                <Icon as={MdRestore} color="#0074E4" boxSize={6} />
+                <Text>
+                  <strong>Archive Day:</strong> {user?.archiveDay}
+                </Text>
+              </Flex>
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
+    </Flex>
+  );
 }
 
 export default Profile;

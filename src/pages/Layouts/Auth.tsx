@@ -1,24 +1,49 @@
-import { useAppSelector } from "@/app/hooks";
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useProfile } from "@/Hooks/useProfile";
+import { useDispatch } from "react-redux";
+import { setProfile, resetProfile } from "@/Redux/Slices/profileSlice";
 
 const Auth = () => {
-	const navigate = useNavigate();
-	const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
-	useEffect(() => {
-		if (isAuthenticated) {
-			navigate("/dashboard");
-		} else {
-			navigate("/login");
-		}
-	}, [isAuthenticated]);
+  const { data, isLoading, isError } = useProfile();
+  const isLoggedIn = localStorage.getItem("eb_logged_in") === "true";
+  const token = localStorage.getItem("token");
 
-	return (
-		<>
-			<Outlet />
-		</>
-	);
+  useEffect(() => {
+    if (!isLoggedIn || !token) {
+      localStorage.setItem("eb_logged_in", "false");
+      dispatch(resetProfile());
+
+      if (location.pathname !== "/login") {
+        navigate("/login", { replace: true });
+      }
+      return;
+    }
+
+    if (isLoggedIn && location.pathname === "/login") {
+      navigate("/dashboard", { replace: true });
+    }
+
+    if (isLoading) return;
+
+    if (data) {
+      dispatch(setProfile(data));
+      return;
+    }
+
+    if (isError) {
+      localStorage.removeItem("token");
+      localStorage.setItem("eb_logged_in", "false");
+      dispatch(resetProfile());
+      navigate("/login", { replace: true });
+    }
+  }, [isLoggedIn, token, data, isError, isLoading, location.pathname]);
+
+  return <Outlet />;
 };
 
 export default Auth;

@@ -17,29 +17,32 @@ export const theme = extendTheme({
   colors: {
     subtle: "#9D9D9D",
     brand: "#8155FE",
+
     light: {
       menu: {
-        bg: "#FFFFFF",
-        text: "#0E1207",
+        bg: "#F7F7F7", // soft premium light bg
+        text: "#0E0E0E",
         primary: "#09090B",
-        secondary: "#F0F0F0",
+        secondary: "#ECECEC",
         card_bg: "#FFFFFF",
-        card_border: "#E7E7E7",
-        icon_color: "black",
+        card_border: "#D9D9D9",
+        icon_color: "#0E0E0E",
       },
     },
+
     dark: {
       menu: {
-        bg: "#111111",
+        bg: "#0D0D0F", // premium matte dark
         text: "#FFFFFF",
         primary: "#8155FE",
-        secondary: "#1E1E1E",
-        card_bg: "#1E1E1E",
-        card_border: "#323232",
-        icon_color: "white",
+        secondary: "#171717",
+        card_bg: "#1A1A1D",
+        card_border: "#2A2A2D",
+        icon_color: "#FFFFFF",
       },
     },
   },
+
   components: {
     Link: {
       baseStyle: {

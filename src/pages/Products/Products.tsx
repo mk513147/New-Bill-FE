@@ -27,6 +27,9 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { useDispatch } from "react-redux";
+import { setActiveTab } from "@/Redux/Slices/dockSlice";
+import { useEffect } from "react";
 
 const products = [
   {
@@ -48,8 +51,14 @@ const products = [
 ];
 
 function Products() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setActiveTab("products"));
+  }, []);
+
   return (
-    <Flex bg="gray.100" w="100vw" h="100vh" direction="column" p={6}>
+    <Flex w="100vw" h="100vh" direction="column" p={6}>
       {/* Header Search + Profile */}
       <Flex justify="space-between" align="center" mb={8}>
         <InputGroup w="40%">

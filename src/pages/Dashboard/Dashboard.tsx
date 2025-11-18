@@ -1,8 +1,17 @@
+import { setActiveTab } from "@/Redux/Slices/dockSlice";
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 function Dashboard() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setActiveTab("home"));
+  }, []);
+
   return (
-    <Flex h="100vh" w="100vw" bgColor="gray.100" color="gray.800">
+    <Flex h="100vh" w="100vw">
       {/* Main Content */}
       <Box flex={1} p={5}>
         <Heading size="lg">Welcome to Dashboard</Heading>

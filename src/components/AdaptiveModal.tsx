@@ -74,8 +74,8 @@ export default function AdaptiveModal({
 							p={4}
 							maxH="400px"
 							overflowY="auto"
-							display="flex"
-							flexDirection="column"
+							display="grid"
+							gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))"
 							gap={4}
 						>
 							{fields.map((field) => (

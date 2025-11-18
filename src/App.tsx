@@ -3,8 +3,9 @@ import { Provider as ReduxProvider } from "react-redux";
 
 import { store } from "./Redux/store.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ChakraProvider } from "@chakra-ui/react";
-import { theme } from "./styles/theme.ts";
+import { Provider as UIProvider } from "@/components/ui/provider.tsx";
+// import { ChakraProvider } from "@chakra-ui/react";
+// import { theme } from "./styles/theme.ts";
 
 const queryClient = new QueryClient();
 const App = () => {
@@ -12,9 +13,9 @@ const App = () => {
 		<>
 			<QueryClientProvider client={queryClient}>
 				<ReduxProvider store={store}>
-					<ChakraProvider theme={theme}>
+					<UIProvider>
 						<PageRouter />
-					</ChakraProvider>
+					</UIProvider>
 				</ReduxProvider>
 			</QueryClientProvider>
 		</>

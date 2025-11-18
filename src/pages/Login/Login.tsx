@@ -8,21 +8,19 @@ import {
 	Link,
 	Heading,
 	Flex,
-	Text,
-	IconButton,
-	InputGroup,
 	Field,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import "@/styles/loginForm.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import logo from "@/assets/logo.png";
 import { ToasterUtil, Toaster } from "@/components/ToasterUtil.tsx";
 import { API } from "@/Api/api";
 import { useNavigate } from "react-router-dom";
 import { setProfile } from "@/Redux/Slices/profileSlice";
 import { useDispatch } from "react-redux";
+import { AxiosError } from "axios";
 import API_ENDPOINTS from "@/Api/apiEndpoints";
 
 interface FormValues {
@@ -40,26 +38,27 @@ const Login = () => {
 
 	const onSubmit: SubmitHandler<FormValues> = async (creds) => {
 		setLoading(true);
+
 		try {
 			const res = await API.post(API_ENDPOINTS.AUTH.SIGNIN, creds);
 
 			if (res.status === 200) {
 				localStorage.setItem("token", res.data.token);
 				localStorage.setItem("eb_logged_in", "true");
-				console.log("Login response data:", res);
 
 				dispatch(setProfile(res.data.data.data));
-
 				navigate("/dashboard");
-				setLoading(false);
 				return;
 			}
+		} catch (error) {
+			console.error("Login error:", error);
 
-			setLoading(false);
-			toastFunc("Invalid Credentials", "error");
-		} catch (err: any) {
-			setLoading(false);
-			toastFunc(err?.message || "Something Went Wrong", "error");
+			if (error instanceof AxiosError) {
+				const msg = error.response?.data?.message || "Invalid Credentials";
+				toastFunc(msg, "error");
+			} else {
+				toastFunc("Something Went Wrong", "error");
+			}
 		} finally {
 			setLoading(false);
 		}

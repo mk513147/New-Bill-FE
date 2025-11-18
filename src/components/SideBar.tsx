@@ -18,32 +18,35 @@ import API_ENDPOINTS from "@/Api/apiEndpoints";
 import { resetProfile } from "@/Redux/Slices/profileSlice";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import { Toaster, ToasterUtil } from "./ToasterUtil";
 
 const SideBar = () => {
+	const toastFunc = ToasterUtil();
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	const handleLogout = async () => {
 		setLoading(true);
+
 		try {
 			const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT);
 
-			if (res.status === 200) {
-				localStorage.clear();
-
-				dispatch(resetProfile());
-
-				navigate("/login", { replace: true });
+			if (res.status !== 200) {
+				throw new Error("Logout failed");
 			}
-			setLoading(false);
 		} catch (error) {
-			setLoading(false);
-			localStorage.clear();
-			dispatch(resetProfile());
-			navigate("/login", { replace: true });
+			console.error("Logout error:", error);
+			toastFunc("Error logging out. Please try again.", "error");
 		}
+
+		localStorage.clear();
+		dispatch(resetProfile());
+		navigate("/login", { replace: true });
+
+		setLoading(false);
 	};
+
 	return (
 		<>
 			{loading && (
@@ -97,6 +100,7 @@ const SideBar = () => {
 					</IconButton>
 				</HStack>
 			</Flex>
+			<Toaster />
 		</>
 	);
 };

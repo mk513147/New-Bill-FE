@@ -6,45 +6,43 @@ import {
 	Stack,
 	Text,
 	Heading,
+	Skeleton,
+	SkeletonText,
 } from "@chakra-ui/react";
 import { FaUpload } from "react-icons/fa";
 import "@/styles/products.css";
-import { API } from "../../Api/api";
-import { useEffect } from "react";
-
-interface ProfileData {
-	firstName: string;
-	lastName: string;
-	emailId: string;
-	mobileNumber: string;
-	shopName: string;
-	archiveDay: string;
-	profileImage?: string;
-}
+import { useProfile } from "@/Hooks/useProfile";
+import { ToasterUtil } from "@/components/ToasterUtil";
 
 function Profile() {
-	const profile: ProfileData = {
-		firstName: "Kaushal",
-		lastName: "Raj",
-		emailId: "kaushal@example.com",
-		mobileNumber: "9876543210",
-		shopName: "Raj Electronics",
-		archiveDay: "30 Days",
-		profileImage: "./image",
-	};
+	const { data, isLoading, isError } = useProfile();
+	const toast = ToasterUtil();
 
-	const fetchUserProfile = async () => {
-		try {
-			const response = await API.get("/auth/view");
-			console.log("Profile Data:", response.data);
-		} catch (error) {
-			console.error("Error fetching profile data:", error);
-		}
-	};
+	if (isLoading) {
+		return (
+			<Box maxW="600px" mx="auto" p={6}>
+				<Flex align="center" gap={4}>
+					<Skeleton height="60px" width="60px" borderRadius="50%" />
+					<Box flex="1">
+						<Skeleton height="20px" width="150px" mb={2} />
+						<Skeleton height="16px" width="200px" />
+					</Box>
+				</Flex>
 
-	useEffect(() => {
-		fetchUserProfile();
-	});
+				<Box mt={6}>
+					<SkeletonText mt="4" noOfLines={4} gap="4" />
+				</Box>
+			</Box>
+		);
+	}
+
+	if (isError) {
+		toast("Error while fetching data", "error");
+	}
+
+	if (!data) {
+		toast("No profile data found", "error");
+	}
 
 	return (
 		<Flex
@@ -70,8 +68,8 @@ function Profile() {
 					{/* Larger Profile Image */}
 					<Flex direction="column" alignItems="center" gap={4}>
 						<Avatar.Root size="2xl" bgColor="gray.200">
-							<Avatar.Image src={profile.profileImage || "./image"} />
-							<Avatar.Fallback name={profile.firstName} />
+							{/* <Avatar.Image src={profile.profileImage || "./image"} />
+							<Avatar.Fallback name={data.firstName} /> */}
 						</Avatar.Root>
 
 						<Button variant="outline" colorScheme="blue" color={"gray.500"}>
@@ -93,22 +91,22 @@ function Profile() {
 						lineHeight="1.9"
 					>
 						<Text>
-							<strong>First Name:</strong> {profile.firstName}
+							<strong>First Name:</strong> {data.firstName}
 						</Text>
 						<Text>
-							<strong>Last Name:</strong> {profile.lastName}
+							<strong>Last Name:</strong> {data.lastName}
 						</Text>
 						<Text>
-							<strong>Email ID:</strong> {profile.emailId}
+							<strong>Email ID:</strong> {data.emailId}
 						</Text>
 						<Text>
-							<strong>Mobile Number:</strong> {profile.mobileNumber}
+							<strong>Mobile Number:</strong> {data.mobileNumber}
 						</Text>
 						<Text>
-							<strong>Shop Name:</strong> {profile.shopName}
+							<strong>Shop Name:</strong> {data.shopName}
 						</Text>
 						<Text>
-							<strong>Archive Day:</strong> {profile.archiveDay}
+							<strong>Archive Day:</strong> {data.archiveDay}
 						</Text>
 					</Box>
 				</Stack>

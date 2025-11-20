@@ -3,8 +3,9 @@ import { API } from "@/Api/api";
 import API_ENDPOINTS from "@/Api/apiEndpoints";
 
 export const getProfile = async () => {
-	const { data } = await API.get(API_ENDPOINTS.MERCHANT.PROFILE);
-	return data.user;
+	const res = await API.get(API_ENDPOINTS.MERCHANT.PROFILE);
+	// await new Promise((resolve) => setTimeout(resolve, 5000));
+	return res.data?.data || null;
 };
 
 export const useProfile = () => {

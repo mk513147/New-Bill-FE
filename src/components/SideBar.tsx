@@ -18,7 +18,7 @@ import API_ENDPOINTS from "@/Api/apiEndpoints";
 import { resetProfile } from "@/Redux/Slices/profileSlice";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
-import { Toaster, ToasterUtil } from "./ToasterUtil";
+import { ToasterUtil } from "./ToasterUtil";
 
 const SideBar = () => {
 	const toastFunc = ToasterUtil();
@@ -100,7 +100,6 @@ const SideBar = () => {
 					</IconButton>
 				</HStack>
 			</Flex>
-			<Toaster />
 		</>
 	);
 };

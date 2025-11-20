@@ -206,8 +206,6 @@ const Login = () => {
 					</Flex>
 				</Flex>
 			</Flex>
-
-			<Toaster />
 		</>
 	);
 };

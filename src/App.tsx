@@ -4,8 +4,6 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./Redux/store.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as UIProvider } from "@/components/ui/provider.tsx";
-// import { ChakraProvider } from "@chakra-ui/react";
-// import { theme } from "./styles/theme.ts";
 
 const queryClient = new QueryClient();
 const App = () => {

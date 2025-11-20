@@ -28,8 +28,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 					toast("Created successfully!", "success");
 					queryClient.invalidateQueries({ queryKey: [baseKey] });
 				},
-				onError: (err: any) =>
-					toast(err.response?.data?.message || "Create failed", "error"),
 			});
 		},
 
@@ -45,8 +43,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 					toast("Updated successfully!", "success");
 					queryClient.invalidateQueries({ queryKey: [baseKey] });
 				},
-				onError: (err: any) =>
-					toast(err.response?.data?.message || "Update failed", "error"),
 			});
 		},
 
@@ -62,8 +58,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 					toast("Deleted successfully!", "success");
 					queryClient.invalidateQueries({ queryKey: [baseKey] });
 				},
-				onError: (err: any) =>
-					toast(err.response?.data?.message || "Delete failed", "error"),
 			});
 		},
 	};

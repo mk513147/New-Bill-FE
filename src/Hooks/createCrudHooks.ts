@@ -6,7 +6,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 	const toast = ToasterUtil();
 
 	return {
-		/** ---------- GET ALL ---------- **/
 		useGetAll: () =>
 			useQuery({
 				queryKey: [baseKey, "list"],
@@ -16,7 +15,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 				},
 			}),
 
-		/** ---------- CREATE ---------- **/
 		useCreate: () => {
 			const queryClient = useQueryClient();
 			return useMutation({
@@ -31,7 +29,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 			});
 		},
 
-		/** ---------- UPDATE ---------- **/
 		useUpdate: () => {
 			const queryClient = useQueryClient();
 			return useMutation({
@@ -46,7 +43,6 @@ export const createCrudHooks = (baseEndpoint: string, baseKey: string) => {
 			});
 		},
 
-		/** ---------- DELETE ---------- **/
 		useDelete: () => {
 			const queryClient = useQueryClient();
 			return useMutation({

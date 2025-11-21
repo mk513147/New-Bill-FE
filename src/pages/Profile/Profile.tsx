@@ -1,20 +1,4 @@
 import {
-<<<<<<< HEAD
-	Avatar,
-	Box,
-	Button,
-	Flex,
-	Stack,
-	Text,
-	Heading,
-	Skeleton,
-	SkeletonText,
-} from "@chakra-ui/react";
-import { FaUpload } from "react-icons/fa";
-import "@/styles/products.css";
-import { useProfile } from "@/hooks/useProfile.ts";
-import { ToasterUtil } from "@/components/ToasterUtil.tsx";
-=======
   Avatar,
   Box,
   Button,
@@ -27,10 +11,9 @@ import { ToasterUtil } from "@/components/ToasterUtil.tsx";
 } from '@chakra-ui/react'
 import { FaUpload } from 'react-icons/fa'
 import '@/styles/products.css'
-import { useProfile } from '@/Hooks/useProfile'
-import { ToasterUtil } from '@/components/ToasterUtil'
-import { useProfileActions } from '@/Hooks/useProfileActions'
->>>>>>> d75b31d56762c7a56c7662413c60c423e933a7d9
+import { useProfile } from '@/hooks/useProfile.ts'
+import { ToasterUtil } from '@/components/ToasterUtil.tsx'
+import { useProfileActions } from '@/hooks/useProfileActions'
 
 function Profile() {
   const { data, isLoading, isError } = useProfile()

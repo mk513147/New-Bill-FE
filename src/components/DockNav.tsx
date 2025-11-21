@@ -1,56 +1,106 @@
 import { Flex, IconButton } from '@chakra-ui/react'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { FaTableList, FaShop, FaUsers, FaUser } from 'react-icons/fa6'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import {
+  FaTableList,
+  FaShop,
+  FaUsers,
+  FaUser,
+  FaChevronLeft,
+  FaChevronRight,
+} from 'react-icons/fa6'
+import { useState } from 'react'
 
 const navItems = [
-  { label: 'Home', icon: <FaShop />, path: '/dashboard' },
-  { label: 'Products', icon: <FaTableList />, path: '/products' },
-  { label: 'Customer', icon: <FaUsers />, path: '/customer' },
-  { label: 'Profile', icon: <FaUser />, path: '/profile' },
+  { label: 'Home', icon: FaShop, path: '/dashboard' },
+  { label: 'Products', icon: FaTableList, path: '/products' },
+  { label: 'Customer', icon: FaUsers, path: '/customer' },
+  { label: 'Profile', icon: FaUser, path: '/profile' },
 ]
 
 const DockNav = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const [collapsed, setCollapsed] = useState(false)
+  const activeItem = navItems.find((i) => i.path === location.pathname)
 
   return (
     <>
+      {/* SINGLE ACTIVE ICON (Collapsed Mode) */}
+      {collapsed && activeItem && (
+        <Flex
+          position="fixed"
+          bottom={30}
+          left={20}
+          alignItems="center"
+          justifyContent="center"
+          bg="rgba(255,255,255,0.6)"
+          backdropFilter="blur(20px)"
+          borderRadius="full"
+          p={4}
+          boxShadow="0px 8px 30px rgba(0,0,0,0.25)"
+          zIndex={300}
+          cursor="pointer"
+          transition="all 0.35s ease"
+          onClick={() => setCollapsed(false)}
+        >
+          <activeItem.icon size={26} color="#0d9488" />
+        </Flex>
+      )}
+
+      {/* MAIN DOCK - MAC STYLE */}
       <Flex
         position="fixed"
-        mb={1}
-        bottom={4}
+        bottom={6}
         left="50%"
-        transform="translateX(-50%)"
-        bg="white"
+        transform={`translateX(-50%) ${
+          collapsed ? 'translateY(40px) scale(0.2)' : 'translateY(0) scale(1)'
+        }`}
+        opacity={collapsed ? 0 : 1}
+        transition="all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)"
+        bg="rgba(255,255,255,0.55)"
+        backdropFilter="blur(20px)"
+        px={5}
         py={3}
-        px={4}
-        justifyContent="space-around"
-        alignItems="center"
-        boxShadow="xl"
-        zIndex={100}
-        borderRadius="full"
+        borderRadius="2xl"
+        boxShadow="0 10px 35px rgba(0,0,0,0.2)"
+        border="1px solid rgba(255,255,255,0.4)"
+        zIndex={200}
         width="70%"
         maxW="420px"
-        border="1px solid"
-        borderColor="gray.200"
+        justifyContent="space-between"
+        alignItems="center"
       >
-        {navItems.map(({ label, icon, path }) => (
-          <NavLink key={path} to={path} style={{ textDecoration: 'none' }}>
-            {({ isActive }) => (
-              <IconButton
-                aria-label={label}
-                onClick={() => navigate(path)}
-                color={isActive ? 'white' : 'teal.500'}
-                bg={isActive ? 'teal.500' : 'transparent'}
-                variant="ghost"
-                _hover={{ bg: 'teal.400', color: 'white' }}
-                size="xl"
+        {navItems.map(({ label, icon: Icon, path }) => {
+          const isActive = location.pathname === path
+          return (
+            <NavLink key={path} to={path}>
+              <Flex
+                p={3}
                 borderRadius="full"
+                bg={isActive ? 'teal.500' : 'transparent'}
+                boxShadow={isActive ? '0px 2px 12px rgba(0,0,0,0.25)' : 'none'}
+                transition="0.2s"
+                onClick={() => navigate(path)}
+                cursor="pointer"
               >
-                {icon}
-              </IconButton>
-            )}
-          </NavLink>
-        ))}
+                <Icon size={22} color={isActive ? 'white' : '#0d9488'} />
+              </Flex>
+            </NavLink>
+          )
+        })}
+
+        {/* COLLAPSE BUTTON */}
+        <Flex
+          p={3}
+          borderRadius="full"
+          bg="rgba(255,255,255,0.5)"
+          boxShadow="0px 2px 10px rgba(0,0,0,0.15)"
+          cursor="pointer"
+          onClick={() => setCollapsed(true)}
+        >
+          <FaChevronLeft size={20} color="#0d9488" />
+        </Flex>
       </Flex>
     </>
   )

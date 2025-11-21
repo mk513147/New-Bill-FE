@@ -8,10 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky init"
+    "prepare": "husky"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
+    "src/**/*.{js,jsx,ts,tsx}": "prettier --write"
   },
   "dependencies": {
     "@chakra-ui/form-control": "^2.2.0",

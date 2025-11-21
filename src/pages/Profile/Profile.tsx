@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { FaUpload } from "react-icons/fa";
 import "@/styles/products.css";
-import { useProfile } from "@/Hooks/useProfile";
-import { ToasterUtil } from "@/components/ToasterUtil";
+import { useProfile } from "@/hooks/useProfile.ts";
+import { ToasterUtil } from "@/components/ToasterUtil.tsx";
 
 function Profile() {
 	const { data, isLoading, isError } = useProfile();

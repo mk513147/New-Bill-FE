@@ -23,7 +23,6 @@ const profileSlice = createSlice({
 	initialState,
 	reducers: {
 		setProfile: (state, action: PayloadAction<ProfileData>) => {
-			console.log("Payload received:", action.payload);
 			state.profile = action.payload;
 		},
 

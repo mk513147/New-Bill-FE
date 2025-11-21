@@ -23,6 +23,7 @@ import {
 } from "react-icons/fa";
 import "@/styles/products.css";
 import { useState } from "react";
+import { useCustomer } from "@/hooks/useCustomer";
 
 interface Customer {
 	id: number;
@@ -95,6 +96,8 @@ function Customers() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = 5;
 	const totalPages = Math.ceil(customers.length / itemsPerPage);
+	const { data } = useCustomer();
+	console.log("Customer Data:", data);
 
 	const paginatedCustomers = customers.slice(
 		(currentPage - 1) * itemsPerPage,

@@ -13,10 +13,25 @@ import { FaUpload } from 'react-icons/fa'
 import '@/styles/products.css'
 import { useProfile } from '@/Hooks/useProfile'
 import { ToasterUtil } from '@/components/ToasterUtil'
+import { useProfileActions } from '@/Hooks/useProfileActions'
 
 function Profile() {
   const { data, isLoading, isError } = useProfile()
   const toast = ToasterUtil()
+  const { createProfile, updateProfile, deleteProfile } = useProfileActions('253')
+
+  const handleUpdate = () => {
+    updateProfile.mutate(
+      { name: 'Guddu' },
+      {
+        onSuccess: () => console.log('Updated profile'),
+      },
+    )
+  }
+
+  const handleDelete = () => {
+    deleteProfile.mutate()
+  }
 
   if (isLoading) {
     return (

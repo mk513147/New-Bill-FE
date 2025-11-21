@@ -40,7 +40,7 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const res = await API.post(API_ENDPOINTS.AUTH.SIGNIN, creds)
+      const res = await API.post(API_ENDPOINTS.AUTH.LOGIN, creds)
 
       if (res.status === 200) {
         localStorage.setItem('token', res.data.token)

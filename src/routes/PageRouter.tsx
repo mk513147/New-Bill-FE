@@ -2,23 +2,39 @@ import Auth from '@/pages/Layouts/Auth.tsx'
 import Layout from '@/pages/Layouts/Layout.tsx'
 
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
-import { pages } from './LayoutRoutes.tsx'
-import { authPages } from './AuthRoutes.tsx'
 
-function PageRouter() {
+import {
+  LoginRoute,
+  ForgotPasswordRoute,
+  CustomerRoute,
+  ProductRoute,
+  DashboardRoute,
+  ProfileRoute,
+} from './index'
+
+const authPages = () => (
+  <>
+    {LoginRoute()}
+    {ForgotPasswordRoute()}
+  </>
+)
+const pages = () => (
+  <>
+    {DashboardRoute()}
+    {CustomerRoute()}
+    {ProductRoute()}
+    {ProfileRoute()}
+  </>
+)
+
+const PageRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Auth />}>
-          {authPages.map((page) => (
-            <Route key={page.path} path={page.path} element={page.element} />
-          ))}
+          {authPages()}
         </Route>
-        <Route element={<Layout />}>
-          {pages.map((page) => (
-            <Route key={page.path} path={page.path} element={page.element} />
-          ))}
-        </Route>
+        <Route element={<Layout />}>{pages()}</Route>
       </Routes>
     </BrowserRouter>
   )

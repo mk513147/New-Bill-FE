@@ -1,4 +1,4 @@
-import { Flex, IconButton } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   FaTableList,
@@ -6,9 +6,15 @@ import {
   FaUsers,
   FaUser,
   FaChevronLeft,
-  FaChevronRight,
+  FaArrowRightToBracket,
 } from 'react-icons/fa6'
 import { useState } from 'react'
+import { API } from '@/Api/api'
+import API_ENDPOINTS from '@/Api/apiEndpoints'
+import { resetProfile } from '@/Redux/Slices/profileSlice'
+import { useDispatch } from 'react-redux'
+import { ToasterUtil } from './ToasterUtil'
+import Loading from './Loading'
 
 const navItems = [
   { label: 'Home', icon: FaShop, path: '/dashboard' },
@@ -23,9 +29,34 @@ const DockNav = () => {
 
   const [collapsed, setCollapsed] = useState(false)
   const activeItem = navItems.find((i) => i.path === location.pathname)
+  const toastFunc = ToasterUtil()
+  const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch()
+
+  const handleLogout = async () => {
+    setLoading(true)
+
+    try {
+      const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
+
+      if (res.status !== 200) {
+        throw new Error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+      toastFunc('Error logging out. Please try again.', 'error')
+    }
+
+    localStorage.clear()
+    dispatch(resetProfile())
+    navigate('/login', { replace: true })
+
+    setLoading(false)
+  }
 
   return (
     <>
+      {loading && <Loading />}
       {/* SINGLE ACTIVE ICON (Collapsed Mode) */}
       {collapsed && activeItem && (
         <Flex
@@ -71,7 +102,7 @@ const DockNav = () => {
         justifyContent="space-between"
         alignItems="center"
       >
-        {navItems.map(({ label, icon: Icon, path }) => {
+        {navItems.map(({ icon: Icon, path }) => {
           const isActive = location.pathname === path
           return (
             <NavLink key={path} to={path}>
@@ -90,6 +121,16 @@ const DockNav = () => {
           )
         })}
 
+        <Flex
+          p={3}
+          borderRadius="full"
+          bg="rgba(255,255,255,0.5)"
+          boxShadow="0px 2px 10px rgba(0,0,0,0.15)"
+          cursor="pointer"
+          onClick={handleLogout}
+        >
+          <FaArrowRightToBracket size={20} color="#dc2626" />
+        </Flex>
         {/* COLLAPSE BUTTON */}
         <Flex
           p={3}

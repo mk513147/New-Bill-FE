@@ -1,27 +1,17 @@
-import {
-  Box,
-  Spinner,
-  Center,
-  Button,
-  Input,
-  Stack,
-  Link,
-  Heading,
-  Flex,
-  Field,
-} from '@chakra-ui/react'
+import { Box, Button, Input, Stack, Link, Heading, Flex, Field } from '@chakra-ui/react'
 import { PasswordInput } from '@/components/ui/password-input'
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
 import '@/styles/loginForm.css'
 import { useState } from 'react'
 import logo from '@/assets/logo.png'
-import { ToasterUtil, Toaster } from '@/components/ToasterUtil.tsx'
+import { ToasterUtil } from '@/components/ToasterUtil.tsx'
 import { API } from '@/Api/api'
 import { useNavigate } from 'react-router-dom'
 import { setProfile } from '@/Redux/Slices/profileSlice'
 import { useDispatch } from 'react-redux'
 import { AxiosError } from 'axios'
 import API_ENDPOINTS from '@/Api/apiEndpoints'
+import Loading from '@/components/Loading'
 
 interface FormValues {
   emailId: string
@@ -72,13 +62,7 @@ const Login = () => {
 
   return (
     <>
-      {loading && (
-        <Box pos="absolute" inset="0" bg="whiteAlpha.600" zIndex={1000}>
-          <Center h="full">
-            <Spinner color="teal.500" size="xl" />
-          </Center>
-        </Box>
-      )}
+      {loading && <Loading />}
       <Flex width={'100vw'} height={'100vh'} bgColor="white">
         <Flex
           width={'45%'}

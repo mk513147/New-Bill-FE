@@ -9,7 +9,7 @@ export const API_ENDPOINTS = {
   },
 
   CUSTOMERS: {
-    BASE: '/customers',
+    BASE: '/customers/getCustomer',
   },
 
   PRODUCTS: {

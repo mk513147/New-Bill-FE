@@ -1,7 +1,8 @@
-import { LoginRoute } from './LoginRoute.tsx'
-import { ForgotPasswordRoute } from './ForgotPasswordRoute.tsx'
-import { CustomerRoute } from './CustomerRoute.tsx'
-import { ProductRoute } from './ProductRoute.tsx'
-import { DashboardRoute } from './DashboardRoute.tsx'
+export * from './ForgotPasswordRoute'
+export * from './CustomerRoute'
+export * from './ProductRoute'
+export * from './DashboardRoute'
+export * from './ProfileRoute'
 
-export const routes = [LoginRoute]
+export * from './LoginRoute'
+export * from './ForgotPasswordRoute'

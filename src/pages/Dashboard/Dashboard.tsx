@@ -19,7 +19,6 @@ function Dashboard() {
     <Box w="100vw" h="100vh" overflowY="auto" p={5}>
       <Heading size="lg">Welcome to Dashboard</Heading>
 
-      {/* STAT BOXES */}
       <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={5} mt={5}>
         <Box bg="blue.500" color="white" p={5} borderRadius="md">
           <Heading size="md">Users</Heading>
@@ -37,9 +36,7 @@ function Dashboard() {
         </Box>
       </Grid>
 
-      {/* CHART GRID */}
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={5} mt={10}>
-        {/* Row 1 */}
         <GridItem colSpan={2} bg="white" p={4} borderRadius="md" shadow="sm">
           <SimpleBarChart />
         </GridItem>
@@ -48,7 +45,6 @@ function Dashboard() {
           <SimpleAreaChart />
         </GridItem>
 
-        {/* Row 2 */}
         <GridItem colSpan={{ base: 2, md: 1 }} bg="white" p={4} borderRadius="md" shadow="sm">
           <PieChartWithPaddingAngle />
         </GridItem>

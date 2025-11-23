@@ -1,6 +1,10 @@
-export { default as Dashboard } from "./Dashboard/Dashboard.tsx";
-export { default as Customer } from "./Customer/Customer.tsx";
-export { default as Profile } from "./Profile/Profile.tsx";
-export { default as Products } from "./Products/Products.tsx";
-export { default as Login } from "./Login/Login.tsx";
-export { default as ForgotPassword } from "./ForgotPassword/ForgotPassword.tsx";
+export { default as Dashboard } from './Dashboard/Dashboard.tsx'
+export { default as Customer } from './Customer/Customer.tsx'
+export { default as Profile } from './Profile/Profile.tsx'
+export { default as Products } from './Products/Products.tsx'
+export { default as Login } from './Login/Login.tsx'
+export { default as ForgotPassword } from './ForgotPassword/ForgotPassword.tsx'
+export { default as Suppliers } from './Suppliers/Suppliers.tsx'
+export { default as Stocks } from './Stocks/Stocks.tsx'
+export { default as Payments } from './Payments/Payments.tsx'
+export { default as Settings } from './Settings/Settings.tsx'

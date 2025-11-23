@@ -10,11 +10,23 @@ const Layout = () => {
   const textColor = useColorModeValue('light.menu.text', 'dark.menu.text')
 
   return (
-    <Flex height="100vh" width="100vw" bg={pageBg} color={textColor}>
-      <Box position="absolute" top="0" left="0" bg="gray.800" color="white" zIndex="1000">
+    <Flex
+      height="100vh"
+      width="100vw"
+      bg={pageBg}
+      color={textColor}
+      overflowX="hidden"
+      overflowY="auto"
+      position="relative"
+    >
+      <Box position="absolute" top="3" left="3" zIndex="1000">
         <SideBar />
       </Box>
-      <Outlet />
+
+      <Box flex="1" pt="10">
+        <Outlet />
+      </Box>
+
       <DockNav />
       <Toaster />
     </Flex>

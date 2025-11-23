@@ -10,7 +10,11 @@ import {
   ProductRoute,
   DashboardRoute,
   ProfileRoute,
-} from './index'
+  StocksRoute,
+  SuppliersRoute,
+  PaymentsRoute,
+  SettingsRoute,
+} from './ImportRoutes/index'
 
 const authPages = () => (
   <>
@@ -24,6 +28,10 @@ const pages = () => (
     {CustomerRoute()}
     {ProductRoute()}
     {ProfileRoute()}
+    {StocksRoute()}
+    {SuppliersRoute()}
+    {PaymentsRoute()}
+    {SettingsRoute()}
   </>
 )
 

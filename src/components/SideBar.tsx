@@ -1,19 +1,15 @@
 import {
   Box,
-  Flex,
-  VStack,
-  Avatar,
   Stack,
-  Text,
   HStack,
   IconButton,
   Button,
-  CloseButton,
   Drawer,
   Portal,
+  StackSeparator,
 } from '@chakra-ui/react'
 
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { FaSignOutAlt } from 'react-icons/fa'
 import { API } from '@/Api/api'
 import API_ENDPOINTS from '@/Api/apiEndpoints'
@@ -22,6 +18,26 @@ import { useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { ToasterUtil } from './ToasterUtil'
 import Loading from './Loading'
+import {
+  GrAnalytics,
+  FaGear,
+  RiMoneyRupeeCircleFill,
+  FaWarehouse,
+  SiBookstack,
+  IoPeopleCircleSharp,
+  BsLayoutSidebarInset,
+  FaShop,
+} from '@/components/Icons'
+
+const navItems = [
+  { label: 'Dashboard', icon: GrAnalytics, path: '/dashboard' },
+  { label: 'Customers', icon: IoPeopleCircleSharp, path: '/customer' },
+  { label: 'Products', icon: SiBookstack, path: '/products' },
+  { label: 'Suppliers', icon: FaShop, path: '/suppliers' },
+  { label: 'Stocks', icon: FaWarehouse, path: '/stocks' },
+  { label: 'Payments', icon: RiMoneyRupeeCircleFill, path: '/payments' },
+  { label: 'Settings', icon: FaGear, path: '/settings' },
+]
 
 const SideBar = () => {
   const toastFunc = ToasterUtil()
@@ -55,25 +71,48 @@ const SideBar = () => {
       {loading && <Loading />}
       <Drawer.Root placement={'start'}>
         <Drawer.Trigger asChild>
-          <Button variant="outline" size="sm">
-            Open Drawer
+          <Button variant="subtle" size="lg">
+            <BsLayoutSidebarInset size={'50px'} />
           </Button>
         </Drawer.Trigger>
         <Portal>
           <Drawer.Backdrop />
           <Drawer.Positioner>
             <Drawer.Content rounded="md">
-              <Drawer.Header>
-                <Drawer.Title>Drawer Title</Drawer.Title>
+              <Drawer.Header mb={2}>
+                <Drawer.Title>
+                  <Box
+                    width={'100%'}
+                    fontSize={'4xl'}
+                    textAlign={'center'}
+                    bgGradient="linear-gradient(0deg,rgba(93, 34, 195, 1) 0%, rgba(45, 253, 243, 1) 100%)"
+                    bgClip="text"
+                    fontWeight="bold"
+                  >
+                    EBILL
+                  </Box>
+                </Drawer.Title>
               </Drawer.Header>
               <Drawer.Body>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                  incididunt ut labore et dolore magna aliqua.
-                </p>
+                <Stack separator={<StackSeparator />}>
+                  {navItems.map((item) => (
+                    <Box
+                      key={item.label}
+                      p={1}
+                      _hover={{ bg: 'whiteAlpha.300' }}
+                      cursor={'pointer'}
+                    >
+                      <NavLink to={item.path}>
+                        <HStack gap={2}>
+                          <item.icon size={'20px'} />
+                          {item.label}
+                        </HStack>
+                      </NavLink>
+                    </Box>
+                  ))}
+                </Stack>
               </Drawer.Body>
               <Drawer.Footer>
-                <Button variant="outline">Cancel</Button>
                 <IconButton
                   onClick={() => handleLogout()}
                   disabled={loading}
@@ -86,9 +125,6 @@ const SideBar = () => {
                   <FaSignOutAlt />
                 </IconButton>
               </Drawer.Footer>
-              <Drawer.CloseTrigger asChild>
-                <CloseButton size="sm" />
-              </Drawer.CloseTrigger>
             </Drawer.Content>
           </Drawer.Positioner>
         </Portal>

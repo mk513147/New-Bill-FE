@@ -1,13 +1,23 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import DockNav from '@/components/DockNav'
 import { Box, Flex } from '@chakra-ui/react'
 import { useColorModeValue } from '@/components/ui/color-mode'
 import SideBar from '@/components/SideBar'
 import { Toaster } from '@/components/ToasterUtil'
+import { useEffect } from 'react'
 
 const Layout = () => {
+  const navigate = useNavigate()
+
   const pageBg = useColorModeValue('light.menu.bg', 'dark.menu.bg')
   const textColor = useColorModeValue('light.menu.text', 'dark.menu.text')
+
+  useEffect(() => {
+    const isLoggedIn = JSON.parse(localStorage.getItem('eb_logged_in') || 'false')
+    if (!isLoggedIn) {
+      navigate('/login', { replace: true })
+    }
+  }, [])
 
   return (
     <Flex

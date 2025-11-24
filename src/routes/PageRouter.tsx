@@ -1,7 +1,7 @@
 import Auth from '@/pages/Layouts/Auth.tsx'
 import Layout from '@/pages/Layouts/Layout.tsx'
 
-import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom'
 
 import {
   LoginRoute,
@@ -43,6 +43,7 @@ const PageRouter = () => {
           {authPages()}
         </Route>
         <Route element={<Layout />}>{pages()}</Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )

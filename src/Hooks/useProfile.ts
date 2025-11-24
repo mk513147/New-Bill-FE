@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { API } from '@/Api/api'
-import API_ENDPOINTS from '@/Api/apiEndpoints'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 
 export const getProfile = async () => {
   const res = await API.get(API_ENDPOINTS.MERCHANT.PROFILE)

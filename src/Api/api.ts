@@ -1,6 +1,6 @@
-import { resetProfile } from '@/Redux/Slices/profileSlice'
-import { store } from '@/Redux/store'
-import { logoutService } from '@/Utils/utils'
+import { resetProfile } from '@/redux/slices/profileSlice'
+import { store } from '@/redux/store'
+import { logoutService } from '@/utils/utils'
 
 import axios from 'axios'
 import API_ENDPOINTS from './apiEndpoints'

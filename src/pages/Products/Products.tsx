@@ -23,7 +23,7 @@ import {
   LuChevronLeft,
   LuChevronRight,
   IoIosSearch,
-} from '@/components/Icons'
+} from '@/Components/icons'
 import '@/styles/products.css'
 import AdaptiveModal, { FieldConfig } from '@/components/AdaptiveModal'
 import { useState } from 'react'

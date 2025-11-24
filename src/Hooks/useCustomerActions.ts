@@ -1,4 +1,4 @@
-import { API } from '@/Api/api'
+import { API } from '@/api/api'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export const useCustomerActions = (pubId: string) => {

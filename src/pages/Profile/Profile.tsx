@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { FaUpload } from 'react-icons/fa'
 import '@/styles/products.css'
-import { useProfile } from '@/hooks/useProfile.ts'
+import { useProfile } from '@/hooks/useProfile'
 import { ToasterUtil } from '@/components/ToasterUtil.tsx'
 import { useProfileActions } from '@/hooks/useProfileActions'
 

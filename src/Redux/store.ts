@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
-import profileReducer from '../Redux/Slices/profileSlice'
-import dockReducer from '../Redux/Slices/dockSlice'
-import customerReducer from '../Redux/Slices/customerSlice'
-import productReducer from '../Redux/Slices/productSlice'
+import profileReducer from './slices/profileSlice'
+import dockReducer from './slices/dockSlice'
+import customerReducer from './slices/customerSlice'
+import productReducer from './slices/productSlice'
 
 export const store = configureStore({
   reducer: {

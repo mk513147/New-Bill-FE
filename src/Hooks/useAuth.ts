@@ -1,5 +1,5 @@
-import { API } from '@/Api/api'
-import API_ENDPOINTS from '@/Api/apiEndpoints'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 
 let isLoggingOut = false
 

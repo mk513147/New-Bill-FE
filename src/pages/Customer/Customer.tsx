@@ -22,7 +22,7 @@ import {
   LuChevronLeft,
   LuChevronRight,
   IoIosSearch,
-} from '@/components/Icons'
+} from '@/Components/icons'
 import { useState } from 'react'
 import { useCustomer } from '@/hooks/useCustomer'
 

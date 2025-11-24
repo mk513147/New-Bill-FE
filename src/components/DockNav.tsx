@@ -9,9 +9,9 @@ import {
   FaArrowRightToBracket,
 } from 'react-icons/fa6'
 import { useState } from 'react'
-import { API } from '@/Api/api'
-import API_ENDPOINTS from '@/Api/apiEndpoints'
-import { resetProfile } from '@/Redux/Slices/profileSlice'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
+import { resetProfile } from '@/redux/slices/profileSlice'
 import { useDispatch } from 'react-redux'
 import { ToasterUtil } from './ToasterUtil'
 import Loading from './Loading'

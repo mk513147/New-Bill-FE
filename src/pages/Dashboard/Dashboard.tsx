@@ -1,4 +1,4 @@
-import { setActiveTab } from '@/Redux/Slices/dockSlice'
+import { setActiveTab } from '@/Redux/slices/dockSlice'
 import { Box, Grid, GridItem, Heading, Text } from '@chakra-ui/react'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
@@ -7,7 +7,7 @@ import {
   SimpleBarChart,
   PieChartWithPaddingAngle,
   LineBarAreaComposedChart,
-} from '@/components/Charts'
+} from '@/components/charts'
 
 function Dashboard() {
   const dispatch = useDispatch()

@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { useProfile } from '@/hooks/useProfile'
 import { useDispatch } from 'react-redux'
-import { setProfile, resetProfile } from '@/Redux/slices/profileSlice'
-import { Toaster, ToasterUtil } from '@/components/ToasterUtil'
+import { setProfile, resetProfile } from '@/redux/slices/profileSlice'
+import { Toaster, ToasterUtil } from '@/components/common/ToasterUtil'
 
 const Auth = () => {
   const navigate = useNavigate()

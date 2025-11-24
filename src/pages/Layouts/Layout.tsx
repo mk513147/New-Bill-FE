@@ -1,9 +1,9 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import DockNav from '@/components/DockNav'
+import DockNav from '@/components/common/DockNav'
 import { Box, Flex } from '@chakra-ui/react'
 import { useColorModeValue } from '@/components/ui/color-mode'
-import SideBar from '@/components/SideBar'
-import { Toaster } from '@/components/ToasterUtil'
+import SideBar from '@/components/common/SideBar'
+import { Toaster } from '@/components/common/ToasterUtil'
 import { useEffect } from 'react'
 
 const Layout = () => {

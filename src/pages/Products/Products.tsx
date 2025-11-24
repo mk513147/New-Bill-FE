@@ -23,9 +23,9 @@ import {
   LuChevronLeft,
   LuChevronRight,
   IoIosSearch,
-} from '@/Components/icons'
+} from '@/components/icons'
 import '@/styles/products.css'
-import AdaptiveModal, { FieldConfig } from '@/components/AdaptiveModal'
+import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal'
 import { useState } from 'react'
 
 const addProductFields: FieldConfig[] = [

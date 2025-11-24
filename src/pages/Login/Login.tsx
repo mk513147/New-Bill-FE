@@ -4,14 +4,14 @@ import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
 import '@/styles/loginForm.css'
 import { useState } from 'react'
 import logo from '@/assets/logo.png'
-import { ToasterUtil } from '@/components/ToasterUtil.tsx'
+import { ToasterUtil } from '@/components/common/ToasterUtil'
 import { API } from '@/api/api'
 import { useNavigate } from 'react-router-dom'
-import { setProfile } from '@/Redux/slices/profileSlice'
+import { setProfile } from '@/redux/slices/profileSlice'
 import { useDispatch } from 'react-redux'
 import { AxiosError } from 'axios'
 import API_ENDPOINTS from '@/api/apiEndpoints'
-import Loading from '@/components/Loading'
+import Loading from '@/components/common/Loading'
 
 interface FormValues {
   emailId: string

@@ -13,7 +13,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { FaSignOutAlt } from 'react-icons/fa'
 import { API } from '@/api/api'
 import API_ENDPOINTS from '@/api/apiEndpoints'
-import { resetProfile } from '@/Redux/slices/profileSlice'
+import { resetProfile } from '@/redux/slices/profileSlice'
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { ToasterUtil } from './ToasterUtil'
@@ -27,7 +27,7 @@ import {
   IoPeopleCircleSharp,
   BsLayoutSidebarInset,
   FaShop,
-} from '@/Components/icons'
+} from '@/components/icons'
 
 const navItems = [
   { label: 'Dashboard', icon: GrAnalytics, path: '/dashboard' },

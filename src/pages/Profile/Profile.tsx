@@ -12,7 +12,7 @@ import {
 import { FaUpload } from 'react-icons/fa'
 import '@/styles/products.css'
 import { useProfile } from '@/hooks/useProfile'
-import { ToasterUtil } from '@/components/ToasterUtil.tsx'
+import { ToasterUtil } from '@/components/common/ToasterUtil'
 import { useProfileActions } from '@/hooks/useProfileActions'
 
 function Profile() {

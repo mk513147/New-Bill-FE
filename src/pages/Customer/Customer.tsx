@@ -3,28 +3,19 @@ import {
   Flex,
   HStack,
   Input,
-  InputGroup,
   Stack,
   Text,
-  ButtonGroup,
   Heading,
   IconButton,
   Button,
   Table,
+  Box,
 } from '@chakra-ui/react'
 
-import {
-  FaFilter,
-  FaPrint,
-  FaPlusCircle,
-  FaEdit,
-  FaTrash,
-  LuChevronLeft,
-  LuChevronRight,
-  IoIosSearch,
-} from '@/components/icons'
+import { FaFilter, FaPrint, FaPlusCircle, FaEdit, FaTrash, IoIosSearch } from '@/components/icons'
+
+import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal'
 import { useState } from 'react'
-import { useCustomer } from '@/hooks/useCustomer'
 
 interface Customer {
   id: number
@@ -36,7 +27,7 @@ interface Customer {
   type: string
 }
 
-const customers: Customer[] = [
+const customersData: Customer[] = [
   {
     id: 1,
     name: 'Aman Gupta',
@@ -55,108 +46,72 @@ const customers: Customer[] = [
     companyName: 'Reliance Retail',
     type: 'Regular',
   },
+]
+
+const addCustomerFields: FieldConfig[] = [
+  { name: 'name', label: 'Customer Name', type: 'text', required: true },
+  { name: 'mobileNumber', label: 'Mobile Number', type: 'text', required: true },
+  { name: 'address', label: 'Address', type: 'text', required: true },
+  { name: 'amount', label: 'Amount', type: 'number', required: true },
+  { name: 'companyName', label: 'Company Name', type: 'text' },
   {
-    id: 3,
-    name: 'Arjun Patel',
-    mobileNumber: '8889990001',
-    address: 'Ahmedabad, India',
-    amount: 23000,
-    companyName: 'Tata Electronics',
-    type: 'Wholesale',
+    name: 'type',
+    label: 'Customer Type',
+    type: 'select',
+    options: ['Regular', 'Premium', 'Wholesale'],
+    defaultValue: 'Regular',
   },
-  {
-    id: 4,
-    name: 'Priya Das',
-    mobileNumber: '9012345678',
-    address: 'Kolkata, India',
-    amount: 12000,
-    companyName: 'Zara India',
-    type: 'Premium',
-  },
-  {
-    id: 5,
-    name: 'Mohit Yadav',
-    mobileNumber: '9123456789',
-    address: 'Lucknow, India',
-    amount: 7000,
-    companyName: 'Local Market',
-    type: 'Regular',
-  },
-  ...Array.from({ length: 10 }, (_, i) => ({
-    id: i + 6,
-    name: `Customer ${i + 6}`,
-    mobileNumber: `98${Math.floor(10000000 + Math.random() * 9000000)}`,
-    address: 'India',
-    amount: Math.floor(5000 + Math.random() * 20000),
-    companyName: 'Generic Traders',
-    type: i % 2 === 0 ? 'Wholesale' : 'Regular',
-  })),
 ]
 
 function Customers() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
-  const totalPages = Math.ceil(customers.length / itemsPerPage)
-  const { data } = useCustomer()
-  console.log('Customer Data:', data)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [customers, setCustomers] = useState(customersData)
 
-  const paginatedCustomers = customers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  )
-
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
-
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
+  function handleAddCustomerSubmit(data: Record<string, any>) {
+    console.log('New Customer:', data)
+    setIsModalOpen(false)
   }
 
   return (
-    <Flex
-      bgColor="gray.100"
-      width="100vw"
-      height="100vh"
-      flexDirection={{ base: 'column', md: 'row', sm: 'column' }}
-    >
+    <>
       <Flex
-        width={{ base: 'full', md: '80%', sm: 'full' }}
-        height={{ base: '90%', md: 'full', sm: '90%' }}
+        bgColor="gray.100"
+        width="100vw"
+        minH="100vh"
         flexDirection="column"
-        gap={10}
-        padding={8}
+        overflow="hidden"
+        p={{ base: 4, md: 6 }}
       >
-        {/* Header Section */}
+        {/* SEARCH + USER SECTION */}
         <Flex
           justifyContent="space-between"
           width="full"
           alignItems="center"
           color="gray.800"
-          gap={6}
+          gap={4}
+          flexWrap="wrap"
         >
-          <InputGroup
-            startElement={<IoIosSearch color="blue" size="20px" />}
-            bgColor="white"
-            shadow="md"
-            width="50%"
-            rounded="full"
-          >
+          <HStack bg="white" shadow="md" width={{ base: '100%', md: '45%' }} rounded="full" px={4}>
+            <Box color="blue">
+              <IoIosSearch size="20px" />
+            </Box>
+
             <Input
               placeholder="Search Customers"
-              outline="none"
               border="none"
               _placeholder={{ color: 'gray.500' }}
               size="lg"
+              flex="1"
             />
-          </InputGroup>
+          </HStack>
 
           <HStack gap="4">
             <Avatar.Root bgColor="#0074E4" size="xl">
               <Avatar.Fallback name="Kaushal Raj" />
               <Avatar.Image src="./image" />
             </Avatar.Root>
-            <Stack gap="0">
+
+            <Stack>
               <Text fontWeight="medium">Kaushal Raj</Text>
               <Text color="fg.muted" textStyle="sm">
                 Shop Name
@@ -165,108 +120,112 @@ function Customers() {
           </HStack>
         </Flex>
 
-        {/* Title + Buttons */}
-        <Flex justifyContent="space-between" width="full" alignItems="center" color="gray.800">
-          <Heading size="3xl">Customers</Heading>
-          <HStack gap={15}>
-            <Button bgColor="teal.400" color="white" variant="solid">
-              <FaFilter />
-              Filter
+        {/* CUSTOMERS TITLE + BUTTONS */}
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          width="full"
+          mt={10}
+          flexWrap="wrap"
+          gap={4}
+        >
+          <Heading size="2xl" color="gray.800">
+            Customers
+          </Heading>
+
+          <HStack gap={4} flexWrap="wrap">
+            <Button bgColor="teal.400" color="white">
+              <HStack gap={3}>
+                <FaFilter />
+                <span>Filter</span>
+              </HStack>
             </Button>
-            <Button bgColor="teal.400" color="white" variant="solid">
-              <FaPrint />
-              Print
+
+            <Button bgColor="teal.400" color="white">
+              <HStack gap={3}>
+                <FaPrint />
+                <span>Print</span>
+              </HStack>
             </Button>
-            <Button bgColor="#0074E4" color="white" variant="solid" size="lg">
-              Add customer
-              <FaPlusCircle />
+
+            <Button bgColor="#0074E4" color="white" size="lg" onClick={() => setIsModalOpen(true)}>
+              <HStack gap={3}>
+                <FaPlusCircle />
+                <span>Add customer</span>
+              </HStack>
             </Button>
           </HStack>
         </Flex>
 
-        {/* Table Section */}
-        <Flex flexDirection="column" flex="1" justifyContent="space-between">
-          <Stack
-            width="full"
-            gap="5"
-            bgColor="white"
-            shadow="sm"
-            rounded="lg"
-            overflow="hidden"
-            pb="2"
-            flex="1"
-          >
-            <Table.Root size="lg" stickyHeader color="gray.500">
-              <Table.Header>
-                <Table.Row bgColor="white" borderBottomColor="gray.200" borderBottomWidth="3px">
-                  <Table.ColumnHeader color="gray.600">Name</Table.ColumnHeader>
-                  <Table.ColumnHeader color="gray.600">Mobile Number</Table.ColumnHeader>
-                  <Table.ColumnHeader color="gray.600">Address</Table.ColumnHeader>
-                  <Table.ColumnHeader color="gray.600">Amount</Table.ColumnHeader>
-                  <Table.ColumnHeader color="gray.600">Company Name</Table.ColumnHeader>
-                  <Table.ColumnHeader color="gray.600">Type</Table.ColumnHeader>
-                  <Table.ColumnHeader color="gray.600">Actions</Table.ColumnHeader>
-                </Table.Row>
-              </Table.Header>
-
-              <Table.Body>
-                {paginatedCustomers.map((item) => (
-                  <Table.Row
-                    key={item.id}
-                    bgColor="whiteAlpha.100"
-                    borderBottomColor="gray.200"
-                    borderBottomWidth="3px"
-                  >
-                    <Table.Cell color="gray.700">{item.name}</Table.Cell>
-                    <Table.Cell>{item.mobileNumber}</Table.Cell>
-                    <Table.Cell>{item.address}</Table.Cell>
-                    <Table.Cell>₹{item.amount}</Table.Cell>
-                    <Table.Cell>{item.companyName}</Table.Cell>
-                    <Table.Cell>{item.type}</Table.Cell>
-                    <Table.Cell>
-                      <HStack gap="2" justifyContent="center">
-                        <IconButton aria-label="Edit" size="sm" colorScheme="yellow">
-                          <FaEdit />
-                        </IconButton>
-                        <IconButton aria-label="Delete" size="sm" colorScheme="red">
-                          <FaTrash />
-                        </IconButton>
-                      </HStack>
-                    </Table.Cell>
+        {/* TABLE SECTION */}
+        <Box
+          width="100%"
+          bg="white"
+          mt={6}
+          rounded="lg"
+          shadow="sm"
+          overflow="hidden"
+          color="gray.800"
+          pb={3}
+        >
+          <Box overflowX="auto" width="100%">
+            <Table.ScrollArea height="60vh">
+              <Table.Root size="lg" stickyHeader>
+                <Table.Header>
+                  <Table.Row bg="white" borderBottom="2px solid" borderColor="gray.200">
+                    <Table.ColumnHeader>Name</Table.ColumnHeader>
+                    <Table.ColumnHeader>Mobile Number</Table.ColumnHeader>
+                    <Table.ColumnHeader>Address</Table.ColumnHeader>
+                    <Table.ColumnHeader>Amount</Table.ColumnHeader>
+                    <Table.ColumnHeader>Company Name</Table.ColumnHeader>
+                    <Table.ColumnHeader>Type</Table.ColumnHeader>
+                    <Table.ColumnHeader>Actions</Table.ColumnHeader>
                   </Table.Row>
-                ))}
-              </Table.Body>
-            </Table.Root>
-          </Stack>
+                </Table.Header>
 
-          {/* Pagination */}
-          <Flex
-            justifyContent="center"
-            alignItems="center"
-            mt={4}
-            gap={3}
-            bg="white"
-            p={3}
-            rounded="lg"
-            shadow="sm"
-          >
-            <IconButton aria-label="Previous" disabled={currentPage === 1} onClick={handlePrev}>
-              <LuChevronLeft />
-            </IconButton>
-            <Text>
-              Page {currentPage} of {totalPages}
-            </Text>
-            <IconButton
-              aria-label="Next"
-              disabled={currentPage === totalPages}
-              onClick={handleNext}
-            >
-              <LuChevronRight />
-            </IconButton>
-          </Flex>
-        </Flex>
+                <Table.Body>
+                  {customers.map((item) => (
+                    <Table.Row
+                      key={item.id}
+                      bg="white"
+                      borderBottom="2px solid"
+                      borderColor="gray.200"
+                    >
+                      <Table.Cell>{item.name}</Table.Cell>
+                      <Table.Cell>{item.mobileNumber}</Table.Cell>
+                      <Table.Cell>{item.address}</Table.Cell>
+                      <Table.Cell>₹{item.amount}</Table.Cell>
+                      <Table.Cell>{item.companyName}</Table.Cell>
+                      <Table.Cell>{item.type}</Table.Cell>
+
+                      <Table.Cell>
+                        <HStack gap={2}>
+                          <IconButton aria-label="Edit" size="sm" colorScheme="yellow">
+                            <FaEdit />
+                          </IconButton>
+                          <IconButton aria-label="Delete" size="sm" colorScheme="red">
+                            <FaTrash />
+                          </IconButton>
+                        </HStack>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
+            </Table.ScrollArea>
+          </Box>
+        </Box>
       </Flex>
-    </Flex>
+
+      {/* CUSTOMER MODAL */}
+      <AdaptiveModal
+        isOpen={isModalOpen}
+        title="Add New Customer"
+        fields={addCustomerFields}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddCustomerSubmit}
+      />
+    </>
   )
 }
 

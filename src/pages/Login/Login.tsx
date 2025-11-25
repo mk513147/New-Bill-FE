@@ -125,7 +125,7 @@ const Login = () => {
                       bgColor="gray.200"
                       borderColor="teal.300"
                       _focus={{ outlineColor: 'teal.500' }}
-                      value={'kaushal@gmail.com'}
+                      defaultValue={'kaushal@gmail.com'}
                     />
                   </Box>
                 </Field.Root>
@@ -147,7 +147,7 @@ const Login = () => {
                       bgColor="gray.200"
                       borderColor="teal.300"
                       _focus={{ outlineColor: 'teal.500' }}
-                      value={'Gautam@123'}
+                      defaultValue={'Gautam@123'}
                     />
                   </Box>
                 </Field.Root>

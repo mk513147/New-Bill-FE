@@ -1,4 +1,4 @@
-import { Dialog, Card, Button, HStack, Text } from '@chakra-ui/react'
+import { Dialog, Card, Button, HStack, Text, Box } from '@chakra-ui/react'
 
 export interface FieldConfig {
   name: string
@@ -46,7 +46,7 @@ export default function AdaptiveModal({
           position: 'fixed',
           inset: 0,
           background: 'rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(3px)',
+          backdropFilter: 'blur(4px)',
         }}
       />
 
@@ -56,43 +56,72 @@ export default function AdaptiveModal({
         left="50%"
         transform="translate(-50%, -50%)"
         bg="white"
-        shadow="xl"
         rounded="lg"
-        width="500px"
-        maxW="90%"
+        shadow="lg"
+        // ⬇ Responsive width
+        width={{ base: '95%', md: '90%', lg: '900px' }}
+        maxW="95%"
+        // ⬇ Increased height
+        maxH={{ base: '80vh', md: '85vh', lg: '90vh' }}
+        overflow="hidden"
       >
-        <Card.Root>
+        <Card.Root borderRadius="lg">
           {/* HEADER */}
-          <Card.Header p={4} borderBottom="1px solid #eee">
-            <Text fontSize="xl" fontWeight="semibold">
+          <Card.Header
+            p={5}
+            borderBottom="1px solid #e5e7eb"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Text fontSize="2xl" fontWeight="semibold">
               {title}
             </Text>
+
+            <HStack gap={2}>
+              <Button size="sm" variant="outline">
+                Add Custom Field
+              </Button>
+
+              <Button size="sm" variant="outline">
+                Bulk Upload
+              </Button>
+
+              <Button size="sm" variant="ghost" onClick={onClose}>
+                ✕
+              </Button>
+            </HStack>
           </Card.Header>
 
+          {/* BODY */}
           <form onSubmit={handleSubmit}>
             <Card.Body
-              p={4}
-              maxH="400px"
+              p={5}
               overflowY="auto"
+              // ⬇ Increased scrollable area
+              maxH={{ base: '55vh', md: '60vh', lg: '70vh' }}
               display="grid"
-              gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))"
-              gap={4}
+              // ⬇ Responsive grid (2 columns on mobile, 3 on medium+)
+              gridTemplateColumns={{
+                base: 'repeat(1, 1fr)',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(auto-fill, minmax(260px, 1fr))',
+              }}
+              gap={5}
             >
               {fields.map((field) => (
-                <div key={field.name} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <label htmlFor={field.name} style={{ fontWeight: 500 }}>
-                    {field.label}
-                  </label>
+                <Box key={field.name} display="flex" flexDirection="column">
+                  <label htmlFor={`field-${field.name}`}>{field.label}</label>
 
                   {field.type === 'select' ? (
                     <select
-                      id={field.name}
+                      id={`field-${field.name}`}
                       name={field.name}
                       defaultValue={field.defaultValue as string}
                       required={field.required}
                       style={{
-                        padding: '8px',
-                        borderRadius: '6px',
+                        padding: '10px',
+                        borderRadius: '8px',
                         border: '1px solid #ccc',
                       }}
                     >
@@ -104,31 +133,36 @@ export default function AdaptiveModal({
                     </select>
                   ) : (
                     <input
-                      id={field.name}
+                      id={`field-${field.name}`}
                       name={field.name}
                       type={field.type}
                       required={field.required}
                       defaultValue={field.defaultValue as string}
                       style={{
-                        padding: '8px',
-                        borderRadius: '6px',
+                        padding: '10px',
+                        borderRadius: '8px',
                         border: '1px solid #ccc',
                       }}
                     />
                   )}
-                </div>
+                </Box>
               ))}
             </Card.Body>
 
-            <Card.Footer p={4} borderTop="1px solid #eee">
-              <HStack justify="flex-end" w="full">
-                <Button variant="ghost" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button colorPalette="blue" type="submit">
-                  Submit
-                </Button>
-              </HStack>
+            {/* FOOTER */}
+            <Card.Footer
+              p={5}
+              borderTop="1px solid #e5e7eb"
+              display="flex"
+              justifyContent="flex-end"
+              gap={3}
+            >
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button colorPalette="blue" type="submit">
+                Add
+              </Button>
             </Card.Footer>
           </form>
         </Card.Root>

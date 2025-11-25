@@ -3,27 +3,16 @@ import {
   Flex,
   HStack,
   Input,
-  InputGroup,
   Stack,
   Text,
-  ButtonGroup,
   Heading,
   IconButton,
-  Pagination,
   Button,
   Table,
+  Box,
 } from '@chakra-ui/react'
 
-import {
-  FaFilter,
-  FaPrint,
-  FaPlusCircle,
-  FaEdit,
-  FaTrash,
-  LuChevronLeft,
-  LuChevronRight,
-  IoIosSearch,
-} from '@/components/icons'
+import { FaFilter, FaPrint, FaPlusCircle, FaEdit, FaTrash, IoIosSearch } from '@/components/icons'
 import '@/styles/products.css'
 import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal'
 import { useState } from 'react'
@@ -90,7 +79,6 @@ function Products() {
   function handleAddProductSubmit(data: Record<string, any>) {
     console.log('New product:', data)
     setIsModalOpen(false)
-    // TODO: call API or update state
   }
 
   return (
@@ -98,179 +86,152 @@ function Products() {
       <Flex
         bgColor="gray.100"
         width="100vw"
-        height="100vh"
-        flexDirection={{ base: 'column', md: 'row', sm: 'column' }}
-        overflow={'hidden'}
+        minH="100vh"
+        flexDirection="column"
+        overflow="hidden"
+        p={{ base: 4, md: 6 }}
       >
+        {/* SEARCH + USER SECTION */}
         <Flex
-          width={{ base: 'full', md: '80%', sm: 'full' }}
-          height={{ base: '90%', md: 'full', sm: '90%' }}
-          flexDirection="column"
-          gap={10}
-          padding={8}
+          justifyContent="space-between"
+          width="full"
+          alignItems="center"
+          color="gray.800"
+          gap={4}
+          flexWrap="wrap"
         >
-          <Flex
-            justifyContent="space-between"
-            width="full"
-            alignItems="center"
-            color="gray.800"
-            gap={6}
-          >
-            <InputGroup
-              startElement={<IoIosSearch color="blue" size="20px" />}
-              bgColor="white"
-              shadow="md"
-              width="50%"
-              rounded="full"
-            >
-              <Input
-                placeholder="Search Products"
-                outline="none"
-                border="none"
-                _placeholder={{ color: 'gray.500' }}
-                size="lg"
-              />
-            </InputGroup>
-            <HStack gap="4">
-              <Avatar.Root bgColor="#0074E4" size="xl">
-                <Avatar.Fallback name="Kaushal Raj" />
-                <Avatar.Image src="./image" />
-              </Avatar.Root>
-              <Stack gap="0">
-                <Text fontWeight="medium">Kaushal Raj</Text>
-                <Text color="fg.muted" textStyle="sm">
-                  Shop Name
-                </Text>
-              </Stack>
-            </HStack>
-          </Flex>
+          <HStack bg="white" shadow="md" width={{ base: '100%', md: '45%' }} rounded="full" px={4}>
+            <Box color="blue">
+              <IoIosSearch size="20px" />
+            </Box>
+            <Input
+              placeholder="Search Products"
+              border="none"
+              _placeholder={{ color: 'gray.500' }}
+              size="lg"
+              flex="1"
+            />
+          </HStack>
 
-          <Flex justifyContent="space-between" width="full" alignItems="center" color="gray.800">
-            <Heading size="3xl">Products</Heading>
-            <HStack gap={15}>
-              <Button bgColor="teal.400" color="white" variant="solid">
-                <FaFilter />
-                Filter
-              </Button>
-              <Button bgColor="teal.400" color="white" variant="solid">
-                <FaPrint />
-                Print
-              </Button>
-              <Button
-                bgColor="#0074E4"
-                color="white"
-                variant="solid"
-                size="lg"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Add product
-                <FaPlusCircle />
-              </Button>
-            </HStack>
-          </Flex>
-
-          <Flex>
-            <Stack
-              width="full"
-              gap="5"
-              bgColor="white"
-              shadow="sm"
-              rounded="lg"
-              overflow="hidden"
-              pb="2"
-            >
-              <Table.ScrollArea rounded="md" height="sm">
-                <Table.Root size="lg" stickyHeader color="gray.500" height="5" overflowY="scroll">
-                  <Table.Header>
-                    <Table.Row bgColor="white" borderBottomColor="gray.200" borderBottomWidth="3px">
-                      <Table.ColumnHeader color="gray.600">Name</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Quantity</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Purchase Price</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Selling Price</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Max Discount</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Min Discount</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Category</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Supplier Info</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Date of Purchase</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Payment Status</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Discount on Bulk</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Damaged Items</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Stock</Table.ColumnHeader>
-                      <Table.ColumnHeader color="gray.600">Actions</Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-
-                  <Table.Body>
-                    {products.map((item) => (
-                      <Table.Row
-                        key={item.id}
-                        bgColor="whiteAlpha.100"
-                        borderBottomColor="gray.200"
-                        borderBottomWidth="3px"
-                      >
-                        <Table.Cell color="gray.700">{item.name}</Table.Cell>
-                        <Table.Cell>{item.productQuantity}</Table.Cell>
-                        <Table.Cell>₹{item.purchasePrice}</Table.Cell>
-                        <Table.Cell>₹{item.sellingPrice}</Table.Cell>
-                        <Table.Cell>{item.maxDiscount}%</Table.Cell>
-                        <Table.Cell>{item.minDiscount}%</Table.Cell>
-                        <Table.Cell>{item.category}</Table.Cell>
-                        <Table.Cell>{item.supplierInfo}</Table.Cell>
-                        <Table.Cell>{item.dateOfPurchase}</Table.Cell>
-                        <Table.Cell>{item.paymentStatus}</Table.Cell>
-                        <Table.Cell>{item.discountOnBulk}</Table.Cell>
-                        <Table.Cell>{item.damagedItems}</Table.Cell>
-                        <Table.Cell>{item.stock}</Table.Cell>
-                        <Table.Cell>
-                          <HStack gap="2" justifyContent="center">
-                            <IconButton aria-label="Edit" size="sm" colorScheme="yellow">
-                              <FaEdit />
-                            </IconButton>
-                            <IconButton aria-label="Delete" size="sm" colorScheme="red">
-                              <FaTrash />
-                            </IconButton>
-                          </HStack>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
-              </Table.ScrollArea>
-              {/* 
-						<Pagination.Root count={products.length * 5} pageSize={5} page={1}>
-							<ButtonGroup
-								variant="ghost"
-								size="sm"
-								wrap="wrap"
-								color="gray.500"
-							>
-								<Pagination.PrevTrigger asChild>
-									<IconButton>
-										<LuChevronLeft color="gray.500" />
-									</IconButton>
-								</Pagination.PrevTrigger>
-
-								<Pagination.Items
-									render={(page) => (
-										<IconButton
-											variant={{ base: "ghost", _selected: "outline" }}
-										>
-											{page.value}
-										</IconButton>
-									)}
-								/>
-
-								<Pagination.NextTrigger asChild>
-									<IconButton>
-										<LuChevronRight color="gray.500" />
-									</IconButton>
-								</Pagination.NextTrigger>
-							</ButtonGroup>
-						</Pagination.Root> */}
+          <HStack gap="4">
+            <Avatar.Root bgColor="#0074E4" size="xl">
+              <Avatar.Fallback name="Kaushal Raj" /> <Avatar.Image src="./image" />
+            </Avatar.Root>
+            <Stack>
+              <Text fontWeight="medium">Kaushal Raj</Text>
+              <Text color="fg.muted" textStyle="sm">
+                Shop Name
+              </Text>
             </Stack>
-          </Flex>
+          </HStack>
         </Flex>
+
+        {/* PRODUCTS TITLE + BUTTONS */}
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          width="full"
+          mt={10}
+          flexWrap="wrap"
+          gap={4}
+        >
+          <Heading size="2xl" color={'gray.800'}>
+            Products
+          </Heading>
+
+          <HStack gap={4} flexWrap="wrap">
+            <Button bgColor="teal.400" color="white">
+              <HStack gap={3}>
+                <FaFilter />
+                <span>Filter</span>
+              </HStack>
+            </Button>
+            <Button bgColor="teal.400" color="white">
+              <HStack gap={3}>
+                <FaPrint />
+                <span>Print</span>
+              </HStack>
+            </Button>
+            <Button bgColor="#0074E4" color="white" size="lg" onClick={() => setIsModalOpen(true)}>
+              <HStack gap={3}>
+                <FaPlusCircle />
+                <span>Add product</span>
+              </HStack>
+            </Button>
+          </HStack>
+        </Flex>
+
+        {/* TABLE SECTION */}
+        <Box
+          width="100%"
+          bg="white"
+          mt={6}
+          rounded="lg"
+          shadow="sm"
+          overflow="hidden"
+          color={'gray.800'}
+          pb={3}
+        >
+          <Table.ScrollArea height="60vh">
+            <Table.Root size="lg" color={'gray.800'} stickyHeader>
+              <Table.Header>
+                <Table.Row bg="white" borderBottom="2px solid" borderColor="gray.200">
+                  <Table.ColumnHeader>Name</Table.ColumnHeader>
+                  <Table.ColumnHeader>Quantity</Table.ColumnHeader>
+                  <Table.ColumnHeader>Purchase Price</Table.ColumnHeader>
+                  <Table.ColumnHeader>Selling Price</Table.ColumnHeader>
+                  <Table.ColumnHeader>Max Discount</Table.ColumnHeader>
+                  <Table.ColumnHeader>Min Discount</Table.ColumnHeader>
+                  <Table.ColumnHeader>Category</Table.ColumnHeader>
+                  <Table.ColumnHeader>Supplier Info</Table.ColumnHeader>
+                  <Table.ColumnHeader>Date of Purchase</Table.ColumnHeader>
+                  <Table.ColumnHeader>Payment Status</Table.ColumnHeader>
+                  <Table.ColumnHeader>Discount on Bulk</Table.ColumnHeader>
+                  <Table.ColumnHeader>Damaged Items</Table.ColumnHeader>
+                  <Table.ColumnHeader>Stock</Table.ColumnHeader>
+                  <Table.ColumnHeader>Actions</Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Body>
+                {products.map((item) => (
+                  <Table.Row
+                    key={item.id}
+                    bg="white"
+                    borderBottom="2px solid"
+                    borderColor="gray.200"
+                  >
+                    <Table.Cell>{item.name}</Table.Cell>
+                    <Table.Cell>{item.productQuantity}</Table.Cell>
+                    <Table.Cell>₹{item.purchasePrice}</Table.Cell>
+                    <Table.Cell>₹{item.sellingPrice}</Table.Cell>
+                    <Table.Cell>{item.maxDiscount}%</Table.Cell>
+                    <Table.Cell>{item.minDiscount}%</Table.Cell>
+                    <Table.Cell>{item.category}</Table.Cell>
+                    <Table.Cell>{item.supplierInfo}</Table.Cell>
+                    <Table.Cell>{item.dateOfPurchase}</Table.Cell>
+                    <Table.Cell>{item.paymentStatus}</Table.Cell>
+                    <Table.Cell>{item.discountOnBulk}</Table.Cell>
+                    <Table.Cell>{item.damagedItems}</Table.Cell>
+                    <Table.Cell>{item.stock}</Table.Cell>
+                    <Table.Cell>
+                      <HStack gap={2}>
+                        <IconButton aria-label="Edit" size="sm" colorScheme="yellow">
+                          <FaEdit />
+                        </IconButton>
+                        <IconButton aria-label="Delete" size="sm" colorScheme="red">
+                          <FaTrash />
+                        </IconButton>
+                      </HStack>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Table.ScrollArea>
+        </Box>
       </Flex>
+
       <AdaptiveModal
         isOpen={isModalOpen}
         title="Add New Product"

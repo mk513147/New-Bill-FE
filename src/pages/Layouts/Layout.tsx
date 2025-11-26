@@ -12,6 +12,8 @@ const Layout = () => {
     const isLoggedIn = JSON.parse(localStorage.getItem('eb_logged_in') || 'false')
     if (!isLoggedIn) {
       navigate('/login', { replace: true })
+    } else {
+      navigate('/dashboard')
     }
   }, [])
 

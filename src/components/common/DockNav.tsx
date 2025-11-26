@@ -9,12 +9,12 @@ import {
   FaArrowRightToBracket,
 } from 'react-icons/fa6'
 import { useState } from 'react'
-import { API } from '@/api/api'
-import API_ENDPOINTS from '@/api/apiEndpoints'
-import { resetProfile } from '@/redux/slices/profileSlice'
+import { API } from '@/api/api.ts'
+import API_ENDPOINTS from '@/api/apiEndpoints.ts'
+import { resetProfile } from '@/redux/slices/profileSlice.ts'
 import { useDispatch } from 'react-redux'
-import { ToasterUtil } from './ToasterUtil'
-import Loading from './Loading'
+import { ToasterUtil } from './ToasterUtil.tsx'
+import Loading from './Loading.tsx'
 
 const navItems = [
   { label: 'Home', icon: FaShop, path: '/dashboard' },

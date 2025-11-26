@@ -12,9 +12,16 @@ import {
   Box,
 } from '@chakra-ui/react'
 
-import { FaFilter, FaPrint, FaPlusCircle, FaEdit, FaTrash, IoIosSearch } from '@/components/icons'
+import {
+  FaFilter,
+  FaPrint,
+  FaPlusCircle,
+  FaEdit,
+  FaTrash,
+  IoIosSearch,
+} from '@/components/icons/index.ts'
 
-import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal'
+import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal.tsx'
 import { useState } from 'react'
 
 interface Customer {

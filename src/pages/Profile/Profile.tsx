@@ -11,27 +11,27 @@ import {
 } from '@chakra-ui/react'
 import { FaUpload } from 'react-icons/fa'
 import '@/styles/products.css'
-import { useProfile } from '@/hooks/useProfile'
-import { ToasterUtil } from '@/components/common/ToasterUtil'
-import { useProfileActions } from '@/hooks/useProfileActions'
+import { useProfile } from '@/hooks/useProfile.ts'
+import { ToasterUtil } from '@/components/common/ToasterUtil.tsx'
+// import { useProfileActions } from '@/hooks/useProfileActions'
 
 function Profile() {
   const { data, isLoading, isError } = useProfile()
   const toast = ToasterUtil()
-  const { createProfile, updateProfile, deleteProfile } = useProfileActions('253')
+  // const { updateProfile, deleteProfile } = useProfileActions('253')
 
-  const handleUpdate = () => {
-    updateProfile.mutate(
-      { name: 'Guddu' },
-      {
-        onSuccess: () => console.log('Updated profile'),
-      },
-    )
-  }
+  // const handleUpdate = () => {
+  //   updateProfile.mutate(
+  //     { name: 'Guddu' },
+  //     {
+  //       onSuccess: () => console.log('Updated profile'),
+  //     },
+  //   )
+  // }
 
-  const handleDelete = () => {
-    deleteProfile.mutate()
-  }
+  // const handleDelete = () => {
+  //   deleteProfile.mutate()
+  // }
 
   if (isLoading) {
     return (

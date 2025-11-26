@@ -1,4 +1,4 @@
-import { Toaster, toaster } from '@/components/ui/toaster'
+import { Toaster, toaster } from '@/components/ui/toaster.tsx'
 
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 

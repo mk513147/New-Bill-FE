@@ -1,5 +1,5 @@
-import API_ENDPOINTS from '@/api/apiEndpoints'
-import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints.ts'
+import { API } from '@/api/api.ts'
 import { useQuery } from '@tanstack/react-query'
 
 export const getCustomer = async () => {

@@ -14,7 +14,7 @@ import {
   SuppliersRoute,
   PaymentsRoute,
   SettingsRoute,
-} from './importRoutes/index'
+} from './importRoutes/index.ts'
 
 const authPages = () => (
   <>

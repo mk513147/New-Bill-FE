@@ -5,7 +5,7 @@ export const useProductActions = (pubId: string) => {
   const queryClient = useQueryClient()
 
   const createProduct = useMutation({
-    mutationFn: (payload: any) => API.post('/products', payload).then((res) => res.data),
+    mutationFn: (payload: any) => API.post('/products', payload).then((res: any) => res.data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
@@ -13,7 +13,8 @@ export const useProductActions = (pubId: string) => {
   })
 
   const updateProduct = useMutation({
-    mutationFn: (payload: any) => API.put(`/products/${pubId}`, payload).then((res) => res.data),
+    mutationFn: (payload: any) =>
+      API.put(`/products/${pubId}`, payload).then((res: any) => res.data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products', pubId] })
@@ -21,7 +22,7 @@ export const useProductActions = (pubId: string) => {
   })
 
   const deleteProduct = useMutation({
-    mutationFn: () => API.delete(`/products/${pubId}`).then((res) => res.data),
+    mutationFn: () => API.delete(`/products/${pubId}`).then((res: any) => res.data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })

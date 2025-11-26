@@ -1,17 +1,16 @@
 import { Box, Button, Input, Stack, Link, Heading, Flex, Field } from '@chakra-ui/react'
-import { PasswordInput } from '@/components/ui/password-input'
+import { PasswordInput } from '@/components/ui/password-input.tsx'
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
-import '@/styles/loginForm.css'
 import { useState } from 'react'
 import logo from '@/assets/logo.png'
-import { ToasterUtil } from '@/components/common/ToasterUtil'
-import { API } from '@/api/api'
+import { ToasterUtil } from '@/components/common/ToasterUtil.tsx'
+import { API } from '@/api/api.ts'
 import { useNavigate } from 'react-router-dom'
-import { setProfile } from '@/redux/slices/profileSlice'
+import { setProfile } from '@/redux/slices/profileSlice.ts'
 import { useDispatch } from 'react-redux'
 import { AxiosError } from 'axios'
-import API_ENDPOINTS from '@/api/apiEndpoints'
-import Loading from '@/components/common/Loading'
+import API_ENDPOINTS from '@/api/apiEndpoints.ts'
+import Loading from '@/components/common/Loading.tsx'
 
 interface FormValues {
   emailId: string

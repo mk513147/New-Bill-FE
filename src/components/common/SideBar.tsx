@@ -71,14 +71,14 @@ const SideBar = () => {
       {loading && <Loading />}
       <Drawer.Root placement={'start'}>
         <Drawer.Trigger asChild>
-          <Button variant="subtle" size="lg">
+          <Button variant="solid" size="lg">
             <BsLayoutSidebarInset size={'50px'} />
           </Button>
         </Drawer.Trigger>
         <Portal>
           <Drawer.Backdrop />
           <Drawer.Positioner>
-            <Drawer.Content rounded="md">
+            <Drawer.Content rounded="md" bg={'gray.100'} color={'gray.800'}>
               <Drawer.Header mb={2}>
                 <Drawer.Title>
                   <Box
@@ -99,7 +99,7 @@ const SideBar = () => {
                     <Box
                       key={item.label}
                       p={1}
-                      _hover={{ bg: 'whiteAlpha.300' }}
+                      _hover={{ bg: 'whiteAlpha.700' }}
                       cursor={'pointer'}
                     >
                       <NavLink to={item.path}>

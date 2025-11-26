@@ -1,7 +1,6 @@
 import { Box, Button, Input, Stack, Link, Heading, Flex, Field } from '@chakra-ui/react'
 import { PasswordInput } from '@/components/ui/password-input'
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
-import '@/styles/loginForm.css'
 import { useState } from 'react'
 import logo from '@/assets/logo.png'
 import { ToasterUtil } from '@/components/common/ToasterUtil'

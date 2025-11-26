@@ -11,7 +11,7 @@ import {
 import { useState } from 'react'
 import { API } from '@/api/api.ts'
 import API_ENDPOINTS from '@/api/apiEndpoints.ts'
-import { resetProfile } from '@/Redux/slices/profileSlice.ts'
+import { resetProfile } from '@/Redux/Slices/profileSlice.ts'
 import { useDispatch } from 'react-redux'
 import { ToasterUtil } from './ToasterUtil.tsx'
 import Loading from './Loading.tsx'

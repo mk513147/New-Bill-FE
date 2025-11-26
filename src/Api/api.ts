@@ -1,44 +1,51 @@
-import { resetProfile } from "@/Redux/Slices/profileSlice";
-import { store } from "@/Redux/store";
+import { resetProfile } from '@/redux/slices/profileSlice'
+import { store } from '@/redux/store'
+import { logoutService } from '@/utils/utils'
 
-import axios from "axios";
+import axios from 'axios'
+import API_ENDPOINTS from './apiEndpoints'
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
 
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   withCredentials: true,
-});
+})
 
 API.interceptors.response.use(
   (response) => response,
 
-  (error) => {
-    const status = error?.response?.status;
-    const currentPath = window.location.pathname;
+  async (error) => {
+    const status = error?.response?.status
+    const currentPath = window.location.pathname
 
-    if (currentPath === "/login") {
-      return Promise.reject(error);
+    if (currentPath === '/login') {
+      return Promise.reject(error)
     }
 
     if (status === 401) {
-      console.log("⛔ Unauthorized — clearing session");
+      console.log('⛔ Unauthorized — clearing session')
 
-      localStorage.clear();
-      sessionStorage.clear();
+      if (error.config?.url?.includes(API_ENDPOINTS.AUTH.LOGOUT)) {
+        console.warn('Logout API returned 401 — ignoring')
+        return Promise.reject(error)
+      }
 
-      store.dispatch(resetProfile());
+      await logoutService()
 
-      window.location.href = "/login";
-      return Promise.reject(error);
+      store.dispatch(resetProfile())
+
+      window.location.href = '/login'
+
+      return Promise.reject(error)
     }
 
     if (!error.response) {
-      console.error("Network error — offline?");
+      console.error('Network error — offline?')
     }
 
-    return Promise.reject(error);
-  }
-);
+    return Promise.reject(error)
+  },
+)

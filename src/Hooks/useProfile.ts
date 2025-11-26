@@ -1,15 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { API } from "@/Api/api";
-import API_ENDPOINTS from "@/Api/apiEndpoints";
+import { useQuery } from '@tanstack/react-query'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 
 export const getProfile = async () => {
-  const { data } = await API.get(API_ENDPOINTS.MERCHANT.PROFILE);
-  return data.user;
-};
+  const res = await API.get(API_ENDPOINTS.MERCHANT.PROFILE)
+  return res?.data?.data || null
+}
 
 export const useProfile = () => {
   return useQuery({
-    queryKey: ["getProfile"],
+    queryKey: ['getProfile'],
     queryFn: getProfile,
     retry: false,
 
@@ -17,5 +17,5 @@ export const useProfile = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-  });
-};
+  })
+}

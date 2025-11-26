@@ -1,33 +1,52 @@
+import Auth from '@/pages/Layouts/Auth.tsx'
+import Layout from '@/pages/Layouts/Layout.tsx'
+
+import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom'
+
 import {
-  Dashboard,
-  Customer,
-  Products,
-  Profile,
-  Login,
-} from "../pages/index.ts";
-import Auth from "@/pages/Layouts/Auth.tsx";
-import Layout from "@/pages/Layouts/Layout.tsx";
+  LoginRoute,
+  ForgotPasswordRoute,
+  CustomerRoute,
+  ProductRoute,
+  DashboardRoute,
+  ProfileRoute,
+  StocksRoute,
+  SuppliersRoute,
+  PaymentsRoute,
+  SettingsRoute,
+} from './importRoutes/index'
 
-import { Route, Routes, BrowserRouter } from "react-router-dom";
-import { dashboard } from "./dashboard.tsx";
+const authPages = () => (
+  <>
+    {LoginRoute()}
+    {ForgotPasswordRoute()}
+  </>
+)
+const pages = () => (
+  <>
+    {DashboardRoute()}
+    {CustomerRoute()}
+    {ProductRoute()}
+    {ProfileRoute()}
+    {StocksRoute()}
+    {SuppliersRoute()}
+    {PaymentsRoute()}
+    {SettingsRoute()}
+  </>
+)
 
-function PageRouter() {
+const PageRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Auth />}>
-          <Route path="/login" element={<Login />} />
-          {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+          {authPages()}
         </Route>
-        <Route element={<Layout />}>
-          {dashboard()}
-          <Route path="/customer" element={<Customer />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/products" element={<Products />} />
-        </Route>
+        <Route element={<Layout />}>{pages()}</Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
-export default PageRouter;
+export default PageRouter

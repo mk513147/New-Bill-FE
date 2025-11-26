@@ -1,12 +1,24 @@
 export const API_ENDPOINTS = {
   AUTH: {
-    SIGNIN: "/auth/login",
-    LOGOUT: "/auth/logout",
+    LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
   },
 
   MERCHANT: {
-    PROFILE: "/auth/view",
+    PROFILE: '/auth/view',
   },
-};
 
-export default API_ENDPOINTS;
+  CUSTOMERS: {
+    BASE: '/customers/getCustomer',
+  },
+
+  PRODUCTS: {
+    BASE: '/products',
+  },
+
+  SUPPLIERS: {
+    BASE: '/suppliers',
+  },
+}
+
+export default API_ENDPOINTS

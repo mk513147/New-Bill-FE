@@ -1,5 +1,5 @@
-import { resetProfile } from '@/redux/slices/profileSlice'
-import { store } from '@/redux/store'
+import { resetProfile } from '@/Redux/slices/profileSlice'
+import { store } from '@/Redux/store'
 import { logoutService } from '@/utils/utils'
 
 import axios from 'axios'

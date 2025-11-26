@@ -1,4 +1,4 @@
-import { setActiveTab } from '@/redux/slices/dockSlice.ts'
+import { setActiveTab } from '@/Redux/slices/dockSlice'
 import { Box, Grid, GridItem, Heading, Text } from '@chakra-ui/react'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'

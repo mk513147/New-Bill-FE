@@ -1,12 +1,17 @@
 import {
   Box,
-  Stack,
   HStack,
   IconButton,
   Button,
   Drawer,
   Portal,
   StackSeparator,
+  useMediaQuery,
+  CloseButton,
+  Avatar,
+  Input,
+  VStack,
+  Text,
 } from '@chakra-ui/react'
 
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -15,9 +20,7 @@ import { API } from '@/api/api'
 import API_ENDPOINTS from '@/api/apiEndpoints'
 import { resetProfile } from '@/redux/slices/profileSlice'
 import { useDispatch } from 'react-redux'
-import { useState } from 'react'
 import { ToasterUtil } from './ToasterUtil'
-import Loading from './Loading'
 import {
   GrAnalytics,
   FaGear,
@@ -39,15 +42,12 @@ const navItems = [
   { label: 'Settings', icon: FaGear, path: '/settings' },
 ]
 
-const SideBar = () => {
+export const SideBar = () => {
   const toastFunc = ToasterUtil()
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
-    setLoading(true)
-
     try {
       const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
 
@@ -62,75 +62,188 @@ const SideBar = () => {
     localStorage.clear()
     dispatch(resetProfile())
     navigate('/login', { replace: true })
-
-    setLoading(false)
   }
+
+  const [isLarge] = useMediaQuery(['(min-width: 768px)']) // md breakpoint
 
   return (
     <>
-      {loading && <Loading />}
-      <Drawer.Root placement={'start'}>
-        <Drawer.Trigger asChild>
-          <Button variant="solid" size="lg">
-            <BsLayoutSidebarInset size={'50px'} />
-          </Button>
-        </Drawer.Trigger>
-        <Portal>
-          <Drawer.Backdrop />
-          <Drawer.Positioner>
-            <Drawer.Content rounded="md" bg={'gray.100'} color={'gray.800'}>
-              <Drawer.Header mb={2}>
-                <Drawer.Title>
-                  <Box
-                    width={'100%'}
-                    fontSize={'4xl'}
-                    textAlign={'center'}
-                    bgGradient="linear-gradient(0deg,rgba(93, 34, 195, 1) 0%, rgba(45, 253, 243, 1) 100%)"
-                    bgClip="text"
-                    fontWeight="bold"
+      {isLarge ? (
+        // ============================
+        // DESKTOP — FIXED SIDEBAR
+        // ============================
+        <Box
+          w="320px"
+          h="100vh"
+          bg="white"
+          position="relative"
+          borderRight="1px solid"
+          borderColor="gray.200"
+          p={5}
+          display={{ base: 'none', md: 'block' }} // hides on mobile
+        >
+          {/* LOGO */}
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            bgGradient="linear-gradient(90deg, #5D22C3, #2DFDF3)"
+            bgClip="text"
+            mb={6}
+            textAlign="left"
+          >
+            EBILL
+          </Text>
+
+          {/* SEARCH BAR */}
+          <Input
+            placeholder="Search"
+            mb={6}
+            borderRadius="full"
+            bg="gray.50"
+            _focus={{ borderColor: 'purple.400' }}
+          />
+
+          {/* NAVIGATION */}
+          <VStack align="stretch" gap={1}>
+            {navItems.map((item) => (
+              <NavLink to={item.path} key={item.label}>
+                {({ isActive }) => (
+                  <HStack
+                    px={3}
+                    py={2}
+                    rounded="md"
+                    cursor="pointer"
+                    gap={3}
+                    bg={isActive ? 'purple.50' : 'transparent'}
+                    color={isActive ? 'purple.600' : 'gray.700'}
+                    _hover={{ bg: 'purple.50' }}
                   >
-                    EBILL
-                  </Box>
-                </Drawer.Title>
-              </Drawer.Header>
-              <Drawer.Body>
-                <Stack separator={<StackSeparator />}>
-                  {navItems.map((item) => (
-                    <Box
-                      key={item.label}
-                      p={1}
-                      _hover={{ bg: 'whiteAlpha.700' }}
-                      cursor={'pointer'}
+                    <item.icon size="20px" />
+                    <Text fontWeight={isActive ? 'semibold' : 'normal'}>{item.label}</Text>
+                  </HStack>
+                )}
+              </NavLink>
+            ))}
+          </VStack>
+
+          {/* FOOTER AREA */}
+          <Box position="absolute" bottom="20px" left="0" w="100%" px={5}>
+            <HStack justify="space-between">
+              <HStack>
+                <Avatar.Root>
+                  <Avatar.Fallback name="Segun Adebayo" />
+                  <Avatar.Image src="https://i.pravatar.cc/100?img=5" />
+                </Avatar.Root>
+                <Box color="gray.700">
+                  <Text>Olivia Rhye</Text>
+                  <Text>Admin</Text>
+                </Box>
+              </HStack>
+
+              <IconButton
+                aria-label="logout"
+                size="md"
+                rounded="full"
+                bg="white"
+                shadow="sm"
+                _hover={{ bg: 'gray.600' }}
+                onClick={handleLogout}
+              >
+                {<FaSignOutAlt />}
+              </IconButton>
+            </HStack>
+          </Box>
+        </Box>
+      ) : (
+        // ============================
+        // MOBILE — DRAWER
+        // ============================
+        <Drawer.Root placement={'start'}>
+          <Drawer.Trigger asChild position={'absolute'} top="2" left="2">
+            <Button variant="solid" size="sm">
+              <BsLayoutSidebarInset />
+            </Button>
+          </Drawer.Trigger>
+          <Portal>
+            <Drawer.Backdrop />
+            <Drawer.Positioner>
+              <Drawer.Content
+                bg="white"
+                position="relative"
+                borderRight="1px solid"
+                borderColor="gray.200"
+              >
+                <Drawer.Header>
+                  <Drawer.Title>
+                    <Text
+                      fontSize="2xl"
+                      fontWeight="bold"
+                      bgGradient="linear-gradient(90deg, #5D22C3, #2DFDF3)"
+                      bgClip="text"
+                      mb={6}
+                      textAlign="left"
                     >
-                      <NavLink to={item.path}>
-                        <HStack gap={2}>
-                          <item.icon size={'20px'} />
-                          {item.label}
-                        </HStack>
+                      EBILL
+                    </Text>
+                  </Drawer.Title>
+                </Drawer.Header>
+                <Drawer.Body>
+                  <VStack align="stretch" gap={1}>
+                    {navItems.map((item) => (
+                      <NavLink to={item.path} key={item.label}>
+                        {({ isActive }) => (
+                          <HStack
+                            px={3}
+                            py={2}
+                            rounded="md"
+                            cursor="pointer"
+                            gap={3}
+                            bg={isActive ? 'purple.50' : 'transparent'}
+                            color={isActive ? 'purple.600' : 'gray.700'}
+                            _hover={{ bg: 'purple.50' }}
+                          >
+                            <item.icon size="20px" />
+                            <Text fontWeight={isActive ? 'semibold' : 'normal'}>{item.label}</Text>
+                          </HStack>
+                        )}
                       </NavLink>
-                    </Box>
-                  ))}
-                </Stack>
-              </Drawer.Body>
-              <Drawer.Footer>
-                <IconButton
-                  onClick={() => handleLogout()}
-                  disabled={loading}
-                  bg="teal.500"
-                  color="white"
-                  _hover={{ bg: 'teal.600' }}
-                  size="md"
-                  borderRadius="full"
-                >
-                  <FaSignOutAlt />
-                </IconButton>
-              </Drawer.Footer>
-            </Drawer.Content>
-          </Drawer.Positioner>
-        </Portal>
-      </Drawer.Root>
+                    ))}
+                  </VStack>
+                </Drawer.Body>
+                <Drawer.Footer>
+                  <HStack justifyContent="space-between" width="full">
+                    <HStack>
+                      <Avatar.Root>
+                        <Avatar.Fallback name="Segun Adebayo" />
+                        <Avatar.Image src="https://i.pravatar.cc/100?img=5" />
+                      </Avatar.Root>
+                      <Box color="gray.700">
+                        <Text>Olivia Rhye</Text>
+                        <Text>Admin</Text>
+                      </Box>
+                    </HStack>
+
+                    <IconButton
+                      aria-label="logout"
+                      size="md"
+                      rounded="full"
+                      bg="white"
+                      shadow="sm"
+                      _hover={{ bg: 'gray.600' }}
+                      onClick={handleLogout}
+                    >
+                      {<FaSignOutAlt />}
+                    </IconButton>
+                  </HStack>
+                </Drawer.Footer>
+                <Drawer.CloseTrigger asChild>
+                  <CloseButton size="sm" />
+                </Drawer.CloseTrigger>
+              </Drawer.Content>
+            </Drawer.Positioner>
+          </Portal>
+        </Drawer.Root>
+      )}
     </>
   )
 }
-
-export default SideBar

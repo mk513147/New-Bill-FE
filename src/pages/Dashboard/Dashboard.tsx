@@ -16,7 +16,7 @@ function Dashboard() {
     dispatch(setActiveTab('home'))
   }, [])
   return (
-    <Box w="100vw" h="100vh" overflowY="auto" p={5}>
+    <Box w="100%" h="100%" overflowY="auto" p={5}>
       <Heading size="lg">Welcome to Dashboard</Heading>
 
       <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={5} mt={5}>

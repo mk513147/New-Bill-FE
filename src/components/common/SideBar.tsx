@@ -17,7 +17,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { FaSignOutAlt } from 'react-icons/fa'
 import { API } from '@/api/api.ts'
 import API_ENDPOINTS from '@/api/apiEndpoints.ts'
-import { resetProfile } from '@/Redux/Slices/profileSlice.ts'
+import { resetProfile } from '@/redux/slices/profileSlice.ts'
 import { useDispatch } from 'react-redux'
 import { ToasterUtil } from './ToasterUtil'
 import {

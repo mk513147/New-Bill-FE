@@ -5,7 +5,6 @@ import {
   Button,
   Drawer,
   Portal,
-  StackSeparator,
   useMediaQuery,
   CloseButton,
   Avatar,
@@ -64,14 +63,11 @@ export const SideBar = () => {
     navigate('/login', { replace: true })
   }
 
-  const [isLarge] = useMediaQuery(['(min-width: 768px)']) // md breakpoint
+  const [isLarge] = useMediaQuery(['(min-width: 768px)'])
 
   return (
     <>
       {isLarge ? (
-        // ============================
-        // DESKTOP — FIXED SIDEBAR
-        // ============================
         <Box
           w="320px"
           h="100vh"
@@ -80,9 +76,8 @@ export const SideBar = () => {
           borderRight="1px solid"
           borderColor="gray.200"
           p={5}
-          display={{ base: 'none', md: 'block' }} // hides on mobile
+          display={{ base: 'none', md: 'block' }}
         >
-          {/* LOGO */}
           <Text
             fontSize="2xl"
             fontWeight="bold"
@@ -94,7 +89,6 @@ export const SideBar = () => {
             EBILL
           </Text>
 
-          {/* SEARCH BAR */}
           <Input
             placeholder="Search"
             mb={6}
@@ -103,7 +97,6 @@ export const SideBar = () => {
             _focus={{ borderColor: 'purple.400' }}
           />
 
-          {/* NAVIGATION */}
           <VStack align="stretch" gap={1}>
             {navItems.map((item) => (
               <NavLink to={item.path} key={item.label}>
@@ -126,7 +119,6 @@ export const SideBar = () => {
             ))}
           </VStack>
 
-          {/* FOOTER AREA */}
           <Box position="absolute" bottom="20px" left="0" w="100%" px={5}>
             <HStack justify="space-between">
               <HStack>
@@ -155,9 +147,6 @@ export const SideBar = () => {
           </Box>
         </Box>
       ) : (
-        // ============================
-        // MOBILE — DRAWER
-        // ============================
         <Drawer.Root placement={'start'}>
           <Drawer.Trigger asChild position={'absolute'} top="2" left="2">
             <Button variant="solid" size="sm">

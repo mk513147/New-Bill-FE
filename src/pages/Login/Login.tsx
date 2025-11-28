@@ -1,8 +1,23 @@
-import { Box, Button, Input, Stack, Link, Heading, Flex, Field } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Input,
+  Stack,
+  Link,
+  Heading,
+  Flex,
+  Field,
+  Text,
+  Image,
+  HStack,
+} from '@chakra-ui/react'
 import { PasswordInput } from '@/components/ui/password-input'
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
 import { useState } from 'react'
+import login from '@/assets/Login-Image.jpg'
+import dash from '@/assets/Dash-Image.jpg'
 import logo from '@/assets/logo.png'
+
 import { ToasterUtil } from '@/components/common/ToasterUtil'
 import { API } from '@/api/api'
 import { useNavigate } from 'react-router-dom'
@@ -62,125 +77,154 @@ const Login = () => {
   return (
     <>
       {loading && <Loading />}
-      <Flex width={'100vw'} height={'100vh'} bgColor="white">
+
+      <Flex w="100vw" h="100vh" bg="white">
         <Flex
-          width={'45%'}
-          height={'100%'}
-          bgColor="#0074E4"
-          alignItems={'center'}
-          justifyContent={'center'}
-          roundedRight="xl"
+          w={{ base: '100%', md: '50%' }}
+          h="100%"
+          direction="column"
+          justify="center"
+          align="center"
+          px={{ base: 6, md: 16 }}
+          position="relative"
         >
-          <img src={logo} alt="Logo" height="450px" width="450px" />
-        </Flex>
-        <Flex
-          width="55%"
-          height="100%"
-          alignItems="center"
-          justifyContent="center"
-          zIndex={1}
-          pointerEvents="auto"
-        >
-          <Flex
-            width={{ base: '85%', md: '60%' }}
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-            bgColor="whiteAlpha.800"
-            backdropFilter="blur(1px)"
-            p={8}
-          >
-            <Flex direction="column" justifyContent="flex-start" width="100%" mb={8}>
-              <Heading
-                size="5xl"
-                textAlign="left"
-                fontWeight="medium"
-                color="gray.700"
-                letterSpacing="wide"
-                mb={4}
-              >
-                Welcome Back
-              </Heading>
-              <Heading size="xl" color="gray.600">
-                Welcome back! Please enter your details.
-              </Heading>
-            </Flex>
-            <form onSubmit={handleSubmit(onSubmit, onError)} className="login-form">
-              <Stack align="center" width="100%" justify="center" gap={3}>
-                <Field.Root width="100%" mb={6}>
-                  <Box pos="relative" w="full">
-                    <Field.Label color="gray.500" fontSize="lg" mb={1}>
-                      Email
-                    </Field.Label>
-                    <Input
-                      {...register('emailId', {
-                        required: 'Email Id is required',
-                      })}
-                      variant="outline"
-                      placeholder=""
-                      className="peer"
-                      size="lg"
-                      color="gray.800"
-                      bgColor="gray.200"
-                      borderColor="teal.300"
-                      _focus={{ outlineColor: 'teal.500' }}
-                      defaultValue={'kaushal@gmail.com'}
-                    />
-                  </Box>
+          <HStack position="absolute" top="40px" left={{ base: '20px', md: '40px' }} gap={2}>
+            <Image src={logo} w="34px" h="34px" alt="Logo" />
+            <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+              Ebill
+            </Text>
+          </HStack>
+
+          <Box w="100%" textAlign="center" mt={{ base: 20, md: 0 }} mb={8}>
+            <Heading fontSize="5xl" fontWeight="semibold" color="gray.800">
+              Welcome Back
+            </Heading>
+
+            <Text mt={6} fontSize="md" color="gray.500">
+              Enter your email and password to access your account.
+            </Text>
+          </Box>
+
+          <Box w="100%" maxW="420px">
+            <form onSubmit={handleSubmit(onSubmit, onError)}>
+              <Stack gap={5} w="100%">
+                <Field.Root w="100%">
+                  <Field.Label color="gray.700" fontSize="sm" mb={1} fontWeight="medium">
+                    Email
+                  </Field.Label>
+
+                  <Input
+                    {...register('emailId', { required: 'Email Id is required' })}
+                    size="lg"
+                    bg="white"
+                    border="1px solid"
+                    borderColor="gray.300"
+                    color="gray.800"
+                    borderRadius="md"
+                    _focus={{ borderColor: 'blue.500', bg: 'white' }}
+                  />
                 </Field.Root>
 
-                <Field.Root width="100%" mb={6}>
-                  <Box pos="relative" w="full">
-                    <Field.Label color="gray.500" fontSize="lg" mb={1}>
-                      Password
-                    </Field.Label>
-                    <PasswordInput
-                      {...register('password', {
-                        required: 'Password is required',
-                      })}
-                      variant="outline"
-                      placeholder=""
-                      size="lg"
-                      className="peer"
-                      color="gray.800"
-                      bgColor="gray.200"
-                      borderColor="teal.300"
-                      _focus={{ outlineColor: 'teal.500' }}
-                      defaultValue={'Gautam@123'}
-                    />
-                  </Box>
+                <Field.Root w="100%">
+                  <Field.Label color="gray.700" fontSize="sm" mb={1} fontWeight="medium">
+                    Password
+                  </Field.Label>
+
+                  <PasswordInput
+                    {...register('password', { required: 'Password is required' })}
+                    size="lg"
+                    bg="white"
+                    border="1px solid"
+                    borderColor="gray.300"
+                    color="gray.800"
+                    borderRadius="md"
+                    _focus={{ borderColor: 'blue.500', bg: 'white' }}
+                  />
                 </Field.Root>
+
+                <Flex justify="flex-end" mt={-2}>
+                  <Link
+                    fontSize="sm"
+                    color="blue.600"
+                    _hover={{ textDecoration: 'underline', color: 'blue.700' }}
+                  >
+                    Forgot Your Password?
+                  </Link>
+                </Flex>
 
                 <Button
                   type="submit"
-                  bgColor="#0074E4"
-                  variant="solid"
+                  w="100%"
+                  size="lg"
+                  bg="blue.600"
                   color="white"
-                  mt={4}
-                  w="full"
-                  _hover={{
-                    bgColor: '#3391FF',
-                  }}
-                  transition="all 0.3s ease-in-out"
-                  fontSize="xl"
-                  borderRadius="lg"
-                  letterSpacing="widest"
+                  borderRadius="md"
+                  fontSize="lg"
+                  mt={2}
+                  _hover={{ bg: 'blue.700' }}
                 >
-                  LOGIN
+                  Log In
                 </Button>
               </Stack>
             </form>
-            <Link
-              mt={4}
-              color="teal.800"
-              // onClick={() => navigate("/forgot-password")}
-              fontSize="sm"
-              textDecoration="underline"
-              _hover={{ color: 'teal.700' }}
-            >
-              Forgot password?
-            </Link>
-          </Flex>
+          </Box>
+        </Flex>
+
+        <Flex
+          display={{ base: 'none', md: 'flex' }}
+          w="50%"
+          h="100%"
+          justify="center"
+          align="center"
+          borderLeftRadius="2xl"
+          overflow="hidden"
+          direction="column"
+          bgGradient="linear-gradient(110deg, #3b5cff 10%, #5f6bff 90%)"
+          position="relative"
+        >
+          <Box w="100%" display="flex" flexDirection="column" alignItems="center" pt="90px">
+            <Box color="white" textAlign="left" maxW="600px" mb={12}>
+              <Heading fontSize="4xl" fontWeight="light" letterSpacing="wide" lineHeight="1.2">
+                Effortlessly manage your inventory and stock operations.
+              </Heading>
+
+              <Text
+                mt={5}
+                fontSize="lg"
+                opacity={0.9}
+                fontWeight="light"
+                letterSpacing="wide"
+                lineHeight="1.6"
+                maxW="600px"
+              >
+                Log in to access your inventory dashboard and streamline your warehouse management.
+              </Text>
+            </Box>
+
+            <Box position="relative" display="flex" justifyContent="center" w="100%">
+              <Image
+                src={login}
+                alt="Login Illustration"
+                width="75%"
+                position={'relative'}
+                left={0}
+                borderRadius="lg"
+                zIndex={1}
+              />
+
+              <Image
+                src={dash}
+                alt="Dashboard Overlay"
+                position="absolute"
+                right="5%"
+                top="28%"
+                width="40%"
+                shadow="lg"
+                borderRadius="xl"
+                zIndex={5}
+              />
+            </Box>
+          </Box>
         </Flex>
       </Flex>
     </>

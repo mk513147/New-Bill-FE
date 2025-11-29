@@ -17,6 +17,12 @@ import {
 } from './importRoutes/index'
 import { useSelector } from 'react-redux'
 import Loading from '@/components/common/Loading'
+import { PurchaseRoute } from './importRoutes/PurchaseRoute'
+import { StaffRoute } from './importRoutes/StaffRoute'
+import { SalesRoute } from './importRoutes/SalesRoute'
+import { CategoryRoute } from './importRoutes/CategoryRoute'
+import { HelpRoute } from './importRoutes/HelpRoute'
+import { AttendanceRoute } from './importRoutes/AttendaceRoute'
 
 const authPages = () => (
   <>
@@ -34,6 +40,12 @@ const pages = () => (
     {SuppliersRoute()}
     {PaymentsRoute()}
     {SettingsRoute()}
+    {PurchaseRoute()}
+    {StaffRoute()}
+    {SalesRoute()}
+    {CategoryRoute()}
+    {HelpRoute()}
+    {AttendanceRoute()}
   </>
 )
 

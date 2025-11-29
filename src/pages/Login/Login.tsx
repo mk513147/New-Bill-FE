@@ -14,7 +14,6 @@ import {
 } from '@chakra-ui/react'
 import { PasswordInput } from '@/components/ui/password-input'
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
-import { useState } from 'react'
 import login from '@/assets/Login-Image.jpg'
 import dash from '@/assets/Dash-Image.jpg'
 import logo from '@/assets/logo.png'
@@ -28,7 +27,7 @@ import { setProfile } from '@/redux/slices/profileSlice'
 import { useDispatch } from 'react-redux'
 import { AxiosError } from 'axios'
 import API_ENDPOINTS from '@/api/apiEndpoints'
-import Loading from '@/components/common/Loading'
+import { clearLoading, setLoading } from '@/redux/slices/uiSlice'
 
 interface FormValues {
   emailId: string
@@ -37,7 +36,6 @@ interface FormValues {
 
 const Login = () => {
   const toastFunc = ToasterUtil()
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
@@ -45,8 +43,7 @@ const Login = () => {
   const [isLarge] = useMediaQuery(['(min-width: 500px)'])
 
   const onSubmit: SubmitHandler<FormValues> = async (creds) => {
-    setLoading(true)
-
+    dispatch(setLoading({ loading: true, message: 'Logging in...' }))
     try {
       const res = await API.post(API_ENDPOINTS.AUTH.LOGIN, creds)
 
@@ -68,7 +65,7 @@ const Login = () => {
         toastFunc('Something Went Wrong', 'error')
       }
     } finally {
-      setLoading(false)
+      dispatch(clearLoading())
     }
   }
 
@@ -80,8 +77,6 @@ const Login = () => {
 
   return (
     <>
-      {loading && <Loading text="Logging In..." />}
-
       {!isLarge ? (
         <Flex w="100%" h="100vh" justify="center" align="center" bg="white">
           <Flex w="100%" maxW="450px" h="100%" direction="column" position="relative" bg="white">

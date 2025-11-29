@@ -30,6 +30,7 @@ import {
   BsLayoutSidebarInset,
   FaShop,
 } from '@/components/icons'
+import { clearLoading, setLoading } from '@/redux/slices/uiSlice'
 
 const navItems = [
   { label: 'Dashboard', icon: GrAnalytics, path: '/dashboard' },
@@ -47,6 +48,7 @@ export const SideBar = () => {
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
+    dispatch(setLoading({ loading: true, message: 'Logging out...' }))
     try {
       const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
 
@@ -56,10 +58,13 @@ export const SideBar = () => {
     } catch (error) {
       console.error('Logout error:', error)
       toastFunc('Error logging out. Please try again.', 'error')
+    } finally {
+      dispatch(clearLoading())
     }
 
     localStorage.clear()
     dispatch(resetProfile())
+
     navigate('/login', { replace: true })
   }
 

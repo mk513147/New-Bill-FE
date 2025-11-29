@@ -82,7 +82,7 @@ const Login = () => {
           <Flex w="100%" maxW="450px" h="100%" direction="column" position="relative" bg="white">
             <Box
               w="100%"
-              h="320px"
+              h="400px"
               bg="blue.600"
               borderBottomRadius="40px"
               position="relative"

@@ -1,0 +1,38 @@
+<svg width="160" height="120" viewBox="-40 -40 200 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#5E8BFF"/>
+      <stop offset="1" stop-color="#3F72FF"/>
+    </linearGradient>
+
+    <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1840c4" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Updated background wave with Option B shade -->
+  <path d="M-30 -30 L160 -30 C120 10 90 26 40 40 C-10 54 -20 10 -30 -30Z"
+        fill="url(#g1)" opacity="0.95"/>
+
+  <!-- Shelf lines -->
+  <rect x="-20" y="10" width="90" height="10" rx="4" fill="#dbe8ff" opacity="0.9"/>
+  <rect x="10" y="24" width="60" height="6" rx="3" fill="#c7dbff" opacity="0.9"/>
+
+  <!-- Peeking box -->
+  <g transform="translate(-8,32)" filter="url(#s)">
+    <rect x="-8" y="0" width="58" height="36" rx="6" fill="#ffffff" stroke="#173fbf" stroke-width="2"/>
+    <rect x="-8" y="-6" width="58" height="10" rx="4" fill="#173fbf"/>
+    <rect x="6" y="18" width="28" height="8" rx="2" fill="#173fbf" opacity="0.18"/>
+  </g>
+
+  <!-- Mini barcode -->
+  <g transform="translate(60,34) scale(0.9)">
+    <rect x="0" y="0" width="36" height="28" rx="4" fill="#ffffff" stroke="#173fbf" stroke-width="1.6"/>
+    <rect x="6" y="6" width="2" height="16" fill="#173fbf"/>
+    <rect x="9" y="6" width="1" height="16" fill="#173fbf"/>
+    <rect x="12" y="6" width="3" height="16" fill="#173fbf"/>
+    <rect x="17" y="6" width="2" height="16" fill="#173fbf"/>
+    <rect x="20" y="6" width="1.5" height="16" fill="#173fbf"/>
+    <rect x="23" y="6" width="3.5" height="16" fill="#173fbf"/>
+  </g>
+</svg>

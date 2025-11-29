@@ -14,7 +14,15 @@ import {
   SuppliersRoute,
   PaymentsRoute,
   SettingsRoute,
-} from '@/routes/importRoutes/index.ts'
+} from './importRoutes/index'
+import { useSelector } from 'react-redux'
+import Loading from '@/components/common/Loading'
+import { PurchaseRoute } from './importRoutes/PurchaseRoute'
+import { StaffRoute } from './importRoutes/StaffRoute'
+import { SalesRoute } from './importRoutes/SalesRoute'
+import { CategoryRoute } from './importRoutes/CategoryRoute'
+import { HelpRoute } from './importRoutes/HelpRoute'
+import { AttendanceRoute } from './importRoutes/AttendaceRoute'
 
 const authPages = () => (
   <>
@@ -32,20 +40,30 @@ const pages = () => (
     {SuppliersRoute()}
     {PaymentsRoute()}
     {SettingsRoute()}
+    {PurchaseRoute()}
+    {StaffRoute()}
+    {SalesRoute()}
+    {CategoryRoute()}
+    {HelpRoute()}
+    {AttendanceRoute()}
   </>
 )
 
 const PageRouter = () => {
+  const isLoading = useSelector((state: any) => state.ui.isLoading)
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Auth />}>
-          {authPages()}
-        </Route>
-        <Route element={<Layout />}>{pages()}</Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      {isLoading && <Loading />}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Auth />}>
+            {authPages()}
+          </Route>
+          <Route element={<Layout />}>{pages()}</Route>
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }
 

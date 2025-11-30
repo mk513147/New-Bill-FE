@@ -1,15 +1,15 @@
 import {
-  Avatar,
   Flex,
   HStack,
   Input,
-  Stack,
   Text,
   Heading,
   IconButton,
   Button,
   Table,
   Box,
+  Card,
+  VStack,
 } from '@chakra-ui/react'
 
 import {
@@ -23,37 +23,7 @@ import {
 
 import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal.tsx'
 import { useState } from 'react'
-
-interface Customer {
-  id: number
-  name: string
-  mobileNumber: string
-  address: string
-  amount: number
-  companyName: string
-  type: string
-}
-
-const customersData: Customer[] = [
-  {
-    id: 1,
-    name: 'Aman Gupta',
-    mobileNumber: '9876543210',
-    address: 'New Delhi, India',
-    amount: 15000,
-    companyName: 'Boat India Pvt. Ltd.',
-    type: 'Premium',
-  },
-  {
-    id: 2,
-    name: 'Riya Sharma',
-    mobileNumber: '9998887776',
-    address: 'Mumbai, India',
-    amount: 8000,
-    companyName: 'Reliance Retail',
-    type: 'Regular',
-  },
-]
+import { useAllCustomers } from '@/hooks/useCustomer'
 
 const addCustomerFields: FieldConfig[] = [
   { name: 'name', label: 'Customer Name', type: 'text', required: true },
@@ -72,7 +42,14 @@ const addCustomerFields: FieldConfig[] = [
 
 function Customers() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [customers, setCustomers] = useState(customersData)
+  const [page, setPage] = useState(1)
+  const limit = 20
+
+  const { data, isLoading } = useAllCustomers(limit, page)
+  console.log('Customer Data:', data)
+
+  const customers = data ?? []
+  const totalPages = data?.totalPages ?? 3
 
   function handleAddCustomerSubmit(data: Record<string, any>) {
     console.log('New Customer:', data)
@@ -81,150 +58,257 @@ function Customers() {
 
   return (
     <>
-      <Flex
-        bgColor="gray.100"
-        width="100vw"
-        minH="100vh"
-        flexDirection="column"
-        overflow="hidden"
-        p={{ base: 4, md: 6 }}
-      >
-        {/* SEARCH + USER SECTION */}
-        <Flex
-          justifyContent="space-between"
-          width="full"
-          alignItems="center"
-          color="gray.800"
-          gap={4}
-          flexWrap="wrap"
-        >
-          <HStack bg="white" shadow="md" width={{ base: '100%', md: '45%' }} rounded="full" px={4}>
-            <Box color="blue">
-              <IoIosSearch size="20px" />
-            </Box>
+      <Flex bg="white" minH="100vh" flexDir="column" p={6}>
+        {/* PAGE TITLE */}
+        <Heading size="3xl" color="gray.800" mb={4}>
+          Customers
+        </Heading>
 
-            <Input
-              placeholder="Search Customers"
-              border="none"
-              _placeholder={{ color: 'gray.500' }}
-              size="lg"
-              flex="1"
-            />
-          </HStack>
-
-          <HStack gap="4">
-            <Avatar.Root bgColor="#0074E4" size="xl">
-              <Avatar.Fallback name="Kaushal Raj" />
-              <Avatar.Image src="./image" />
-            </Avatar.Root>
-
-            <Stack>
-              <Text fontWeight="medium">Kaushal Raj</Text>
-              <Text color="fg.muted" textStyle="sm">
-                Shop Name
+        {/* STATS SECTION */}
+        <Flex gap={6} wrap="wrap">
+          <Card.Root w="260px" shadow="sm" bg="#6730EC" color="white" borderRadius="lg">
+            <Card.Body>
+              <Text fontSize="lg">Active Customers</Text>
+              <Heading size="2xl">100</Heading>
+              <Text fontSize="sm" opacity={0.9}>
+                ↑ 12% vs last month
               </Text>
-            </Stack>
-          </HStack>
+            </Card.Body>
+          </Card.Root>
+
+          <Card.Root w="260px" shadow="sm" borderRadius="lg" color="gray.800" bg="white">
+            <Card.Body>
+              <Text fontSize="lg">Inactive Customers</Text>
+              <Heading size="2xl">19</Heading>
+              <Text fontSize="sm">↑ 12% vs last month</Text>
+            </Card.Body>
+          </Card.Root>
+
+          <Card.Root w="260px" shadow="sm" borderRadius="lg" color="gray.800" bg="white">
+            <Card.Body>
+              <Text fontSize="lg">Deleted Customers</Text>
+              <Heading size="2xl">10</Heading>
+              <Text fontSize="sm">↑ 12% vs last month</Text>
+            </Card.Body>
+          </Card.Root>
         </Flex>
 
-        {/* CUSTOMERS TITLE + BUTTONS */}
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          width="full"
-          mt={10}
-          flexWrap="wrap"
-          gap={4}
-        >
-          <Heading size="2xl" color="gray.800">
-            Customers
+        {/* ACTIVE CUSTOMER HEADER */}
+        <Flex justify="space-between" align="center" mt={8} w="100%" gap={4} flexWrap="nowrap">
+          {/* Title */}
+          <Heading size="xl" color="gray.800" whiteSpace="nowrap">
+            Active Customer
           </Heading>
 
-          <HStack gap={4} flexWrap="wrap">
-            <Button bgColor="teal.400" color="white">
-              <HStack gap={3}>
-                <FaFilter />
-                <span>Filter</span>
-              </HStack>
-            </Button>
-
-            <Button bgColor="teal.400" color="white">
-              <HStack gap={3}>
-                <FaPrint />
-                <span>Print</span>
-              </HStack>
-            </Button>
-
-            <Button bgColor="#0074E4" color="white" size="lg" onClick={() => setIsModalOpen(true)}>
-              <HStack gap={3}>
-                <FaPlusCircle />
-                <span>Add customer</span>
-              </HStack>
-            </Button>
-          </HStack>
+          {/* Right Controls */}
         </Flex>
 
-        {/* TABLE SECTION */}
+        {/* TABLE */}
         <Box
-          width="100%"
           bg="white"
           mt={6}
           rounded="lg"
           shadow="sm"
-          overflow="hidden"
-          color="gray.800"
-          pb={3}
+          border="1px solid"
+          borderColor="gray.200"
+          p={4}
         >
-          <Box overflowX="auto" width="100%">
-            <Table.ScrollArea height="60vh">
-              <Table.Root size="lg" stickyHeader>
-                <Table.Header>
-                  <Table.Row bg="white" borderBottom="2px solid" borderColor="gray.200">
-                    <Table.ColumnHeader>Name</Table.ColumnHeader>
-                    <Table.ColumnHeader>Mobile Number</Table.ColumnHeader>
-                    <Table.ColumnHeader>Address</Table.ColumnHeader>
-                    <Table.ColumnHeader>Amount</Table.ColumnHeader>
-                    <Table.ColumnHeader>Company Name</Table.ColumnHeader>
-                    <Table.ColumnHeader>Type</Table.ColumnHeader>
-                    <Table.ColumnHeader>Actions</Table.ColumnHeader>
+          {/* Top Controls */}
+          <Flex gap={3} justifyContent={'space-between'} mb={3}>
+            {/* Search */}
+            <HStack gap={2}>
+              <HStack
+                bg="white"
+                rounded="md"
+                px={3}
+                py={1}
+                border="1px solid"
+                borderColor="gray.400"
+                minW="260px"
+              >
+                <IoIosSearch size="22px" color="#6b7280" />
+                <Input
+                  placeholder="Search"
+                  border="none"
+                  _focus={{ outline: 'none', boxShadow: 'none' }}
+                  _placeholder={{ color: 'gray.500' }}
+                />
+              </HStack>
+
+              {/* Filters */}
+              <Button
+                bg="white"
+                border="1px solid "
+                borderColor="gray.400"
+                _hover={{ bg: 'gray.50' }}
+                px={4}
+                height="38px"
+              >
+                <HStack gap={2}>
+                  <FaFilter size="14px" />
+                  <Text fontSize="sm">Filters</Text>
+                </HStack>
+              </Button>
+            </HStack>
+
+            <HStack gap={2}>
+              {/* Add New */}
+              <Button
+                bg="white"
+                border="1px solid "
+                borderColor="gray.400"
+                px={5}
+                height="38px"
+                onClick={() => setIsModalOpen(true)}
+                _hover={{ bg: 'gray.50' }}
+              >
+                <HStack gap={2}>
+                  <FaPlusCircle size="15px" />
+                  <Text fontSize="sm">Add New Customer</Text>
+                </HStack>
+              </Button>
+
+              {/* Export */}
+              <Button bg="#6730EC" color={'white'} px={4} height="38px" _hover={{ bg: '#5b29d8' }}>
+                <HStack gap={2}>
+                  <FaPrint size="14px" />
+                  <Text fontSize="sm">Export</Text>
+                </HStack>
+              </Button>
+            </HStack>
+          </Flex>
+
+          {/* Table */}
+          <Box
+            w="100%"
+            overflowX="auto"
+            maxW="100%"
+            maxH={'300px'}
+            css={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              '&::-webkit-scrollbar': { display: 'none' },
+            }}
+          >
+            <Table.Root size="md" stickyHeader minW="980px">
+              <Table.Header>
+                <Table.Row bg="#F5F6FA">
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Contact Name
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Customer ID
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Email
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Address
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Phone Number
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Actions
+                  </Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Body>
+                {customers.map((item: any) => (
+                  <Table.Row
+                    key={item._id}
+                    _hover={{ bg: 'gray.50' }}
+                    borderBottom="1px solid"
+                    borderColor="gray.100"
+                    height="60px"
+                  >
+                    <Table.Cell>
+                      <Text fontSize="sm">{item.name}</Text>
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <Text fontSize="sm">BC{item._id.slice(-8).toUpperCase()}</Text>
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <Text fontSize="sm">{item.email}</Text>
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <Text fontSize="sm">{item.address}</Text>
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <Text fontSize="sm">{item.mobileNumber}</Text>
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <HStack gap={4}>
+                        <IconButton
+                          aria-label="Edit"
+                          size="sm"
+                          variant="ghost"
+                          _hover={{ bg: 'transparent', color: '#7C3AED' }}
+                        >
+                          {<FaEdit size="16px" color="#7C3AED" />}
+                        </IconButton>
+
+                        <IconButton
+                          aria-label="Delete"
+                          size="sm"
+                          variant="ghost"
+                          _hover={{ bg: 'transparent', color: '#EF4444' }}
+                        >
+                          {<FaTrash size="16px" color="#EF4444" />}
+                        </IconButton>
+                      </HStack>
+                    </Table.Cell>
                   </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                  {customers.map((item) => (
-                    <Table.Row
-                      key={item.id}
-                      bg="white"
-                      borderBottom="2px solid"
-                      borderColor="gray.200"
-                    >
-                      <Table.Cell>{item.name}</Table.Cell>
-                      <Table.Cell>{item.mobileNumber}</Table.Cell>
-                      <Table.Cell>{item.address}</Table.Cell>
-                      <Table.Cell>₹{item.amount}</Table.Cell>
-                      <Table.Cell>{item.companyName}</Table.Cell>
-                      <Table.Cell>{item.type}</Table.Cell>
-
-                      <Table.Cell>
-                        <HStack gap={2}>
-                          <IconButton aria-label="Edit" size="sm" colorScheme="yellow">
-                            <FaEdit />
-                          </IconButton>
-                          <IconButton aria-label="Delete" size="sm" colorScheme="red">
-                            <FaTrash />
-                          </IconButton>
-                        </HStack>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </Table.ScrollArea>
+                ))}
+              </Table.Body>
+            </Table.Root>
           </Box>
         </Box>
+
+        {/* PAGINATION */}
+        <Flex justify="center" align="center" mt={4} gap={4}>
+          <Button
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+            variant="outline"
+            bg="white"
+            color={'gray.800'}
+          >
+            Previous
+          </Button>
+
+          <HStack gap={2}>
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <Button
+                key={index}
+                onClick={() => setPage(index + 1)}
+                bg={page === index + 1 ? '#6730EC' : 'gray.200'}
+                color={page === index + 1 ? 'white' : 'black'}
+              >
+                {index + 1}
+              </Button>
+            ))}
+          </HStack>
+
+          <Button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            variant="outline"
+            bg="white"
+            color={'gray.800'}
+          >
+            Next
+          </Button>
+        </Flex>
       </Flex>
 
-      {/* CUSTOMER MODAL */}
+      {/* ADD CUSTOMER MODAL */}
       <AdaptiveModal
         isOpen={isModalOpen}
         title="Add New Customer"

@@ -10,6 +10,9 @@ export const API_ENDPOINTS = {
 
   CUSTOMERS: {
     BASE: '/customers/getCustomer',
+    CREATE: '/customers/createCustomer',
+    UPDATE: '/customers/updateCustomer',
+    DELETE: '/customers/deleteCustomer',
   },
 
   PRODUCTS: {

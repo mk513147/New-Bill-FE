@@ -24,6 +24,7 @@ import {
 import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal.tsx'
 import { useState } from 'react'
 import { useAllCustomers } from '@/hooks/useCustomer'
+import DisplayCard from '@/components/common/DisplayCard'
 
 const addCustomerFields: FieldConfig[] = [
   { name: 'name', label: 'Customer Name', type: 'text', required: true },
@@ -58,39 +59,37 @@ function Customers() {
 
   return (
     <>
-      <Flex bg="white" minH="100vh" flexDir="column" p={6}>
+      <Flex bg="white" minH="100vh" flexDir="column" p={6} mt={3}>
         {/* PAGE TITLE */}
         <Heading size="3xl" color="gray.800" mb={4}>
           Customers
         </Heading>
 
         {/* STATS SECTION */}
-        <Flex gap={6} wrap="wrap">
-          <Card.Root w="260px" shadow="sm" bg="#6730EC" color="white" borderRadius="lg">
-            <Card.Body>
-              <Text fontSize="lg">Active Customers</Text>
-              <Heading size="2xl">100</Heading>
-              <Text fontSize="sm" opacity={0.9}>
-                ↑ 12% vs last month
-              </Text>
-            </Card.Body>
-          </Card.Root>
+        <Flex
+          gap={6}
+          wrap="wrap"
+          width={'100vw'}
+          alignItems={'center'}
+          flexDirection={{ base: 'column', md: 'row' }}
+        >
+          <DisplayCard
+            title="Active Customers"
+            highlight={100}
+            description="↑ 12% vs last month"
+            bgColor="#6730EC"
+            textColor="white"
+            animate={true}
+          />
 
-          <Card.Root w="260px" shadow="sm" borderRadius="lg" color="gray.800" bg="white">
-            <Card.Body>
-              <Text fontSize="lg">Inactive Customers</Text>
-              <Heading size="2xl">19</Heading>
-              <Text fontSize="sm">↑ 12% vs last month</Text>
-            </Card.Body>
-          </Card.Root>
+          <DisplayCard
+            title="Inactive Customers"
+            highlight={19}
+            description="↑ 12% vs last month"
+            graph={false}
+          />
 
-          <Card.Root w="260px" shadow="sm" borderRadius="lg" color="gray.800" bg="white">
-            <Card.Body>
-              <Text fontSize="lg">Deleted Customers</Text>
-              <Heading size="2xl">10</Heading>
-              <Text fontSize="sm">↑ 12% vs last month</Text>
-            </Card.Body>
-          </Card.Root>
+          <DisplayCard title="Deleted Customer" highlight={10} description="↑ 12% vs last month" />
         </Flex>
 
         {/* ACTIVE CUSTOMER HEADER */}

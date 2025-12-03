@@ -45,7 +45,7 @@ const Auth = () => {
       toast('session expired', 'error')
       navigate('/login', { replace: true })
     }
-  }, [isLoggedIn, token, data, isError, isLoading, location.pathname])
+  }, [isLoggedIn, token, data, isError, isLoading, location])
 
   return (
     <>

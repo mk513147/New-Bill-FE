@@ -15,12 +15,12 @@ const Layout = () => {
   }, [])
 
   return (
-    <Flex height="100vh" width="100vw" overflowX="hidden" overflowY="auto" position="relative">
+    <Flex height="100vh" width="100%" overflowX="hidden" overflowY={'auto'} position="relative">
       <Box zIndex="1000">
         <SideBar />
       </Box>
 
-      <Box flex="1">
+      <Box flex="1" minH="100vh" overflowX="auto">
         <Outlet />
       </Box>
 

@@ -297,7 +297,7 @@ const Login = () => {
             display={{ base: 'none', md: 'flex' }}
             w="50%"
             h="100%"
-            justify="center"
+            pt={10}
             align="center"
             borderLeftRadius="2xl"
             overflow="hidden"

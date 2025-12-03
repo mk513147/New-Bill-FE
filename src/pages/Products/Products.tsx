@@ -170,7 +170,7 @@ function Products() {
 
         {/* TABLE SECTION */}
         <Box
-          width="100%"
+          width="80%"
           bg="white"
           mt={6}
           rounded="lg"

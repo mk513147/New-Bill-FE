@@ -27,19 +27,24 @@ const DisplayCard = ({
   const animatedValue = animate && isNumber ? useCountUp(Number(highlight), 1500) : highlight
   return (
     <Card.Root
-      w={graph ? { base: '100%', sm: '300px', md: '360px' } : '260px'}
-      minH="140px"
-      shadow="sm"
+      w={{
+        base: '100%',
+        sm: graph ? '300px' : '260px',
+        md: graph ? '360px' : '300px',
+      }}
+      minH="160px"
+      shadow={'lightGray'}
       bg={bgColor}
       color={textColor}
       borderRadius="lg"
+      border={0}
       position="relative"
       overflow="hidden"
       p={4}
       transition="all 0.2s ease-in-out"
       _hover={{
         transform: 'scale(1.02)',
-        boxShadow: 'md',
+        shadow: 'lightGray',
       }}
     >
       <Card.Body p={0}>

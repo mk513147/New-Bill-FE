@@ -20,29 +20,25 @@ import {
   IoIosSearch,
 } from '@/components/icons/index.ts'
 
-import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal.tsx'
 import { useState } from 'react'
 import { useAllCustomers } from '@/hooks/useCustomer'
 import DisplayCard from '@/components/common/DisplayCard'
-
-const addCustomerFields: FieldConfig[] = [
-  { name: 'name', label: 'Customer Name', type: 'text', required: true },
-  { name: 'mobileNumber', label: 'Mobile Number', type: 'text', required: true },
-  { name: 'address', label: 'Address', type: 'text', required: true },
-  { name: 'amount', label: 'Amount', type: 'number', required: true },
-  { name: 'companyName', label: 'Company Name', type: 'text' },
-  {
-    name: 'type',
-    label: 'Customer Type',
-    type: 'select',
-    options: ['Regular', 'Premium', 'Wholesale'],
-    defaultValue: 'Regular',
-  },
-]
+import CustomerDialog, { CustomerFormValues } from '@/components/modals/CustomerModal'
+import { useCustomerActions } from '@/hooks/useCustomerActions'
+import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
 
 function Customers() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [page, setPage] = useState(1)
+  const [open, setOpen] = useState(false)
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editDefaults, setEditDefaults] = useState<CustomerFormValues>()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleteName, setDeleteName] = useState('')
+
+  const { deleteCustomer } = useCustomerActions(deleteId ?? '')
+
   const limit = 20
 
   const { data, isLoading } = useAllCustomers(limit, page)
@@ -50,11 +46,6 @@ function Customers() {
 
   const customers = data ?? []
   const totalPages = data?.totalPages ?? 3
-
-  function handleAddCustomerSubmit(data: Record<string, any>) {
-    console.log('New Customer:', data)
-    setIsModalOpen(false)
-  }
 
   return (
     <>
@@ -175,7 +166,12 @@ function Customers() {
                 borderColor="gray.400"
                 px={{ base: 2, md: 5 }}
                 height="36px"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setDialogMode('add')
+                  setEditId(null)
+                  setEditDefaults(undefined)
+                  setOpen(true)
+                }}
                 _hover={{ bg: 'gray.50' }}
               >
                 <HStack gap={2}>
@@ -295,6 +291,19 @@ function Customers() {
                             size="sm"
                             variant="ghost"
                             _hover={{ bg: 'transparent', color: '#7C3AED' }}
+                            onClick={() => {
+                              setDialogMode('edit')
+                              setEditId(item._id)
+                              setEditDefaults({
+                                name: item.name,
+                                mobileNumber: item.mobileNumber,
+                                email: item.email,
+                                state: item.state,
+                                pincode: item.pincode,
+                                address: item.address,
+                              })
+                              setOpen(true)
+                            }}
                           >
                             {<FaEdit size="16px" color="#7C3AED" />}
                           </IconButton>
@@ -304,6 +313,11 @@ function Customers() {
                             size="sm"
                             variant="ghost"
                             _hover={{ bg: 'transparent', color: '#EF4444' }}
+                            onClick={() => {
+                              setDeleteId(item._id)
+                              setDeleteName(item.name)
+                              setDeleteOpen(true)
+                            }}
                           >
                             {<FaTrash size="16px" color="#EF4444" />}
                           </IconButton>
@@ -372,12 +386,28 @@ function Customers() {
         </Flex>
       </Flex>
 
-      <AdaptiveModal
-        isOpen={isModalOpen}
-        title="Add New Customer"
-        fields={addCustomerFields}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddCustomerSubmit}
+      <CustomerDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        mode={dialogMode}
+        pubId={editId ?? undefined}
+        defaultValues={editDefaults}
+      />
+      <ConfirmDeleteDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        title="Delete Customer"
+        description={`Are you sure you want to delete "${deleteName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={deleteCustomer.isPending}
+        onConfirm={() => {
+          deleteCustomer.mutate(undefined, {
+            onSuccess: () => {
+              setDeleteOpen(false)
+            },
+          })
+        }}
       />
     </>
   )

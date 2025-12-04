@@ -16,7 +16,7 @@ export const useCustomerActions = (pubId: string) => {
 
   const updateCustomer = useMutation({
     mutationFn: (payload: any) =>
-      API.put(`${API_ENDPOINTS.CUSTOMERS.UPDATE}${pubId}`, payload).then((res: any) => res.data),
+      API.patch(`${API_ENDPOINTS.CUSTOMERS.UPDATE}/${pubId}`, payload).then((res: any) => res.data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers', pubId] })

@@ -48,10 +48,8 @@ const Login = () => {
       const res = await API.post(API_ENDPOINTS.AUTH.LOGIN, creds)
 
       if (res.status === 200) {
-        localStorage.setItem('token', res.data.token)
         localStorage.setItem('eb_logged_in', 'true')
-
-        dispatch(setProfile(res.data.data.data))
+        dispatch(setProfile(res?.data?.data?.data))
         navigate('/dashboard')
         return
       }

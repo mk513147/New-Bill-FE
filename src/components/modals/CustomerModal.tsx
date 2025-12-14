@@ -1,23 +1,13 @@
 import { useEffect, useState } from 'react'
-import {
-  Dialog,
-  Portal,
-  Button,
-  Input,
-  Field,
-  HStack,
-  NativeSelect,
-  CloseButton,
-} from '@chakra-ui/react'
+import { Dialog, Portal, Button, Input, Field, CloseButton, useMediaQuery } from '@chakra-ui/react'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
 
 export interface CustomerFormValues {
   name: string
   mobileNumber: string
   email?: string
-  state?: string
-  pincode?: string
-  address: string
+  address?: string
+  balance?: string
 }
 
 interface CustomerDialogProps {
@@ -39,9 +29,8 @@ export default function CustomerDialog({
     name: '',
     mobileNumber: '',
     email: '',
-    state: '',
-    pincode: '',
     address: '',
+    balance: '',
   })
 
   const { createCustomer, updateCustomer } = useCustomerActions(pubId ?? '')
@@ -54,9 +43,8 @@ export default function CustomerDialog({
         name: '',
         mobileNumber: '',
         email: '',
-        state: '',
-        pincode: '',
         address: '',
+        balance: '',
       })
     }
   }, [defaultValues, mode])
@@ -78,15 +66,17 @@ export default function CustomerDialog({
     })
   }
 
+  const [isLarge] = useMediaQuery(['(min-width: 540px)'])
+
   return (
     <Dialog.Root
       open={open}
-      placement="center"
       onOpenChange={(details) => {
         if (!details.open) onClose()
       }}
       preventScroll
-      size="lg"
+      size={isLarge ? 'lg' : 'full'}
+      placement={isLarge ? 'center' : 'bottom'} //
     >
       <Portal>
         <Dialog.Backdrop />
@@ -136,46 +126,23 @@ export default function CustomerDialog({
                 />
               </Field.Root>
 
-              {/* State + Pincode */}
-              <HStack gap={4} mb={3}>
-                <Field.Root flex={1}>
-                  <Field.Label>State</Field.Label>
+              <Field.Root flex={1}>
+                <Field.Label>Balance</Field.Label>
+                <Input
+                  name="balance"
+                  value={formData.balance}
+                  onChange={handleChange}
+                  placeholder="Enter Balance"
+                />
+              </Field.Root>
 
-                  <NativeSelect.Root size="sm">
-                    <NativeSelect.Field
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      placeholder="Select State"
-                      aria-label="Select State"
-                    >
-                      <option value="">Select State</option>
-                      <option value="MH">Maharashtra</option>
-                      <option value="DL">Delhi</option>
-                      <option value="UP">Uttar Pradesh</option>
-                    </NativeSelect.Field>
-                  </NativeSelect.Root>
-                </Field.Root>
-
-                <Field.Root flex={1}>
-                  <Field.Label>Pincode</Field.Label>
-                  <Input
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={handleChange}
-                    placeholder="Enter Pincode"
-                  />
-                </Field.Root>
-              </HStack>
-
-              {/* Address */}
-              <Field.Root mb={3}>
+              <Field.Root flex={1}>
                 <Field.Label>Address</Field.Label>
                 <Input
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter your Address"
+                  placeholder="Enter Address"
                 />
               </Field.Root>
             </Dialog.Body>

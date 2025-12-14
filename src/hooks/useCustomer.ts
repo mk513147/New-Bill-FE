@@ -32,9 +32,7 @@ export const useAllCustomers = (limit = 20, page = 1) => {
     queryKey: ['allCustomers', limit, page],
     queryFn: () => getAllCustomers(limit, page),
     retry: false,
-    staleTime: 1000 * 60 * 10,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: true,
   })
 }

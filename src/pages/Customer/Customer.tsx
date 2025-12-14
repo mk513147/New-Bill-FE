@@ -42,7 +42,6 @@ function Customers() {
   const limit = 20
 
   const { data, isLoading } = useAllCustomers(limit, page)
-  // console.log('Customer Data:', data)
 
   const customers = data ?? []
   const totalPages = data?.totalPages ?? 3
@@ -230,6 +229,9 @@ function Customers() {
                     Phone Number
                   </Table.ColumnHeader>
                   <Table.ColumnHeader fontWeight="600" color="gray.600">
+                    Balance
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader fontWeight="600" color="gray.600">
                     Actions
                   </Table.ColumnHeader>
                 </Table.Row>
@@ -283,6 +285,9 @@ function Customers() {
                       <Table.Cell>
                         <Text fontSize="sm">{item.mobileNumber}</Text>
                       </Table.Cell>
+                      <Table.Cell>
+                        <Text fontSize="sm">{item.balance}</Text>
+                      </Table.Cell>
 
                       <Table.Cell>
                         <HStack gap={4}>
@@ -298,8 +303,7 @@ function Customers() {
                                 name: item.name,
                                 mobileNumber: item.mobileNumber,
                                 email: item.email,
-                                state: item.state,
-                                pincode: item.pincode,
+                                balance: item.balance,
                                 address: item.address,
                               })
                               setOpen(true)

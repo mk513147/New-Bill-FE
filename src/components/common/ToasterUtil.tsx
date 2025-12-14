@@ -3,7 +3,7 @@ import { Toaster, toaster } from '@/components/ui/toaster.tsx'
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 
 const ToasterUtil = () => {
-  const toastFunc = (msg: String, type: ToastType = 'info') => {
+  const toastFunc = (msg: string, type: ToastType = 'info') => {
     toaster.create({
       title: msg,
       type: type,

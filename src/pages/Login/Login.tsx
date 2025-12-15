@@ -50,6 +50,8 @@ const Login = () => {
       if (res.status === 200) {
         localStorage.setItem('eb_logged_in', 'true')
         dispatch(setProfile(res?.data?.data?.data))
+        dispatch(clearLoading())
+        toastFunc('Logged in successfully', 'success')
         navigate('/dashboard')
         return
       }
@@ -62,8 +64,6 @@ const Login = () => {
       } else {
         toastFunc('Something Went Wrong', 'error')
       }
-    } finally {
-      dispatch(clearLoading())
     }
   }
 

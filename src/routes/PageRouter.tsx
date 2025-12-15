@@ -23,6 +23,8 @@ import { SalesRoute } from './importRoutes/SalesRoute'
 import { CategoryRoute } from './importRoutes/CategoryRoute'
 import { HelpRoute } from './importRoutes/HelpRoute'
 import { AttendanceRoute } from './importRoutes/AttendaceRoute'
+import { Toaster } from '@/components/ui/toaster'
+import ProtectedRoutes from './ProtectedRoutes'
 
 const authPages = () => (
   <>
@@ -56,14 +58,19 @@ const PageRouter = () => {
       {isLoading && <Loading />}
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/" element={<Auth />}>
-            {authPages()}
+          <Route index element={<Navigate to="/login" replace />} />
+
+          <Route element={<Auth />}>{authPages()}</Route>
+
+          <Route element={<ProtectedRoutes />}>
+            <Route element={<Layout />}>{pages()}</Route>
           </Route>
-          <Route element={<Layout />}>{pages()}</Route>
+
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
+
+      <Toaster />
     </>
   )
 }

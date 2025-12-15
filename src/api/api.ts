@@ -1,9 +1,12 @@
 import { resetProfile } from '@/redux/slices/profileSlice'
 import { store } from '@/redux/store'
 import { logoutService } from '@/utils/utils'
+import { ToasterUtil } from '@/components/common/ToasterUtil'
 
 import axios from 'axios'
 import API_ENDPOINTS from './apiEndpoints'
+
+const toast = ToasterUtil()
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
@@ -36,6 +39,7 @@ API.interceptors.response.use(
       await logoutService()
 
       store.dispatch(resetProfile())
+      toast('Session expired', 'error')
 
       window.location.href = '/login'
 
@@ -44,6 +48,7 @@ API.interceptors.response.use(
 
     if (!error.response) {
       console.error('Network error — offline?')
+      toast('You are offline', 'error')
     }
 
     return Promise.reject(error)

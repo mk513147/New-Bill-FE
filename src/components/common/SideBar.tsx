@@ -94,6 +94,7 @@ export const SideBar = () => {
     dispatch(resetProfile())
 
     navigate('/login', { replace: true })
+    toastFunc('Logged out Successfully', 'success')
   }
 
   const [isLarge] = useMediaQuery(['(min-width: 768px)'])

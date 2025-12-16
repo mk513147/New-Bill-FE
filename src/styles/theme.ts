@@ -23,6 +23,11 @@ const config = defineConfig({
           rowHover: { value: '#b7bbbeff' },
         },
       },
+      fonts: {
+        body: {
+          value: `'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif`,
+        },
+      },
     },
     semanticTokens: {
       colors: {

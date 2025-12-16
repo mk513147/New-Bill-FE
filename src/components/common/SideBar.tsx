@@ -8,9 +8,9 @@ import {
   useMediaQuery,
   CloseButton,
   Avatar,
-  Input,
   VStack,
   Text,
+  Separator,
 } from '@chakra-ui/react'
 
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -113,6 +113,18 @@ export const SideBar = () => {
           position="relative"
           shadow={'sm'}
         >
+          <Box position="sticky" top="0" bg="white" zIndex="1" p={3}>
+            <Text
+              fontSize="2xl"
+              fontWeight="bold"
+              bgGradient="linear-gradient(90deg, #5D22C3, #2DFDF3)"
+              bgClip="text"
+              mb={3}
+            >
+              EBILL
+            </Text>
+            <Separator />
+          </Box>
           <Box
             flex="1"
             overflowY="auto"
@@ -125,25 +137,8 @@ export const SideBar = () => {
             }}
             p={5}
             pb="120px"
+            bg={'white'}
           >
-            <Text
-              fontSize="2xl"
-              fontWeight="bold"
-              bgGradient="linear-gradient(90deg, #5D22C3, #2DFDF3)"
-              bgClip="text"
-              mb={4}
-            >
-              EBILL
-            </Text>
-
-            <Input
-              placeholder="Search"
-              mb={6}
-              borderRadius="full"
-              bg="gray.50"
-              _focus={{ borderColor: 'purple.400' }}
-            />
-
             {sections.map((section) => (
               <Box key={section.title} mb={6}>
                 <Text

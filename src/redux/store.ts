@@ -4,6 +4,7 @@ import dockReducer from './slices/dockSlice'
 import customerReducer from './slices/customerSlice'
 import productReducer from './slices/productSlice'
 import uiReducer from './slices/uiSlice'
+import headerReducer from './slices/headerSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     customer: customerReducer,
     product: productReducer,
     ui: uiReducer,
+    header: headerReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

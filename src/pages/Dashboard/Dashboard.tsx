@@ -8,17 +8,26 @@ import {
   PieChartWithPaddingAngle,
   LineBarAreaComposedChart,
 } from '@/components/charts'
+import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 
 function Dashboard() {
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(setActiveTab('home'))
-  }, [])
+    dispatch(
+      setHeader({
+        title: 'Dashboard',
+        subtitle: 'Overview & statistics',
+      }),
+    )
+
+    return () => {
+      dispatch(clearHeader())
+    }
+  }, [dispatch])
   return (
     <Box w="100%" h="100%" overflowY="auto" p={5}>
-      <Heading size="lg">Welcome to Dashboard</Heading>
-
       <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={5} mt={5}>
         <Box bg="blue.500" color="white" p={5} borderRadius="md">
           <Heading size="md">Users</Heading>

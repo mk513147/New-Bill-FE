@@ -20,12 +20,14 @@ import {
   IoIosSearch,
 } from '@/components/icons/index.ts'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAllCustomers } from '@/hooks/useCustomer'
 import DisplayCard from '@/components/common/DisplayCard'
 import CustomerDialog, { CustomerFormValues } from '@/components/modals/CustomerModal'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
+import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
+import { useDispatch } from 'react-redux'
 
 function Customers() {
   const [page, setPage] = useState(1)
@@ -46,10 +48,24 @@ function Customers() {
   const customers = data ?? []
   const totalPages = data?.totalPages ?? 3
 
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(
+      setHeader({
+        title: 'Customers',
+      }),
+    )
+
+    return () => {
+      dispatch(clearHeader())
+    }
+  }, [dispatch])
+
   return (
     <>
       <Flex
-        bg="white"
+        bg="gray.100"
         width="100%"
         minH="100vh"
         overflowX="auto"
@@ -59,10 +75,6 @@ function Customers() {
         pt={{ base: 3, sm: 4, md: 1 }}
         mb={3}
       >
-        <Heading size="3xl" color="gray.800" mt={{ base: 6, md: 1 }} mb={4}>
-          Customers
-        </Heading>
-
         <Flex
           gap={6}
           wrap="wrap"

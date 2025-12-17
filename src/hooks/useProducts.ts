@@ -2,8 +2,6 @@ import API_ENDPOINTS from '@/api/apiEndpoints'
 import { API } from '@/api/api'
 import { useQuery } from '@tanstack/react-query'
 
-// ---------- API functions ----------
-
 export const getProduct = async () => {
   const res = await API.get(API_ENDPOINTS.PRODUCTS.BASE)
   return res.data?.data || null
@@ -16,8 +14,6 @@ export const getAllProducts = async (limit = 20, page = 1) => {
 
   return res.data?.data || null
 }
-
-// ---------- Hooks ----------
 
 export const useProduct = () => {
   return useQuery({

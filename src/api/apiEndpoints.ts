@@ -17,6 +17,9 @@ export const API_ENDPOINTS = {
 
   PRODUCTS: {
     BASE: '/products',
+    CREATE: '/products/createProduct',
+    UPDATE: '/products/updateProduct',
+    DELETE: '/products/deleteProduct',
   },
 
   SUPPLIERS: {

@@ -1,250 +1,196 @@
 import {
-  Avatar,
   Flex,
   HStack,
   Input,
-  Stack,
   Text,
   Heading,
   IconButton,
   Button,
   Table,
   Box,
+  Skeleton,
 } from '@chakra-ui/react'
 
-import {
-  FaFilter,
-  FaPrint,
-  FaPlusCircle,
-  FaEdit,
-  FaTrash,
-  IoIosSearch,
-} from '@/components/icons/index.ts'
-import '@/styles/products.css'
-import AdaptiveModal, { FieldConfig } from '@/components/common/AdaptiveModal.tsx'
-import { useState } from 'react'
+import { FaFilter, FaPrint, FaPlusCircle, FaEdit, FaTrash, IoIosSearch } from '@/components/icons'
 
-const addProductFields: FieldConfig[] = [
-  { name: 'name', label: 'Product Name', type: 'text', required: true },
-  {
-    name: 'productQuantity',
-    label: 'Quantity',
-    type: 'number',
-    required: true,
-  },
-  { name: 'purchasePrice', label: 'Purchase Price', type: 'number' },
-  { name: 'sellingPrice', label: 'Selling Price', type: 'number' },
-  { name: 'category', label: 'Category', type: 'text' },
-  { name: 'supplierInfo', label: 'Supplier Info', type: 'text' },
-  {
-    name: 'paymentStatus',
-    label: 'Payment Status',
-    type: 'select',
-    options: ['Paid', 'Pending'],
-    defaultValue: 'Paid',
-  },
-]
-
-const products = [
-  {
-    id: 1,
-    name: 'Laptop',
-    productQuantity: 10,
-    purchasePrice: 200,
-    sellingPrice: 250,
-    maxDiscount: 15,
-    minDiscount: 5,
-    category: 'Electronics',
-    supplierInfo: 'Tech World',
-    dateOfPurchase: '2025-11-01',
-    paymentStatus: 'Paid',
-    discountOnBulk: '10% on 5+',
-    damagedItems: 0,
-    stock: 50,
-  },
-  {
-    id: 2,
-    name: 'Shoes',
-    productQuantity: 20,
-    purchasePrice: 100,
-    sellingPrice: 150,
-    maxDiscount: 20,
-    minDiscount: 10,
-    category: 'Fashion',
-    supplierInfo: 'Nike India',
-    dateOfPurchase: '2025-10-25',
-    paymentStatus: 'Pending',
-    discountOnBulk: '15% on 10+',
-    damagedItems: 1,
-    stock: 80,
-  },
-]
+import { useEffect, useState } from 'react'
+import DisplayCard from '@/components/common/DisplayCard'
+import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
+import ProductDialog, { ProductFormValues } from '@/components/modals/ProductModal'
+import { useAllProducts } from '@/hooks/useProducts'
+import { useProductActions } from '@/hooks/useProductActions'
+import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
+import { useDispatch } from 'react-redux'
 
 function Products() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [open, setOpen] = useState(false)
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editDefaults, setEditDefaults] = useState<ProductFormValues>()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleteName, setDeleteName] = useState('')
 
-  function handleAddProductSubmit(data: Record<string, any>) {
-    console.log('New product:', data)
-    setIsModalOpen(false)
-  }
+  const limit = 20
+
+  const { data, isLoading } = useAllProducts(limit, page)
+  const products = data ?? []
+  const totalPages = data?.totalPages ?? 1
+
+  const { deleteProduct } = useProductActions(deleteId ?? '')
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(setHeader({ title: 'Products' }))
+    return () => {
+      dispatch(clearHeader())
+    }
+  }, [dispatch])
 
   return (
     <>
-      <Flex
-        bgColor="gray.100"
-        width="100vw"
-        minH="100vh"
-        flexDirection="column"
-        overflow="hidden"
-        p={{ base: 4, md: 6 }}
-      >
-        {/* SEARCH + USER SECTION */}
-        <Flex
-          justifyContent="space-between"
-          width="full"
-          alignItems="center"
-          color="gray.800"
-          gap={4}
-          flexWrap="wrap"
-        >
-          <HStack bg="white" shadow="md" width={{ base: '100%', md: '45%' }} rounded="full" px={4}>
-            <Box color="blue">
-              <IoIosSearch size="20px" />
-            </Box>
-            <Input
-              placeholder="Search Products"
-              border="none"
-              _placeholder={{ color: 'gray.500' }}
-              size="lg"
-              flex="1"
-            />
-          </HStack>
-
-          <HStack gap="4">
-            <Avatar.Root bgColor="#0074E4" size="xl">
-              <Avatar.Fallback name="Kaushal Raj" /> <Avatar.Image src="./image" />
-            </Avatar.Root>
-            <Stack>
-              <Text fontWeight="medium">Kaushal Raj</Text>
-              <Text color="fg.muted" textStyle="sm">
-                Shop Name
-              </Text>
-            </Stack>
-          </HStack>
+      <Flex bg="gray.100" minH="100vh" flexDir="column" px={6} pt={3}>
+        <Flex gap={6} wrap="wrap">
+          <DisplayCard title="Total Products" highlight={products.length} />
+          <DisplayCard title="Low Stock" highlight={8} />
+          <DisplayCard title="Out of Stock" highlight={2} />
         </Flex>
 
-        {/* PRODUCTS TITLE + BUTTONS */}
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          width="full"
-          mt={10}
-          flexWrap="wrap"
-          gap={4}
-        >
-          <Heading size="2xl" color={'gray.800'}>
-            Products
-          </Heading>
-
-          <HStack gap={4} flexWrap="wrap">
-            <Button bgColor="teal.400" color="white">
-              <HStack gap={3}>
-                <FaFilter />
-                <span>Filter</span>
-              </HStack>
-            </Button>
-            <Button bgColor="teal.400" color="white">
-              <HStack gap={3}>
-                <FaPrint />
-                <span>Print</span>
-              </HStack>
-            </Button>
-            <Button bgColor="#0074E4" color="white" size="lg" onClick={() => setIsModalOpen(true)}>
-              <HStack gap={3}>
-                <FaPlusCircle />
-                <span>Add product</span>
-              </HStack>
-            </Button>
-          </HStack>
+        <Flex justify="space-between" align="center" mt={8}>
+          <Heading size="xl">Products</Heading>
         </Flex>
 
-        {/* TABLE SECTION */}
-        <Box
-          width="80%"
-          bg="white"
-          mt={6}
-          rounded="lg"
-          shadow="sm"
-          overflow="hidden"
-          color={'gray.800'}
-          pb={3}
-        >
-          <Table.ScrollArea height="60vh">
-            <Table.Root size="lg" color={'gray.800'} stickyHeader>
+        <Box bg="white" mt={6} rounded="lg" border="1px solid" borderColor="gray.100" p={4}>
+          <Flex justify="space-between" mb={3} gap={3} flexWrap="wrap">
+            <HStack>
+              <HStack border="1px solid" borderColor="gray.400" px={2} py={1} rounded="md">
+                <IoIosSearch size="18px" />
+                <Input placeholder="Search" border="none" _focus={{ boxShadow: 'none' }} />
+              </HStack>
+              <Button border="1px solid" borderColor="gray.400">
+                <FaFilter /> <Text ml={2}>Filters</Text>
+              </Button>
+            </HStack>
+
+            <HStack>
+              <Button
+                border="1px solid"
+                borderColor="gray.400"
+                onClick={() => {
+                  setDialogMode('add')
+                  setEditId(null)
+                  setEditDefaults(undefined)
+                  setOpen(true)
+                }}
+              >
+                <FaPlusCircle /> <Text ml={2}>Add Product</Text>
+              </Button>
+              <Button bg="#6730EC" color="white">
+                <FaPrint /> <Text ml={2}>Export</Text>
+              </Button>
+            </HStack>
+          </Flex>
+
+          <Box maxH="350px" overflow="auto">
+            <Table.Root stickyHeader variant="outline">
               <Table.Header>
-                <Table.Row bg="white" borderBottom="2px solid" borderColor="gray.200">
-                  <Table.ColumnHeader>Name</Table.ColumnHeader>
-                  <Table.ColumnHeader>Quantity</Table.ColumnHeader>
+                <Table.Row bg="#F5F6FA">
+                  <Table.ColumnHeader>Product Name</Table.ColumnHeader>
+                  <Table.ColumnHeader>SKU</Table.ColumnHeader>
+                  <Table.ColumnHeader>Barcode</Table.ColumnHeader>
+                  <Table.ColumnHeader>Category</Table.ColumnHeader>
                   <Table.ColumnHeader>Purchase Price</Table.ColumnHeader>
                   <Table.ColumnHeader>Selling Price</Table.ColumnHeader>
-                  <Table.ColumnHeader>Max Discount</Table.ColumnHeader>
-                  <Table.ColumnHeader>Min Discount</Table.ColumnHeader>
-                  <Table.ColumnHeader>Category</Table.ColumnHeader>
-                  <Table.ColumnHeader>Supplier Info</Table.ColumnHeader>
-                  <Table.ColumnHeader>Date of Purchase</Table.ColumnHeader>
-                  <Table.ColumnHeader>Payment Status</Table.ColumnHeader>
-                  <Table.ColumnHeader>Discount on Bulk</Table.ColumnHeader>
-                  <Table.ColumnHeader>Damaged Items</Table.ColumnHeader>
-                  <Table.ColumnHeader>Stock</Table.ColumnHeader>
+                  <Table.ColumnHeader>Stock Alert</Table.ColumnHeader>
                   <Table.ColumnHeader>Actions</Table.ColumnHeader>
                 </Table.Row>
               </Table.Header>
 
-              <Table.Body>
-                {products.map((item) => (
-                  <Table.Row
-                    key={item.id}
-                    bg="white"
-                    borderBottom="2px solid"
-                    borderColor="gray.200"
-                  >
-                    <Table.Cell>{item.name}</Table.Cell>
-                    <Table.Cell>{item.productQuantity}</Table.Cell>
-                    <Table.Cell>₹{item.purchasePrice}</Table.Cell>
-                    <Table.Cell>₹{item.sellingPrice}</Table.Cell>
-                    <Table.Cell>{item.maxDiscount}%</Table.Cell>
-                    <Table.Cell>{item.minDiscount}%</Table.Cell>
-                    <Table.Cell>{item.category}</Table.Cell>
-                    <Table.Cell>{item.supplierInfo}</Table.Cell>
-                    <Table.Cell>{item.dateOfPurchase}</Table.Cell>
-                    <Table.Cell>{item.paymentStatus}</Table.Cell>
-                    <Table.Cell>{item.discountOnBulk}</Table.Cell>
-                    <Table.Cell>{item.damagedItems}</Table.Cell>
-                    <Table.Cell>{item.stock}</Table.Cell>
-                    <Table.Cell>
-                      <HStack gap={2}>
-                        <IconButton aria-label="Edit" size="sm" colorScheme="yellow">
-                          <FaEdit />
-                        </IconButton>
-                        <IconButton aria-label="Delete" size="sm" colorScheme="red">
-                          <FaTrash />
-                        </IconButton>
-                      </HStack>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
+              {isLoading ? (
+                <Table.Body>
+                  {[...Array(4)].map((_, i) => (
+                    <Table.Row key={i}>
+                      <Table.Cell colSpan={8}>
+                        <Skeleton height="20px" />
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              ) : (
+                <Table.Body>
+                  {products.map((item: any) => (
+                    <Table.Row key={item._id} _hover={{ bg: 'gray.50' }}>
+                      <Table.Cell>{item.name}</Table.Cell>
+                      <Table.Cell>{item.sku}</Table.Cell>
+                      <Table.Cell>{item.barcode}</Table.Cell>
+                      <Table.Cell>{item.categoryId}</Table.Cell>
+                      <Table.Cell>{item.purchasePrice}</Table.Cell>
+                      <Table.Cell>{item.sellingPrice}</Table.Cell>
+                      <Table.Cell>{item.lowStockAlert}</Table.Cell>
+                      <Table.Cell>
+                        <HStack>
+                          <IconButton
+                            aria-label="Edit"
+                            variant="ghost"
+                            onClick={() => {
+                              setDialogMode('edit')
+                              setEditId(item._id)
+                              setEditDefaults(item)
+                              setOpen(true)
+                            }}
+                          >
+                            <FaEdit />
+                          </IconButton>
+                          <IconButton
+                            aria-label="Delete"
+                            variant="ghost"
+                            onClick={() => {
+                              setDeleteId(item._id)
+                              setDeleteName(item.name)
+                              setDeleteOpen(true)
+                            }}
+                          >
+                            <FaTrash />
+                          </IconButton>
+                        </HStack>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              )}
             </Table.Root>
-          </Table.ScrollArea>
+          </Box>
         </Box>
+
+        <Flex justify="center" mt={4} gap={3}>
+          <Button onClick={() => setPage(page - 1)} disabled={page === 1}>
+            Previous
+          </Button>
+          <Button onClick={() => setPage(page + 1)} disabled={page === totalPages}>
+            Next
+          </Button>
+        </Flex>
       </Flex>
 
-      <AdaptiveModal
-        isOpen={isModalOpen}
-        title="Add New Product"
-        fields={addProductFields}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddProductSubmit}
+      <ProductDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        mode={dialogMode}
+        pubId={editId ?? undefined}
+        defaultValues={editDefaults}
+      />
+
+      <ConfirmDeleteDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        title="Delete Product"
+        description={`Are you sure you want to delete "${deleteName}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={deleteProduct.isPending}
+        onConfirm={() => deleteProduct.mutate()}
       />
     </>
   )

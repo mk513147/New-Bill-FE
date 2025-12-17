@@ -13,25 +13,28 @@ import { FaUpload } from 'react-icons/fa'
 import '@/styles/products.css'
 import { useProfile } from '@/hooks/useProfile.ts'
 import { ToasterUtil } from '@/components/common/ToasterUtil.tsx'
-// import { useProfileActions } from '@/hooks/useProfileActions'
+import { useProfileActions } from '@/hooks/useProfileActions'
+import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 function Profile() {
   const { data, isLoading, isError } = useProfile()
   const toast = ToasterUtil()
-  // const { updateProfile, deleteProfile } = useProfileActions('253')
+  const { updateProfile, deleteProfile } = useProfileActions('253')
 
-  // const handleUpdate = () => {
-  //   updateProfile.mutate(
-  //     { name: 'Guddu' },
-  //     {
-  //       onSuccess: () => console.log('Updated profile'),
-  //     },
-  //   )
-  // }
+  const handleUpdate = () => {
+    updateProfile.mutate(
+      { name: 'Guddu' },
+      {
+        onSuccess: () => console.log('Updated profile'),
+      },
+    )
+  }
 
-  // const handleDelete = () => {
-  //   deleteProfile.mutate()
-  // }
+  const handleDelete = () => {
+    deleteProfile.mutate()
+  }
 
   if (isLoading) {
     return (
@@ -58,6 +61,20 @@ function Profile() {
   if (!data) {
     toast('No profile data found', 'error')
   }
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(
+      setHeader({
+        title: 'Profile',
+      }),
+    )
+
+    return () => {
+      dispatch(clearHeader())
+    }
+  }, [dispatch])
 
   return (
     <Flex

@@ -1,6 +1,30 @@
 import { useEffect, useState } from 'react'
-import { Dialog, Portal, Button, Input, Field, CloseButton, useMediaQuery } from '@chakra-ui/react'
+import {
+  Dialog,
+  Portal,
+  Button,
+  Input,
+  Field,
+  CloseButton,
+  useMediaQuery,
+  Select,
+  SimpleGrid,
+} from '@chakra-ui/react'
 import { useProductActions } from '@/hooks/useProductActions'
+import { createListCollection } from '@chakra-ui/react'
+
+const unitCollection = createListCollection({
+  items: [
+    { label: 'Pieces', value: 'pcs' },
+    { label: 'Box', value: 'box' },
+    { label: 'Kilogram', value: 'kg' },
+    { label: 'Litre', value: 'litre' },
+    { label: 'Packet', value: 'packet' },
+    { label: 'Dozen', value: 'dozen' },
+    { label: 'Meter', value: 'meter' },
+    { label: 'Other', value: 'other' },
+  ],
+})
 
 export interface ProductFormValues {
   name: string
@@ -91,14 +115,22 @@ export default function ProductDialog({
       onOpenChange={(details) => {
         if (!details.open) onClose()
       }}
-      preventScroll
+      scrollBehavior="inside"
       size={isLarge ? 'lg' : 'full'}
       placement={isLarge ? 'center' : 'bottom'}
     >
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="white" rounded="lg" shadow="lg" p={4} maxW="600px" w="100%">
+          <Dialog.Content
+            bg="white"
+            rounded="lg"
+            shadow="lg"
+            p={4}
+            maxW="600px"
+            w="100%"
+            maxH="90vh"
+          >
             <Dialog.Header px={1}>
               <Dialog.Title fontSize="2xl" fontWeight="700" color="gray.800">
                 {mode === 'add' ? 'Add New Product' : 'Edit Product'}
@@ -109,74 +141,119 @@ export default function ProductDialog({
               </Dialog.CloseTrigger>
             </Dialog.Header>
 
-            <Dialog.Body pt={4}>
-              <Field.Root mb={3}>
-                <Field.Label>Product Name</Field.Label>
-                <Input name="name" value={formData.name} onChange={handleChange} />
-              </Field.Root>
+            <Dialog.Body
+              pt={4}
+              overflowY="auto"
+              css={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                '&::-webkit-scrollbar': { display: 'none' },
+              }}
+            >
+              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                <Field.Root>
+                  <Field.Label>Product Name</Field.Label>
+                  <Input name="name" value={formData.name} onChange={handleChange} />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>SKU</Field.Label>
-                <Input name="sku" value={formData.sku} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>SKU</Field.Label>
+                  <Input name="sku" value={formData.sku} onChange={handleChange} />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Barcode</Field.Label>
-                <Input name="barcode" value={formData.barcode} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>Barcode</Field.Label>
+                  <Input name="barcode" value={formData.barcode} onChange={handleChange} />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Category ID</Field.Label>
-                <Input name="categoryId" value={formData.categoryId} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>Category ID</Field.Label>
+                  <Input name="categoryId" value={formData.categoryId} onChange={handleChange} />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Supplier ID</Field.Label>
-                <Input name="supplierId" value={formData.supplierId} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>Supplier ID</Field.Label>
+                  <Input name="supplierId" value={formData.supplierId} onChange={handleChange} />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Purchase Price</Field.Label>
-                <Input
-                  name="purchasePrice"
-                  value={formData.purchasePrice}
-                  onChange={handleChange}
-                />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>Purchase Price</Field.Label>
+                  <Input
+                    name="purchasePrice"
+                    value={formData.purchasePrice}
+                    onChange={handleChange}
+                  />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Selling Price</Field.Label>
-                <Input name="sellingPrice" value={formData.sellingPrice} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>Selling Price</Field.Label>
+                  <Input
+                    name="sellingPrice"
+                    value={formData.sellingPrice}
+                    onChange={handleChange}
+                  />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Unit</Field.Label>
-                <Input name="unit" value={formData.unit} onChange={handleChange} />
-              </Field.Root>
+                {/* UNIT SELECT */}
+                <Field.Root>
+                  <Field.Label>Unit</Field.Label>
 
-              <Field.Root mb={3}>
-                <Field.Label>Tax (%)</Field.Label>
-                <Input name="tax" value={formData.tax} onChange={handleChange} />
-              </Field.Root>
+                  <Select.Root
+                    collection={unitCollection}
+                    value={formData.unit ? [formData.unit] : []}
+                    onValueChange={(details) =>
+                      setFormData((prev) => ({ ...prev, unit: details.value[0] }))
+                    }
+                    positioning={{ strategy: 'fixed', hideWhenDetached: true }}
+                  >
+                    <Select.HiddenSelect name="unit" />
 
-              <Field.Root mb={3}>
-                <Field.Label>Low Stock Alert</Field.Label>
-                <Input
-                  name="lowStockAlert"
-                  value={formData.lowStockAlert}
-                  onChange={handleChange}
-                />
-              </Field.Root>
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select unit" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
 
-              <Field.Root mb={3}>
-                <Field.Label>Max Discount (%)</Field.Label>
-                <Input name="maxDiscount" value={formData.maxDiscount} onChange={handleChange} />
-              </Field.Root>
+                    <Select.Positioner>
+                      <Select.Content bg={'white'}>
+                        {unitCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Min Discount (%)</Field.Label>
-                <Input name="minDiscount" value={formData.minDiscount} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label>Tax (%)</Field.Label>
+                  <Input name="tax" value={formData.tax} onChange={handleChange} />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label>Low Stock Alert</Field.Label>
+                  <Input
+                    name="lowStockAlert"
+                    value={formData.lowStockAlert}
+                    onChange={handleChange}
+                  />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label>Max Discount (%)</Field.Label>
+                  <Input name="maxDiscount" value={formData.maxDiscount} onChange={handleChange} />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label>Min Discount (%)</Field.Label>
+                  <Input name="minDiscount" value={formData.minDiscount} onChange={handleChange} />
+                </Field.Root>
+              </SimpleGrid>
             </Dialog.Body>
 
             <Dialog.Footer>

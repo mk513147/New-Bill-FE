@@ -45,8 +45,13 @@ function Customers() {
 
   const { data, isLoading } = useAllCustomers(limit, page)
 
-  const customers = data ?? []
-  const totalPages = data?.totalPages ?? 3
+  const customers = data?.customers ?? []
+  const pagination = data?.pagination ?? {
+    currentPage: 1,
+    totalPages: 3,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  }
 
   const dispatch = useDispatch()
 
@@ -222,7 +227,7 @@ function Customers() {
               '&::-webkit-scrollbar': { display: 'none' },
             }}
           >
-            <Table.Root size="md" stickyHeader variant="outline">
+            <Table.Root size="md" stickyHeader variant="line">
               <Table.Header borderBottom="1px solid #E5E7EB">
                 <Table.Row bg="#F5F6FA">
                   <Table.ColumnHeader fontWeight="600" color="gray.600">
@@ -350,36 +355,38 @@ function Customers() {
         <Flex
           justify="center"
           align="center"
-          borderRadius={'lg'}
+          borderRadius="lg"
           mt={2}
           mb={2}
           p={2}
-          shadow={'lightGray'}
+          shadow="lightGray"
           gap={4}
           width="100%"
         >
+          {/* Previous */}
           <Button
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
+            onClick={() => setPage(pagination.currentPage - 1)}
+            disabled={!pagination.hasPreviousPage}
             variant="outline"
             bg="white"
             rounded="lg"
           >
             <HStack>
-              <Text color={'gray.800'}>Previous</Text>
+              <Text color="gray.800">Previous</Text>
             </HStack>
           </Button>
 
+          {/* Page numbers */}
           <HStack gap={2}>
-            {Array.from({ length: totalPages }).map((_, index) => {
+            {Array.from({ length: pagination.totalPages }).map((_, index) => {
               const pg = index + 1
               return (
                 <Button
                   key={pg}
                   onClick={() => setPage(pg)}
                   rounded="lg"
-                  bg={pg === page ? 'purple.100' : 'transparent'}
-                  color={pg === page ? 'purple.600' : 'gray.700'}
+                  bg={pg === pagination.currentPage ? 'purple.100' : 'transparent'}
+                  color={pg === pagination.currentPage ? 'purple.600' : 'gray.700'}
                   _hover={{ bg: 'purple.50' }}
                 >
                   {pg}
@@ -388,15 +395,16 @@ function Customers() {
             })}
           </HStack>
 
+          {/* Next */}
           <Button
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages}
+            onClick={() => setPage(pagination.currentPage + 1)}
+            disabled={!pagination.hasNextPage}
             variant="outline"
             bg="white"
             rounded="lg"
           >
             <HStack>
-              <Text color={'gray.800'}>Next</Text>
+              <Text color="gray.800">Next</Text>
             </HStack>
           </Button>
         </Flex>

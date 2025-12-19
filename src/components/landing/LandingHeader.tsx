@@ -21,7 +21,7 @@ export function LandingHeader() {
               <RouterLink to="/login">Login</RouterLink>
             </Button>
 
-            <Button colorPalette="purple" asChild>
+            <Button colorPalette="cyan" asChild>
               <RouterLink to="/login">Get Started</RouterLink>
             </Button>
           </HStack>

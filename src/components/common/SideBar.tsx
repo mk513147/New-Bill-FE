@@ -13,7 +13,7 @@ import {
   Separator,
 } from '@chakra-ui/react'
 
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { FaSignOutAlt } from 'react-icons/fa'
 import { API } from '@/api/api.ts'
 import API_ENDPOINTS from '@/api/apiEndpoints.ts'
@@ -72,7 +72,7 @@ const sections = [
 
 export const SideBar = () => {
   const toastFunc = ToasterUtil()
-  const navigate = useNavigate()
+
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
@@ -93,7 +93,6 @@ export const SideBar = () => {
     localStorage.clear()
     dispatch(resetProfile())
 
-    navigate('/login', { replace: true })
     toastFunc('Logged out Successfully', 'success')
   }
 
@@ -103,7 +102,7 @@ export const SideBar = () => {
     <>
       {isLarge ? (
         <Box
-          w="320px"
+          w="280px"
           h="100vh"
           bg="white"
           borderRight="1px solid"

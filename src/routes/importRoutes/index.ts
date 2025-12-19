@@ -10,3 +10,4 @@ export * from './SettingsRoute'
 
 export * from './LoginRoute'
 export * from './ForgotPasswordRoute'
+export * from './LandingRoute'

@@ -28,6 +28,7 @@ import { useDispatch } from 'react-redux'
 import { AxiosError } from 'axios'
 import API_ENDPOINTS from '@/api/apiEndpoints'
 import { clearLoading, setLoading } from '@/redux/slices/uiSlice'
+import { Link as RouterLink } from 'react-router-dom'
 
 interface FormValues {
   emailId: string
@@ -209,11 +210,20 @@ const Login = () => {
             px={{ base: 6, md: 16 }}
             position="relative"
           >
-            <HStack position="absolute" top="40px" left={{ base: '20px', md: '40px' }} gap={2}>
-              <Image src={logo} w="34px" h="34px" alt="Logo" />
-              <Text fontSize="2xl" fontWeight="bold" color="gray.800">
-                Ebill
-              </Text>
+            <HStack
+              asChild
+              position="absolute"
+              top="40px"
+              left={{ base: '20px', md: '40px' }}
+              gap={2}
+              cursor="pointer"
+            >
+              <RouterLink to="/">
+                <Image src={logo} w="34px" h="34px" alt="Logo" />
+                <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+                  Ebill
+                </Text>
+              </RouterLink>
             </HStack>
 
             <Box w="100%" textAlign="center" mt={{ base: 20, md: 0 }} mb={8}>

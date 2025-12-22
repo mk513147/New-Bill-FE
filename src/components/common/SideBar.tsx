@@ -268,27 +268,21 @@ export const SideBar = () => {
 
             <Drawer.Positioner>
               <Drawer.Content
-                bg="white"
+                bg="linear-gradient(180deg, #0F172A 0%, #1E293B 100%)"
                 h="100vh"
                 display="flex"
                 flexDirection="column"
-                borderRight="1px solid"
-                borderColor="gray.200"
-                position="relative"
+                color="white"
+                border="none"
               >
                 <Drawer.Header pb={0}>
                   <Drawer.Title>
-                    <Text
-                      fontSize="2xl"
-                      fontWeight="bold"
-                      bgGradient="linear-gradient(90deg, #5D22C3, #2DFDF3)"
-                      bgClip="text"
-                      mb={4}
-                    >
+                    <Text fontSize="2xl" fontWeight="bold" color="white">
                       EBILL
                     </Text>
                   </Drawer.Title>
                 </Drawer.Header>
+                <Separator borderColor="whiteAlpha.300" mt={2} />
 
                 <Drawer.Body
                   flex="1"
@@ -322,14 +316,14 @@ export const SideBar = () => {
                           <NavLink to={item.path} key={item.label}>
                             {({ isActive }) => (
                               <HStack
-                                px={3}
-                                py={2}
-                                rounded="md"
-                                cursor="pointer"
-                                gap={3}
-                                bg={isActive ? 'purple.50' : 'transparent'}
-                                color={isActive ? 'purple.600' : 'gray.700'}
-                                _hover={{ bg: 'purple.50' }}
+                                 px={3}
+  py={2}
+  rounded="md"
+  cursor="pointer"
+  gap={3}
+  bg={isActive ? 'whiteAlpha.200' : 'transparent'}
+  color="white"
+  _hover={{ bg: 'whiteAlpha.200' }}
                               >
                                 <item.icon size="20px" />
                                 <Text fontWeight={isActive ? 'semibold' : 'normal'}>
@@ -344,45 +338,19 @@ export const SideBar = () => {
                   ))} */}
                 </Drawer.Body>
 
-                <Drawer.Footer
-                  position="absolute"
-                  bottom="0"
-                  left="0"
-                  w="100%"
-                  bg="white"
-                  borderTop="1px solid"
-                  borderColor="gray.200"
-                  py={3}
-                >
-                  <HStack justify="space-between" w="full">
-                    <HStack>
-                      <Avatar.Root>
-                        <Avatar.Fallback name="Segun Adebayo" />
-                        <Avatar.Image src="https://i.pravatar.cc/100?img=5" />
-                      </Avatar.Root>
-
-                      <Box>
-                        <Text fontWeight="medium" color="gray.700">
-                          Olivia Rhye
-                        </Text>
-                        <Text fontSize="sm" color="gray.500">
-                          Admin
-                        </Text>
-                      </Box>
-                    </HStack>
-
-                    <IconButton
-                      aria-label="logout"
-                      size="md"
-                      rounded="full"
-                      bg="white"
-                      shadow="sm"
-                      _hover={{ bg: 'gray.200' }}
-                      onClick={handleLogout}
-                    >
-                      <FaSignOutAlt />
-                    </IconButton>
-                  </HStack>
+                <Drawer.Footer bg="transparent" borderTop="1px solid" borderColor="whiteAlpha.300">
+                  <IconButton
+                    aria-label="logout"
+                    size="md"
+                    rounded="full"
+                    bg="whiteAlpha.200"
+                    color="white"
+                    _hover={{ bg: 'whiteAlpha.300' }}
+                    shadow="sm"
+                    onClick={handleLogout}
+                  >
+                    <FaSignOutAlt />
+                  </IconButton>
                 </Drawer.Footer>
 
                 <Drawer.CloseTrigger asChild>

@@ -18,10 +18,7 @@ export const ProfilePopover = ({ trigger }: { trigger: React.ReactNode }) => {
     dispatch(setLoading({ loading: true, message: 'Logging out...' }))
     try {
       const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
-
-      if (res.status !== 200) {
-        throw new Error('Logout failed')
-      }
+      if (res.status !== 200) throw new Error('Logout failed')
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
@@ -40,94 +37,104 @@ export const ProfilePopover = ({ trigger }: { trigger: React.ReactNode }) => {
         <Popover.Positioner>
           <Popover.Content
             w="360px"
-            p={4}
+            maxH="calc(100vh - 24px)"
             bg="white"
             borderWidth="1px"
             borderColor="gray.200"
             borderRadius="lg"
-            boxShadow="sm"
-            zIndex={2000}
+            boxShadow="lg"
+            overflow="hidden"
           >
-            <HStack justify="space-between" align="start">
-              <HStack gap={3}>
-                <Avatar.Root size="md">
-                  <Avatar.Fallback>{profile?.firstName?.[0] ?? 'U'}</Avatar.Fallback>
-                </Avatar.Root>
+            <Box p={4}>
+              <HStack justify="space-between" align="start">
+                <HStack gap={3}>
+                  <Avatar.Root size="md">
+                    <Avatar.Fallback>{profile?.firstName?.[0] ?? 'U'}</Avatar.Fallback>
+                  </Avatar.Root>
 
-                <Box>
-                  <Text fontWeight="semibold">
-                    {profile?.firstName} {profile?.lastName}
-                  </Text>
-                  <Text fontSize="sm" color="gray.500">
-                    {profile?.emailId}
-                  </Text>
-                </Box>
+                  <Box>
+                    <Text fontWeight="semibold">
+                      {profile?.firstName} {profile?.lastName}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      {profile?.emailId}
+                    </Text>
+                  </Box>
+                </HStack>
+
+                <Popover.CloseTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    color="gray.500"
+                    _hover={{
+                      bg: 'gray.100',
+                      color: 'gray.700',
+                    }}
+                  >
+                    <X size={16} />
+                  </Button>
+                </Popover.CloseTrigger>
               </HStack>
+            </Box>
 
-              <Popover.CloseTrigger asChild>
-                <Button variant="solid" colorPalette={'red'} size="sm">
-                  <X size={14} />
+            <Separator borderColor={'gray.400'} />
+
+            <Box px={4} py={3} overflowY="auto" maxH="calc(100vh - 180px)">
+              <VStack gap={3} align="start">
+                <HStack gap={2}>
+                  <Text fontSize="sm" color="gray.600">
+                    Contact:
+                  </Text>
+                  <Text>{profile?.mobileNumber}</Text>
+                </HStack>
+
+                <HStack gap={2}>
+                  <Text fontSize="sm" color="gray.600">
+                    Shop Name:
+                  </Text>
+                  <Text>{profile?.shopName}</Text>
+                </HStack>
+
+                <HStack gap={2}>
+                  <Text fontSize="sm" color="gray.600">
+                    Subscription:
+                  </Text>
+                  <Text>{profile?.subscriptionStatus}</Text>
+                </HStack>
+              </VStack>
+            </Box>
+
+            <Separator borderColor={'gray.400'} />
+
+            <Box p={3}>
+              <VStack align="stretch" gap={2}>
+                <Button
+                  variant="ghost"
+                  justifyContent="flex-start"
+                  fontWeight="medium"
+                  color="gray.800"
+                  _hover={{
+                    bg: 'gray.100',
+                    color: 'gray.900',
+                  }}
+                >
+                  My Account
                 </Button>
-              </Popover.CloseTrigger>
-            </HStack>
 
-            <Separator my={4} />
-            <VStack gap={2} align={'start'}>
-              <HStack gap={2}>
-                <Text fontSize="sm" color="gray.800">
-                  User ID:
-                </Text>
-                <Text>{profile?._id}</Text>
-              </HStack>
-              <HStack gap={2}>
-                <Text fontSize="sm" color="gray.800">
-                  Contact:
-                </Text>
-                <Text>{profile?.mobileNumber}</Text>
-              </HStack>
-              <HStack gap={2}>
-                <Text fontSize="sm" color="gray.800">
-                  Shop Name:
-                </Text>
-                <Text>{profile?.shopName}</Text>
-              </HStack>
-              <HStack gap={2}>
-                <Text fontSize="sm" color="gray.800">
-                  Subscription Status:
-                </Text>
-                <Text>{profile?.subscriptionStatus}</Text>
-              </HStack>
-            </VStack>
-
-            <Separator my={4} />
-
-            <VStack align="stretch" gap={2}>
-              <Button
-                variant="plain"
-                justifyContent="flex-start"
-                color="gray.800"
-                fontWeight="medium"
-                _hover={{
-                  bg: 'gray.50',
-                }}
-              >
-                My Account
-              </Button>
-              <Button
-                variant="plain"
-                justifyContent="space-between"
-                color="red.600"
-                fontWeight="medium"
-                _hover={{
-                  bg: 'red.50',
-                  color: 'red.700',
-                }}
-                onClick={handleLogout}
-              >
-                Sign Out
-                <LogOut size={16} />
-              </Button>
-            </VStack>
+                <Button
+                  variant="ghost"
+                  justifyContent="space-between"
+                  color="red.600"
+                  fontWeight="medium"
+                  _hover={{ bg: 'red.50' }}
+                  onClick={handleLogout}
+                >
+                  Sign Out
+                  <LogOut size={16} />
+                </Button>
+              </VStack>
+            </Box>
           </Popover.Content>
         </Popover.Positioner>
       </Portal>

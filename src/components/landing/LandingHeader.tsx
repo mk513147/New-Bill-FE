@@ -56,7 +56,7 @@ export function LandingHeader() {
 
             <Button
               bgGradient="linear(to-r, purple.500, purple.700)"
-              color="white"
+              color="purple.500"
               fontWeight="700"
               px={6}
               borderRadius="full"
@@ -100,7 +100,7 @@ export function LandingHeader() {
                   </Menu.Item>
                   <Menu.Item
                     value="get-started"
-                    color="white"
+                    color="purple.500"
                     bgGradient="linear(to-r, purple.500, purple.700)"
                     asChild
                   >

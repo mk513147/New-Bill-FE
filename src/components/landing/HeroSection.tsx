@@ -176,6 +176,7 @@ export function HeroSection() {
                 fontWeight="700"
                 borderRadius="full"
                 shadow="xl"
+                color="purple.500"
                 _hover={{
                   transform: 'translateY(-2px)',
                   shadow: '2xl',

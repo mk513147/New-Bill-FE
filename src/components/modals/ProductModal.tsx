@@ -282,7 +282,7 @@ export default function ProductDialog({
                 </Button>
               </Dialog.ActionTrigger>
               <Button
-                width="100%"
+                width="50%"
                 bg="#6730EC"
                 color="white"
                 _hover={{ bg: '#5b29d8' }}

@@ -103,6 +103,7 @@ export function HeroSection() {
               bgClip="text"
               maxW="5xl"
               mb={6}
+              color={'white'}
             >
               Smart Billing & Inventory Management
             </Heading>

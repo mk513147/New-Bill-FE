@@ -32,6 +32,7 @@ import {
   MdInventory,
   MdCategory,
   MdOutlineSell,
+  MdCurrencyExchange,
   FaRegClipboard,
   RxHome,
   MdLocalShipping,
@@ -62,6 +63,7 @@ const sections = [
       { label: 'Products', path: '/products', icon: RxBox },
       { label: 'Category', path: '/category', icon: MdCategory },
       { label: 'Suppliers', path: '/suppliers', icon: FiTruck },
+      { label: 'Price List', path: '/price-list', icon: MdCurrencyExchange },
     ],
   },
   {

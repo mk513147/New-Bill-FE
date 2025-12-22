@@ -10,10 +10,10 @@ const Layout = () => {
       <Box zIndex="1000">
         <SideBar />
       </Box>
-      <Flex flex="1" direction="column" overflow="hidden">
+      <Flex flex={1} direction="column" overflow="hidden">
         <Header />
 
-        <Box flex="1" overflowY="auto">
+        <Box flex={1} overflowY="hidden">
           <Outlet />
         </Box>
       </Flex>

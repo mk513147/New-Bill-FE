@@ -26,6 +26,7 @@ export {
   MdReceiptLong,
   MdPayments,
   MdLocalShipping,
+  MdCurrencyExchange,
 } from 'react-icons/md'
 export { TbReportAnalytics } from 'react-icons/tb'
 

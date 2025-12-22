@@ -20,8 +20,8 @@ import { useDispatch } from 'react-redux'
 
 function Profile() {
   const { data, isLoading, isError } = useProfile()
-  const toast = ToasterUtil()
   const { updateProfile, deleteProfile } = useProfileActions('253')
+  const toast = ToasterUtil()
 
   const handleUpdate = () => {
     updateProfile.mutate(

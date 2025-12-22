@@ -7,6 +7,8 @@ export * from './StocksRoute'
 export * from './SuppliersRoute'
 export * from './PaymentsRoute'
 export * from './SettingsRoute'
+export * from './PriceListRoute'
 
+export * from './LandingRoute'
 export * from './LoginRoute'
 export * from './ForgotPasswordRoute'

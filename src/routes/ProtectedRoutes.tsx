@@ -5,7 +5,7 @@ const ProtectedRoutes = () => {
 
   if (!isLoggedIn) {
     localStorage.setItem('eb_logged_in', 'false')
-    return <Navigate to="/login" replace />
+    return <Navigate to="/" replace />
   }
 
   return <Outlet />

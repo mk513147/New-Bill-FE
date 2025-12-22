@@ -17,8 +17,17 @@ export { LuChevronLeft, LuChevronRight } from 'react-icons/lu'
 export { IoIosSearch } from 'react-icons/io'
 export { FaFilter, FaPrint, FaPlusCircle, FaEdit, FaTrash } from 'react-icons/fa'
 export { BsLayoutSidebarInset } from 'react-icons/bs'
-export { RxDashboard, RxPerson, RxBox, RxGear, RxQuestionMarkCircled } from 'react-icons/rx'
+export { RxDashboard, RxPerson, RxBox, RxGear, RxQuestionMarkCircled, RxHome } from 'react-icons/rx'
 export { FiUsers, FiTruck, FiShoppingBag } from 'react-icons/fi'
-export { MdInventory, MdCategory, MdOutlineSell } from 'react-icons/md'
+export {
+  MdInventory,
+  MdCategory,
+  MdOutlineSell,
+  MdReceiptLong,
+  MdPayments,
+  MdLocalShipping,
+  MdCurrencyExchange,
+} from 'react-icons/md'
 export { TbReportAnalytics } from 'react-icons/tb'
+
 export { FaRegClipboard } from 'react-icons/fa'

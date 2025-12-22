@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Dialog, Portal, Button, Input, Field, CloseButton, useMediaQuery } from '@chakra-ui/react'
+import { Dialog, Portal, Button, Input, Field, useMediaQuery } from '@chakra-ui/react'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
+import { X } from 'lucide-react'
 
 export interface CustomerFormValues {
   name: string
@@ -88,12 +89,23 @@ export default function CustomerDialog({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  color="gray.400"
+                  p={1}
+                  minW="auto"
+                  _hover={{
+                    bg: 'transparent',
+                    color: 'gray.600',
+                  }}
+                >
+                  <X size={14} />
+                </Button>
               </Dialog.CloseTrigger>
             </Dialog.Header>
 
             <Dialog.Body pt={4}>
-              {/* Full Name */}
               <Field.Root mb={3}>
                 <Field.Label>Full Name</Field.Label>
                 <Input
@@ -104,7 +116,6 @@ export default function CustomerDialog({
                 />
               </Field.Root>
 
-              {/* Phone */}
               <Field.Root mb={3}>
                 <Field.Label>Phone Number</Field.Label>
                 <Input
@@ -115,7 +126,6 @@ export default function CustomerDialog({
                 />
               </Field.Root>
 
-              {/* Email */}
               <Field.Root mb={3}>
                 <Field.Label>Email-ID</Field.Label>
                 <Input
@@ -147,11 +157,25 @@ export default function CustomerDialog({
               </Field.Root>
             </Dialog.Body>
 
-            <Dialog.Footer>
+            <Dialog.Footer gap={3} justifyContent="flex-end">
+              <Dialog.ActionTrigger asChild>
+                <Button
+                  variant="outline"
+                  minW="120px"
+                  width={'50%'}
+                  color="gray.700"
+                  borderColor="gray.300"
+                  _hover={{ bg: 'gray.100' }}
+                >
+                  Cancel
+                </Button>
+              </Dialog.ActionTrigger>
+
               <Button
-                width="100%"
+                minW="160px"
                 bg="#6730EC"
                 color="white"
+                width={'50%'}
                 _hover={{ bg: '#5b29d8' }}
                 loading={createCustomer.isPending || updateCustomer.isPending}
                 onClick={handleSubmit}

@@ -36,8 +36,6 @@ function Products() {
     hasPreviousPage: false,
   }
 
-  console.log('Products:', data?.products)
-
   const productColumns = [
     {
       key: 'name',

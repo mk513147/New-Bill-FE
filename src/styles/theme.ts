@@ -31,7 +31,7 @@ const config = defineConfig({
     },
     semanticTokens: {
       colors: {
-        bg: { value: '#ffffff' },
+        bg: { value: '#000000ff' },
         text: { value: '#000000' },
         tableHeaderBg: { value: '{colors.table.headerBg}' },
         tableHeaderText: { value: '{colors.table.headerText}' },

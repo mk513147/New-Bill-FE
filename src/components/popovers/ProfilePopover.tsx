@@ -14,8 +14,6 @@ export const ProfilePopover = ({ trigger }: { trigger: React.ReactNode }) => {
 
   const profile = data
 
-  console.log('profile data', profile)
-
   const handleLogout = async () => {
     dispatch(setLoading({ loading: true, message: 'Logging out...' }))
     try {

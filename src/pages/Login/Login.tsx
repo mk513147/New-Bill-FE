@@ -15,7 +15,6 @@ import {
 import { PasswordInput } from '@/components/ui/password-input'
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form'
 import login from '@/assets/Login-Image.jpg'
-import dash from '@/assets/Dash-Image.jpg'
 import logo from '@/assets/logo.png'
 import topSvg from '@/assets/top.svg'
 import rightSvg from '@/assets/right.svg'
@@ -29,6 +28,10 @@ import { AxiosError } from 'axios'
 import API_ENDPOINTS from '@/api/apiEndpoints'
 import { clearLoading, setLoading } from '@/redux/slices/uiSlice'
 import { Link as RouterLink } from 'react-router-dom'
+import { motion } from 'framer-motion'
+
+const MotionFlex = motion(Flex)
+const MotionBox = motion(Box)
 
 interface FormValues {
   emailId: string
@@ -108,24 +111,11 @@ const Login = () => {
                 zIndex={200}
               />
 
-              <Box position="relative" zIndex={3} mt={5} top={'40%'}>
-                <Heading
-                  fontSize="48px"
-                  fontWeight="800"
-                  color="white"
-                  letterSpacing="tight"
-                  lineHeight="1.1"
-                >
+              <Box position="relative" zIndex={3} mt={5} top="40%">
+                <Heading fontSize="48px" fontWeight="800" color="white">
                   Hello!
                 </Heading>
-                <Text
-                  fontSize="xl"
-                  color="white"
-                  mt={3}
-                  fontWeight="500"
-                  letterSpacing="wide"
-                  opacity={0.95}
-                >
+                <Text fontSize="xl" color="white" mt={3} fontWeight="500">
                   Welcome to Ebill
                 </Text>
               </Box>
@@ -142,68 +132,24 @@ const Login = () => {
               boxShadow="0px -4px 18px rgba(0,0,0,0.1)"
               zIndex={10}
             >
-              <Heading fontSize="32px" fontWeight="700" color="blue.700" letterSpacing="tight">
+              <Heading fontSize="32px" fontWeight="700" color="blue.700">
                 Login
               </Heading>
 
               <Box w="100%" mt={6} maxW="350px">
                 <form onSubmit={handleSubmit(onSubmit, onError)}>
-                  <Stack gap={5} w="100%">
-                    <Field.Root w="100%">
-                      <Field.Label color="gray.700" fontSize="sm" mb={1} fontWeight="medium">
-                        Email
-                      </Field.Label>
-
-                      <Input
-                        {...register('emailId', { required: 'Email Id is required' })}
-                        size="lg"
-                        bg="white"
-                        border="1px solid"
-                        borderColor="gray.300"
-                        color="gray.800"
-                        borderRadius="full"
-                        _focus={{ borderColor: 'blue.500', bg: 'white' }}
-                      />
+                  <Stack gap={5}>
+                    <Field.Root>
+                      <Field.Label>Email</Field.Label>
+                      <Input {...register('emailId')} size="lg" />
                     </Field.Root>
 
-                    <Field.Root w="100%">
-                      <Field.Label color="gray.700" fontSize="sm" mb={1} fontWeight="medium">
-                        Password
-                      </Field.Label>
-
-                      <PasswordInput
-                        {...register('password', { required: 'Password is required' })}
-                        size="lg"
-                        bg="white"
-                        border="1px solid"
-                        borderColor="gray.300"
-                        color="gray.800"
-                        borderRadius="full"
-                        _focus={{ borderColor: 'blue.500', bg: 'white' }}
-                      />
+                    <Field.Root>
+                      <Field.Label>Password</Field.Label>
+                      <PasswordInput {...register('password')} size="lg" />
                     </Field.Root>
 
-                    <Flex justify="flex-end" mt={-2}>
-                      <Link
-                        fontSize="sm"
-                        color="blue.600"
-                        _hover={{ textDecoration: 'underline', color: 'blue.700' }}
-                      >
-                        Forgot Your Password?
-                      </Link>
-                    </Flex>
-
-                    <Button
-                      type="submit"
-                      w="100%"
-                      size="lg"
-                      bg="blue.600"
-                      color="white"
-                      borderRadius="full"
-                      fontSize="lg"
-                      mt={2}
-                      _hover={{ bg: 'blue.700' }}
-                    >
+                    <Button type="submit" size="lg" w="100%">
                       Log In
                     </Button>
                   </Stack>
@@ -213,184 +159,162 @@ const Login = () => {
           </Flex>
         </Flex>
       ) : (
-        <Flex w="100vw" h="100vh" bg="white">
+        <MotionFlex
+          w="100vw"
+          h="100vh"
+          bgGradient="radial-gradient(circle at top, #1a1a1a 0%, #0b0b0f 45%, #000000 100%)"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          {/* LEFT — LOGIN */}
           <Flex
-            w={{ base: '100%', md: '50%' }}
-            h="100%"
+            w="50%"
             direction="column"
             justify="center"
             align="center"
-            px={{ base: 6, md: 16 }}
+            px={16}
             position="relative"
           >
-            <HStack
-              asChild
-              position="absolute"
-              top="40px"
-              left={{ base: '20px', md: '40px' }}
-              gap={2}
-              cursor="pointer"
-            >
+            {/* Logo */}
+            <HStack asChild position="absolute" top="40px" left="40px" gap={2} cursor="pointer">
               <RouterLink to="/">
-                <Image src={logo} w="34px" h="34px" alt="Logo" />
-                <Text fontSize="2xl" fontWeight="800" color="gray.900" letterSpacing="tight">
+                <Image src={logo} w="34px" h="34px" />
+                <Text
+                  fontSize="2xl"
+                  fontWeight="800"
+                  bgGradient="linear-gradient(90deg, #9f7aea, #63b3ed)"
+                  bgClip="text"
+                >
                   Ebill
                 </Text>
               </RouterLink>
             </HStack>
 
-            <Box w="100%" textAlign="center" mt={{ base: 20, md: 0 }} mb={8}>
-              <Heading
-                fontSize="5xl"
-                fontWeight="800"
-                color="gray.900"
-                letterSpacing="tight"
-                lineHeight="1.1"
-              >
+            {/* Heading */}
+            <MotionBox
+              textAlign="center"
+              mb={10}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+            >
+              <Heading fontSize="5xl" fontWeight="800" color="white" lineHeight="1.1">
                 Welcome Back
               </Heading>
 
-              <Text
-                mt={6}
-                fontSize="lg"
-                color="gray.600"
-                fontWeight="500"
-                letterSpacing="wide"
-                lineHeight="1.6"
-              >
-                Enter your email and password to access your account.
+              <Text mt={6} fontSize="lg" color="gray.400">
+                Enter your credentials to continue
               </Text>
-            </Box>
+            </MotionBox>
 
-            <Box w="100%" maxW="420px">
+            {/* Login Card */}
+            <MotionBox
+              w="100%"
+              maxW="420px"
+              bg="rgba(255,255,255,0.04)"
+              backdropFilter="blur(14px)"
+              border="1px solid"
+              borderColor="rgba(255,255,255,0.08)"
+              borderRadius="2xl"
+              px={8}
+              py={10}
+              boxShadow="0 20px 60px rgba(0,0,0,0.6)"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               <form onSubmit={handleSubmit(onSubmit, onError)}>
-                <Stack gap={5} w="100%">
-                  <Field.Root w="100%">
-                    <Field.Label color="gray.700" fontSize="sm" mb={1} fontWeight="medium">
-                      Email
-                    </Field.Label>
-
+                <Stack gap={5}>
+                  <Field.Root>
+                    <Field.Label color="gray.300">Email</Field.Label>
                     <Input
-                      {...register('emailId', { required: 'Email Id is required' })}
+                      {...register('emailId')}
                       size="lg"
-                      bg="white"
-                      border="1px solid"
-                      borderColor="gray.300"
-                      color="gray.800"
-                      borderRadius="md"
-                      _focus={{ borderColor: 'blue.500', bg: 'white' }}
+                      bg="rgba(255,255,255,0.06)"
+                      borderColor="rgba(255,255,255,0.12)"
+                      color="white"
+                      _focus={{ borderColor: 'purple.400' }}
                     />
                   </Field.Root>
 
-                  <Field.Root w="100%">
-                    <Field.Label color="gray.700" fontSize="sm" mb={1} fontWeight="medium">
-                      Password
-                    </Field.Label>
-
+                  <Field.Root>
+                    <Field.Label color="gray.300">Password</Field.Label>
                     <PasswordInput
-                      {...register('password', { required: 'Password is required' })}
+                      {...register('password')}
                       size="lg"
-                      bg="white"
-                      border="1px solid"
-                      borderColor="gray.300"
-                      color="gray.800"
-                      borderRadius="md"
-                      _focus={{ borderColor: 'blue.500', bg: 'white' }}
+                      bg="rgba(255,255,255,0.06)"
+                      borderColor="rgba(255,255,255,0.12)"
+                      color="white"
+                      _focus={{ borderColor: 'purple.400' }}
                     />
                   </Field.Root>
 
-                  <Flex justify="flex-end" mt={-2}>
-                    <Link
-                      fontSize="sm"
-                      color="blue.600"
-                      _hover={{ textDecoration: 'underline', color: 'blue.700' }}
-                    >
-                      Forgot Your Password?
+                  <Flex justify="flex-end">
+                    <Link fontSize="sm" color="purple.300">
+                      Forgot your password?
                     </Link>
                   </Flex>
 
-                  <Button
-                    type="submit"
-                    w="100%"
-                    size="lg"
-                    bg="blue.600"
-                    color="white"
-                    borderRadius="md"
-                    fontSize="lg"
-                    mt={2}
-                    _hover={{ bg: 'blue.700' }}
+                  <motion.div
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    Log In
-                  </Button>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      w="100%"
+                      borderRadius="full"
+                      bgGradient="linear-gradient(135deg, #9f7aea, #6b46c1)"
+                      color="white"
+                      fontWeight="700"
+                    >
+                      Log In
+                    </Button>
+                  </motion.div>
                 </Stack>
               </form>
-            </Box>
+            </MotionBox>
           </Flex>
 
           <Flex
-            display={{ base: 'none', md: 'flex' }}
             w="50%"
-            h="100%"
-            pt={10}
-            align="center"
-            borderLeftRadius="2xl"
-            overflow="hidden"
             direction="column"
-            bgGradient="linear-gradient(110deg, #3b5cff 10%, #5f6bff 90%)"
-            position="relative"
+            justify="center"
+            align="center"
+            bgGradient="linear-gradient(135deg, #120018, #1a0026, #000000)"
+            boxShadow="inset 0 0 120px rgba(159,122,234,0.15)"
+            overflow="hidden"
           >
-            <Box w="100%" display="flex" flexDirection="column" alignItems="center" pt="90px">
-              <Box
-                color="white"
-                textAlign="left"
-                maxW="600px"
-                pl={{ base: 6, md: 6, sm: 4, lg: 8 }}
-                mb={12}
-              >
-                <Heading fontSize="4xl" fontWeight="700" letterSpacing="tight" lineHeight="1.2">
-                  Effortlessly manage your inventory and stock operations.
-                </Heading>
+            <MotionBox
+              textAlign="center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <Heading color="white" fontSize="4xl" maxW="520px">
+                Smart Billing & Inventory Management
+              </Heading>
 
-                <Text
-                  mt={5}
-                  fontSize="lg"
-                  opacity={0.95}
-                  fontWeight="500"
-                  letterSpacing="wide"
-                  lineHeight="1.7"
-                  maxW="600px"
-                >
-                  Log in to access your inventory dashboard and streamline your warehouse
-                  management.
-                </Text>
-              </Box>
+              <Text mt={6} color="gray.400" maxW="520px">
+                Track inventory, manage billing, and grow your business effortlessly.
+              </Text>
+            </MotionBox>
 
-              <Box position="relative" display="flex" justifyContent="center" w="100%">
-                <Image
-                  src={login}
-                  alt="Login Illustration"
-                  width="75%"
-                  position={'relative'}
-                  left={0}
-                  borderRadius="lg"
-                  zIndex={1}
-                />
-
-                <Image
-                  src={dash}
-                  alt="Dashboard Overlay"
-                  position="absolute"
-                  right="5%"
-                  top="28%"
-                  width="40%"
-                  shadow="lg"
-                  borderRadius="xl"
-                  zIndex={5}
-                />
-              </Box>
-            </Box>
+            <motion.div
+              style={{ marginTop: '56px', width: '72%' }}
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            >
+              <Image src={login} borderRadius="2xl" boxShadow="0 40px 100px rgba(0,0,0,0.75)" />
+            </motion.div>
           </Flex>
-        </Flex>
+        </MotionFlex>
       )}
     </>
   )

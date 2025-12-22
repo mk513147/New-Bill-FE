@@ -109,10 +109,23 @@ const Login = () => {
               />
 
               <Box position="relative" zIndex={3} mt={5} top={'40%'}>
-                <Heading fontSize="44px" fontWeight="bold" color="white">
+                <Heading
+                  fontSize="48px"
+                  fontWeight="800"
+                  color="white"
+                  letterSpacing="tight"
+                  lineHeight="1.1"
+                >
                   Hello!
                 </Heading>
-                <Text fontSize="lg" color="white" mt={3}>
+                <Text
+                  fontSize="xl"
+                  color="white"
+                  mt={3}
+                  fontWeight="500"
+                  letterSpacing="wide"
+                  opacity={0.95}
+                >
                   Welcome to Ebill
                 </Text>
               </Box>
@@ -129,7 +142,7 @@ const Login = () => {
               boxShadow="0px -4px 18px rgba(0,0,0,0.1)"
               zIndex={10}
             >
-              <Heading fontSize="28px" fontWeight="semibold" color="blue.700">
+              <Heading fontSize="32px" fontWeight="700" color="blue.700" letterSpacing="tight">
                 Login
               </Heading>
 
@@ -220,18 +233,31 @@ const Login = () => {
             >
               <RouterLink to="/">
                 <Image src={logo} w="34px" h="34px" alt="Logo" />
-                <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+                <Text fontSize="2xl" fontWeight="800" color="gray.900" letterSpacing="tight">
                   Ebill
                 </Text>
               </RouterLink>
             </HStack>
 
             <Box w="100%" textAlign="center" mt={{ base: 20, md: 0 }} mb={8}>
-              <Heading fontSize="5xl" fontWeight="semibold" color="gray.800">
+              <Heading
+                fontSize="5xl"
+                fontWeight="800"
+                color="gray.900"
+                letterSpacing="tight"
+                lineHeight="1.1"
+              >
                 Welcome Back
               </Heading>
 
-              <Text mt={6} fontSize="md" color="gray.500">
+              <Text
+                mt={6}
+                fontSize="lg"
+                color="gray.600"
+                fontWeight="500"
+                letterSpacing="wide"
+                lineHeight="1.6"
+              >
                 Enter your email and password to access your account.
               </Text>
             </Box>
@@ -321,17 +347,17 @@ const Login = () => {
                 pl={{ base: 6, md: 6, sm: 4, lg: 8 }}
                 mb={12}
               >
-                <Heading fontSize="4xl" fontWeight="light" letterSpacing="wide" lineHeight="1.2">
+                <Heading fontSize="4xl" fontWeight="700" letterSpacing="tight" lineHeight="1.2">
                   Effortlessly manage your inventory and stock operations.
                 </Heading>
 
                 <Text
                   mt={5}
                   fontSize="lg"
-                  opacity={0.9}
-                  fontWeight="light"
+                  opacity={0.95}
+                  fontWeight="500"
                   letterSpacing="wide"
-                  lineHeight="1.6"
+                  lineHeight="1.7"
                   maxW="600px"
                 >
                   Log in to access your inventory dashboard and streamline your warehouse

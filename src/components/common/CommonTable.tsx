@@ -76,7 +76,7 @@ export function CommonTable<T>({
         {isLoading ? (
           <Table.Body>
             {[...Array(7)].map((_, i) => (
-              <Table.Row key={i} height="50px" border={0}>
+              <Table.Row key={i} height="50px" border={0} bg="white">
                 <Table.Cell colSpan={6} p={1}>
                   <Box w="100%">
                     <Skeleton
@@ -96,7 +96,7 @@ export function CommonTable<T>({
         ) : (
           <Table.Body>
             {data.map((row) => (
-              <Table.Row key={rowKey(row)} _hover={{ bg: '#f1f1f1ff' }}>
+              <Table.Row key={rowKey(row)} bg="white" _hover={{ bg: '#f1f1f1ff' }}>
                 {columns.map((c) => (
                   <Table.Cell
                     key={c.key}

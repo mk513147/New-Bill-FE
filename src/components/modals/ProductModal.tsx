@@ -5,13 +5,13 @@ import {
   Button,
   Input,
   Field,
-  CloseButton,
   useMediaQuery,
   Select,
   SimpleGrid,
 } from '@chakra-ui/react'
 import { useProductActions } from '@/hooks/useProductActions'
 import { createListCollection } from '@chakra-ui/react'
+import { X } from 'lucide-react'
 
 const unitCollection = createListCollection({
   items: [
@@ -137,7 +137,19 @@ export default function ProductDialog({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  color="gray.400"
+                  p={1}
+                  minW="auto"
+                  _hover={{
+                    bg: 'transparent',
+                    color: 'gray.600',
+                  }}
+                >
+                  <X size={14} />
+                </Button>
               </Dialog.CloseTrigger>
             </Dialog.Header>
 
@@ -256,9 +268,21 @@ export default function ProductDialog({
               </SimpleGrid>
             </Dialog.Body>
 
-            <Dialog.Footer>
+            <Dialog.Footer gap={3} justifyContent="flex-end">
+              <Dialog.ActionTrigger asChild>
+                <Button
+                  variant="outline"
+                  minW="120px"
+                  width={'50%'}
+                  color="gray.700"
+                  borderColor="gray.300"
+                  _hover={{ bg: 'gray.100' }}
+                >
+                  Cancel
+                </Button>
+              </Dialog.ActionTrigger>
               <Button
-                width="100%"
+                width="50%"
                 bg="#6730EC"
                 color="white"
                 _hover={{ bg: '#5b29d8' }}

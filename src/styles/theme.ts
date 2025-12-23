@@ -18,7 +18,6 @@ const config = defineConfig({
           headerBg: { value: '#FFFFFF' },
           headerText: { value: '#6B7280' },
           headerBorder: { value: '#E5E7EB' },
-
           rowBorder: { value: '#c6c8cbff' },
           rowHover: { value: '#b7bbbeff' },
         },
@@ -31,12 +30,12 @@ const config = defineConfig({
     },
     semanticTokens: {
       colors: {
-        bg: { value: '#ffffff' },
+        bg: { value: '#000000ff' },
         text: { value: '#000000' },
+
         tableHeaderBg: { value: '{colors.table.headerBg}' },
         tableHeaderText: { value: '{colors.table.headerText}' },
         tableHeaderBorder: { value: '{colors.table.headerBorder}' },
-
         tableRowBorder: { value: '{colors.table.rowBorder}' },
         tableRowHoverBg: { value: '{colors.table.rowHover}' },
       },

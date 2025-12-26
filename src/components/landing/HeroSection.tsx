@@ -171,7 +171,6 @@ export function HeroSection() {
                 px={8}
                 py={7}
                 bgGradient="linear(to-r, purple.500, purple.700)"
-                color="white"
                 fontSize="lg"
                 fontWeight="700"
                 borderRadius="full"

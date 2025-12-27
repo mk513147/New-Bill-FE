@@ -13,7 +13,7 @@ const Layout = () => {
       <Flex flex={1} direction="column" overflow="hidden">
         <Header />
 
-        <Box flex={1} overflowY="hidden">
+        <Box flex={1} overflowY="auto">
           <Outlet />
         </Box>
       </Flex>

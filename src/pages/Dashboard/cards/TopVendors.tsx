@@ -18,7 +18,6 @@ const vendors: Vendor[] = [
 export function TopVendors() {
   return (
     <Card>
-      {/* Header */}
       <HStack justify="space-between" mb={3}>
         <Text fontWeight="600">Top Vendors</Text>
         <Text fontSize="sm" color="gray.500">
@@ -26,7 +25,6 @@ export function TopVendors() {
         </Text>
       </HStack>
 
-      {/* Toggle */}
       <HStack gap={2} mb={4}>
         <Button size="xs" colorPalette="blue">
           By Quantity
@@ -36,10 +34,8 @@ export function TopVendors() {
         </Button>
       </HStack>
 
-      {/* Treemap */}
       <Box borderRadius="md" overflow="hidden" h="260px">
         <HStack h="100%" gap={0}>
-          {/* Left dominant block */}
           <Box w="32%" bg={vendors[0].color} p={3} color="white">
             <Text fontSize="sm" fontWeight="600">
               {vendors[0].name}
@@ -47,7 +43,6 @@ export function TopVendors() {
             <Text fontSize="sm">{vendors[0].percent.toFixed(1)}%</Text>
           </Box>
 
-          {/* Right stacked blocks */}
           <VStack h="100%" gap={0} flex="1">
             {vendors.slice(1).map((vendor) => (
               <Box key={vendor.name} bg={vendor.color} w="100%" flex={`${vendor.percent}`} p={3}>

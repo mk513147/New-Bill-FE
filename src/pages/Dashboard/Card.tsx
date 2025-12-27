@@ -1,4 +1,3 @@
-// Card.tsx
 import { Box } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 
@@ -9,8 +8,8 @@ export function Card({ children }: { children: ReactNode }) {
       border="1px solid"
       borderColor="gray.200"
       borderRadius="md"
-      p={3} // 🔴 reduce padding
-      boxShadow="none" // 🔴 no shadow
+      p={3}
+      boxShadow="none"
     >
       {children}
     </Box>

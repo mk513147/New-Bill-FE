@@ -4,7 +4,6 @@ export function DashBoardFooter() {
   return (
     <Box mt={10} bg="white" borderTop="1px solid" borderColor="gray.200" px={10} py={8}>
       <Grid templateColumns="2fr 1fr 1fr 1fr" gap={8}>
-        {/* Left promo */}
         <Box>
           <Text fontWeight="600" mb={2}>
             Manage your inventory on the go!
@@ -19,25 +18,28 @@ export function DashBoardFooter() {
           </HStack>
         </Box>
 
-        {/* Column 1 */}
-        <VStack align="start" gap={2}>
+        <VStack align="start" gap={2} colorPalette={'blue'}>
           <Text fontWeight="600">OTHER APPS</Text>
-          <Link fontSize="sm">Accounting Software</Link>
+          <Link fontSize="sm" color="gray.700">
+            Accounting Software
+          </Link>
           <Link fontSize="sm">Ecommerce Software</Link>
           <Link fontSize="sm">Subscription Billing</Link>
         </VStack>
 
-        {/* Column 2 */}
-        <VStack align="start" gap={2}>
-          <Text fontWeight="600">HELP & SUPPORT</Text>
+        <VStack align="start" gap={2} colorPalette={'blue'}>
+          <Text fontWeight="600" color="gray.700">
+            HELP & SUPPORT
+          </Text>
           <Link fontSize="sm">Contact Support</Link>
           <Link fontSize="sm">Help Docs</Link>
           <Link fontSize="sm">FAQ</Link>
         </VStack>
 
-        {/* Column 3 */}
-        <VStack align="start" gap={2}>
-          <Text fontWeight="600">QUICK LINKS</Text>
+        <VStack align="start" gap={2} colorPalette={'blue'}>
+          <Text fontWeight="600" color="gray.700">
+            QUICK LINKS
+          </Text>
           <Link fontSize="sm">Getting Started</Link>
           <Link fontSize="sm">Mobile Apps</Link>
           <Link fontSize="sm">What’s New</Link>
@@ -45,7 +47,7 @@ export function DashBoardFooter() {
       </Grid>
 
       <Box mt={6} textAlign="center">
-        <Text fontSize="xs" color="gray.500">
+        <Text fontSize="xs" color="gray.700">
           © 2025 EBILL. All Rights Reserved.
         </Text>
       </Box>

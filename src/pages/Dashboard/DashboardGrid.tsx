@@ -9,12 +9,7 @@ import { ReceiveHistory } from './cards/ReceiveHistory'
 
 export function DashboardGrid() {
   return (
-    <Grid
-      templateColumns="1fr 360px" // 🔑 independent right rail
-      gap={4}
-      alignItems="start"
-    >
-      {/* LEFT COLUMN (main dashboard flow) */}
+    <Grid templateColumns="1fr 360px" gap={4} alignItems="start">
       <VStack align="stretch" gap={4}>
         <TopSellingItems />
 
@@ -39,7 +34,6 @@ export function DashboardGrid() {
         </Grid>
       </VStack>
 
-      {/* RIGHT COLUMN (isolated, fixed-width) */}
       <Box position="relative" width={'320px'}>
         <PendingActions />
       </Box>

@@ -23,9 +23,11 @@ function Dashboard() {
     }
   }, [dispatch])
   return (
-    <Box px={6} py={4} bg="gray.50" minH="100%">
-      <DashboardGrid />
-      <DashBoardFooter />
+    <Box height={'100%'} minH="100%" overflowY="scroll">
+      <Box px={6} py={4} bg="gray.50">
+        <DashboardGrid />
+        <DashBoardFooter />
+      </Box>
     </Box>
   )
 }

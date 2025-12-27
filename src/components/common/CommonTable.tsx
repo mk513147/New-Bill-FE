@@ -75,9 +75,9 @@ export function CommonTable<T>({
 
         {isLoading ? (
           <Table.Body>
-            {[...Array(7)].map((_, i) => (
+            {[...Array(10)].map((_, i) => (
               <Table.Row key={i} height="50px" border={0} bg="white">
-                <Table.Cell colSpan={6} p={1}>
+                <Table.Cell colSpan={8}>
                   <Box w="100%">
                     <Skeleton
                       height="20px"

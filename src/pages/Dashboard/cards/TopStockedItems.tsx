@@ -18,7 +18,6 @@ const items: Item[] = [
 export function TopStockedItems() {
   return (
     <Card>
-      {/* Header */}
       <HStack justify="space-between" mb={3}>
         <Text fontWeight="600">Top Stocked Items</Text>
         <Text fontSize="sm" color="gray.500">
@@ -29,7 +28,6 @@ export function TopStockedItems() {
         </Text>
       </HStack>
 
-      {/* Toggle */}
       <HStack gap={2} mb={4}>
         <Button size="xs" colorPalette="blue">
           By Quantity
@@ -39,16 +37,13 @@ export function TopStockedItems() {
         </Button>
       </HStack>
 
-      {/* List */}
       <VStack align="stretch" gap={0}>
         {items.map((item, index) => (
           <Box key={item.name}>
             <HStack justify="space-between" align="center" py={3}>
               <HStack gap={3}>
-                {/* Image placeholder */}
                 <Box w="36px" h="36px" bg="gray.100" borderRadius="md" />
 
-                {/* Name + SKU */}
                 <Box>
                   <Text fontSize="sm" color="blue.600" fontWeight="500">
                     {item.name}
@@ -61,13 +56,11 @@ export function TopStockedItems() {
                 </Box>
               </HStack>
 
-              {/* Quantity */}
               <Text fontSize="sm" fontWeight="600">
                 {item.qty}
               </Text>
             </HStack>
 
-            {/* Divider */}
             {index !== items.length - 1 && <Separator borderColor="gray.200" />}
           </Box>
         ))}

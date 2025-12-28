@@ -44,7 +44,6 @@ function Section({ icon, title, items }: { icon: React.ReactNode; title: string;
 export function PendingActions() {
   return (
     <Card>
-      {/* 🔑 Fixed-height container */}
       <Box h="520px" display="flex" flexDirection="column">
         <Tabs.Root
           defaultValue="pending"
@@ -89,7 +88,6 @@ export function PendingActions() {
             </Tabs.Trigger>
           </Tabs.List>
 
-          {/* 🔑 Scrollable content */}
           <Tabs.Content value="pending" style={{ flex: 1, overflow: 'hidden' }}>
             <Box
               flex="1"
@@ -136,7 +134,6 @@ export function PendingActions() {
             </Box>
           </Tabs.Content>
 
-          {/* Recent tab */}
           <Tabs.Content value="recent">
             <Text fontSize="sm" color="gray.500">
               No recent activities

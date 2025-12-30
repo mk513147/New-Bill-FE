@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, Heading, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
 
@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
+import { FilterSelect } from '@/components/common/FilterSelect'
 
 function Customers() {
   const [page, setPage] = useState(1)
@@ -111,6 +112,13 @@ function Customers() {
       dispatch(clearHeader())
     }
   }, [dispatch])
+  const [value, setValue] = useState<string[]>([])
+
+  const customerFilters = [
+    { label: 'All customers', value: 'all' },
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
+  ]
 
   return (
     <>
@@ -133,9 +141,13 @@ function Customers() {
           gap={4}
           flexWrap={{ base: 'wrap', md: 'nowrap' }}
         >
-          <Heading size="xl" color="gray.800" whiteSpace="nowrap">
-            Active Customer
-          </Heading>
+          <FilterSelect
+            options={customerFilters}
+            value={value}
+            defaultValue={['all']}
+            placeholder="All customers"
+            onChange={setValue}
+          />
           <HStack gap={2}>
             <IconButton
               aria-label="Add"

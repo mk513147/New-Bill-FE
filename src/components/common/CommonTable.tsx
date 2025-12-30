@@ -1,4 +1,5 @@
-import { Table, Box, Skeleton, HStack, Button } from '@chakra-ui/react'
+import { Table, Box, Skeleton, HStack, Button, Popover, Portal, VStack } from '@chakra-ui/react'
+import { MoreVertical } from 'lucide-react'
 type RowAction<T> = {
   label: string
   icon: React.ReactNode
@@ -22,7 +23,7 @@ type CommonTableProps<T> = {
 }
 
 const DEFAULT_COLUMN_WIDTH = '160px'
-// const ACTION_COLUMN_WIDTH = '120px'
+const ACTION_COLUMN_WIDTH = '80px'
 
 export function CommonTable<T>({
   columns,
@@ -96,7 +97,7 @@ export function CommonTable<T>({
         ) : (
           <Table.Body>
             {data.map((row) => (
-              <Table.Row key={rowKey(row)} bg="white" _hover={{ bg: '#f1f1f1ff' }}>
+              <Table.Row key={rowKey(row)} bg="white" _hover={{ bg: '#f6f6f6ff' }}>
                 {columns.map((c) => (
                   <Table.Cell
                     key={c.key}
@@ -113,19 +114,41 @@ export function CommonTable<T>({
                 ))}
 
                 {actions && (
-                  <Table.Cell verticalAlign="middle" textAlign="center">
-                    <HStack gap={1} justify={'center'}>
-                      {actions.map((action, i) => (
-                        <Button
-                          key={i}
-                          onClick={() => action.onClick(row)}
-                          style={{ color: action.color }}
-                          size={'sm'}
-                        >
-                          {action.icon}
+                  <Table.Cell verticalAlign="middle" textAlign="center" width={ACTION_COLUMN_WIDTH}>
+                    <Popover.Root positioning={{ placement: 'bottom-end' }}>
+                      <Popover.Trigger asChild>
+                        <Button size="sm" variant="solid" bg={'transparent'}>
+                          <MoreVertical />
                         </Button>
-                      ))}
-                    </HStack>
+                      </Popover.Trigger>
+
+                      <Portal>
+                        <Popover.Positioner>
+                          <Popover.Content w="160px" bg={'white'} shadow={'lightGray'}>
+                            <Popover.Body p={1}>
+                              <VStack gap={1} align="stretch">
+                                {actions.map((action, i) => (
+                                  <Button
+                                    key={i}
+                                    onClick={() => action.onClick(row)}
+                                    size="sm"
+                                    justifyContent="flex-start"
+                                    width="100%"
+                                    color="gray.600"
+                                    _hover={{ bg: 'gray.100' }}
+                                  >
+                                    <HStack gap={2}>
+                                      {action.icon}
+                                      {action.label}
+                                    </HStack>
+                                  </Button>
+                                ))}
+                              </VStack>
+                            </Popover.Body>
+                          </Popover.Content>
+                        </Popover.Positioner>
+                      </Portal>
+                    </Popover.Root>
                   </Table.Cell>
                 )}
               </Table.Row>

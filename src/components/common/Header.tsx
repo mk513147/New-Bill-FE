@@ -19,7 +19,13 @@ export const Header = () => {
       zIndex={999}
     >
       <Flex h="100%" align="center" justify="space-between">
-        <Text fontSize="lg" fontWeight="semibold" color="gray.900" truncate>
+        <Text
+          fontSize={{ base: 'xl', md: '2xl' }}
+          fontWeight="700"
+          color="gray.900"
+          lineHeight="1.2"
+          letterSpacing="-0.02em"
+        >
           {title}
         </Text>
 

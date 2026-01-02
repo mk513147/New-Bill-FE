@@ -37,7 +37,7 @@ export function CommonTable<T>({
       w="100%"
       maxW="100%"
       maxH="480px"
-      height={'480px'}
+      // height={'480px'}
       overflow="auto"
       css={{
         scrollbarWidth: 'none',

@@ -27,11 +27,7 @@ const DisplayCard = ({
   const animatedValue = animate && isNumber ? useCountUp(Number(highlight), 1500) : highlight
   return (
     <Card.Root
-      w={{
-        base: '100%',
-        sm: graph ? '300px' : '260px',
-        md: graph ? '360px' : '300px',
-      }}
+      w="100%"
       minH="160px"
       shadow={'lightGray'}
       bg={bgColor}

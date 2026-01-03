@@ -27,7 +27,7 @@ export const useCategoryActions = (pubId: string) => {
       API.patch(`${API_ENDPOINTS.CATEGORY.UPDATE}/${pubId}`, payload).then((res) => res.data),
 
     onSuccess: (updatedCategory) => {
-      queryClient.setQueriesData({ queryKey: ['getCategory'] }, (old: any) => {
+      queryClient.setQueryData(['getCategory'], (old: any) => {
         if (!old?.data) return old
 
         return {
@@ -35,12 +35,12 @@ export const useCategoryActions = (pubId: string) => {
           data: old.data.map((c: any) => (c._id === updatedCategory._id ? updatedCategory : c)),
         }
       })
-      queryClient.invalidateQueries({ queryKey: ['allCustomers'] })
-      toast('Customer updated successfully', 'success')
+
+      toast('Category updated successfully', 'success')
     },
 
     onError: () => {
-      toast('Failed to update customer', 'error')
+      toast('Failed to update category', 'error')
     },
   })
 

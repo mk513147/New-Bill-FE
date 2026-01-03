@@ -24,16 +24,13 @@ export const useCategoryActions = (pubId: string) => {
 
   const updateCategory = useMutation({
     mutationFn: (payload: any) =>
-      API.patch(`${API_ENDPOINTS.CATEGORY.UPDATE}/${pubId}`, payload).then((res) => res.data),
+      API.patch(`${API_ENDPOINTS.CATEGORY.UPDATE}/${pubId}`, payload).then((res) => res.data.data),
 
     onSuccess: (updatedCategory) => {
-      queryClient.setQueryData(['getCategory'], (old: any) => {
-        if (!old?.data) return old
+      queryClient.setQueryData(['getCategory'], (old: any[]) => {
+        if (!Array.isArray(old)) return old
 
-        return {
-          ...old,
-          data: old.data.map((c: any) => (c._id === updatedCategory._id ? updatedCategory : c)),
-        }
+        return old.map((c) => (c._id === updatedCategory._id ? updatedCategory : c))
       })
 
       toast('Category updated successfully', 'success')

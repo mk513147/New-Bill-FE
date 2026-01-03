@@ -124,7 +124,12 @@ export function CommonTable<T>({
 
                       <Portal>
                         <Popover.Positioner>
-                          <Popover.Content w="160px" bg={'white'} shadow={'lightGray'}>
+                          <Popover.Content
+                            w="160px"
+                            bg={'white'}
+                            shadow={'lightGray'}
+                            zIndex={1000}
+                          >
                             <Popover.Body p={1}>
                               <VStack gap={1} align="stretch">
                                 {actions.map((action, i) => (

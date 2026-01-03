@@ -96,7 +96,7 @@ export default function CategoryModal({
               </Dialog.CloseTrigger>
             </Dialog.Header>
 
-            <Dialog.Body pt={4}>
+            <Dialog.Body pt={4} zIndex={2000}>
               <Field.Root mb={3}>
                 <Field.Label>Category Name</Field.Label>
                 <Input

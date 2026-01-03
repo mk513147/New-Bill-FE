@@ -29,6 +29,7 @@ import API_ENDPOINTS from '@/api/apiEndpoints'
 import { clearLoading, setLoading } from '@/redux/slices/uiSlice'
 import { Link as RouterLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useSubscription } from '@/hooks/useSubscription'
 
 const MotionFlex = motion(Flex)
 const MotionBox = motion(Box)
@@ -41,6 +42,7 @@ interface FormValues {
 const Login = () => {
   const toastFunc = ToasterUtil()
   const navigate = useNavigate()
+  const { fetchSubscriptionStatus } = useSubscription()
 
   const dispatch = useDispatch()
   const { register, handleSubmit } = useForm<FormValues>()
@@ -54,9 +56,19 @@ const Login = () => {
       if (res.status === 200) {
         localStorage.setItem('eb_logged_in', 'true')
         dispatch(setProfile(res?.data?.data?.data))
+
+        // Fetch subscription status after successful login
+        const subscription = await fetchSubscriptionStatus()
+
         dispatch(clearLoading())
         toastFunc('Logged in successfully', 'success')
-        navigate('/dashboard')
+
+        // Redirect based on subscription status
+        if (!subscription || subscription.subscriptionStatus === 'expired') {
+          navigate('/pricing')
+        } else {
+          navigate('/dashboard')
+        }
         return
       }
     } catch (error) {
@@ -68,6 +80,7 @@ const Login = () => {
       } else {
         toastFunc('Something Went Wrong', 'error')
       }
+      dispatch(clearLoading())
     }
   }
 

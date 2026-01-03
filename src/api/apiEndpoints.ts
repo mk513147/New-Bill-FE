@@ -8,6 +8,11 @@ export const API_ENDPOINTS = {
     PROFILE: '/auth/view',
   },
 
+  SUBSCRIPTION: {
+    STATUS: '/auth/subscription/status',
+    PLANS: '/subscription/plans',
+  },
+
   CUSTOMERS: {
     BASE: '/customers/getCustomer',
     CREATE: '/customers/createCustomer',

@@ -8,6 +8,7 @@ export * from './SuppliersRoute'
 export * from './PaymentsRoute'
 export * from './SettingsRoute'
 export * from './PriceListRoute'
+export * from './PricingRoute'
 
 export * from './LandingRoute'
 export * from './LoginRoute'

@@ -8,6 +8,7 @@ export { default as Suppliers } from './Suppliers/Suppliers.tsx'
 export { default as Stocks } from './Stocks/Stocks.tsx'
 export { default as Payments } from './Payments/Payments.tsx'
 export { default as Settings } from './Settings/Settings.tsx'
+export { default as Pricing } from './Pricing/Pricing.tsx'
 
 export { default as Attendance } from './Attendance/Attendance.tsx'
 export { default as Help } from './Help/Help.tsx'

@@ -6,6 +6,7 @@ import productReducer from './slices/productSlice'
 import uiReducer from './slices/uiSlice'
 import headerReducer from './slices/headerSlice'
 import staffReducer from './slices/staffSlice'
+import subscriptionReducer from './slices/subscriptionSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     ui: uiReducer,
     header: headerReducer,
     staff: staffReducer,
+    subscription: subscriptionReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

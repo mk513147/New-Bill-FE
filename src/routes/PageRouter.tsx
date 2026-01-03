@@ -16,6 +16,7 @@ import {
   SettingsRoute,
   LandingRoute,
   PriceListRoute,
+  PricingRoute,
 } from './importRoutes/index'
 import { useSelector } from 'react-redux'
 import Loading from '@/components/common/Loading'
@@ -32,6 +33,7 @@ const authPages = () => (
   <>
     {LoginRoute()}
     {ForgotPasswordRoute()}
+    {PricingRoute()}
   </>
 )
 const pages = () => (

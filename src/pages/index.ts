@@ -17,3 +17,7 @@ export { default as Category } from './Category/Category.tsx'
 export { default as Purchase } from './Purchase/Purchase.tsx'
 export { default as Landing } from './Landing/Landing.tsx'
 export { default as PriceList } from './PriceList/PriceList.tsx'
+
+export { default as Invoice } from './Invoice/Invoice.tsx'
+export { default as SalesOrder } from './Sales/SalesOrder.tsx'
+export { default as SalesReturn } from './Sales/SalesReturn.tsx'

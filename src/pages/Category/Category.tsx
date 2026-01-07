@@ -54,7 +54,7 @@ function Categories() {
       key: 'name',
       header: 'Category Name',
       width: '250px',
-      render: (c: any) => c.name,
+      render: (c: any) => c.name.charAt(0).toUpperCase() + c.name.slice(1),
     },
     {
       key: 'categoryId',

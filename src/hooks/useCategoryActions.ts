@@ -13,7 +13,7 @@ export const useCategoryActions = (pubId: string) => {
       API.post(API_ENDPOINTS.CATEGORY.CREATE, payload).then((res: any) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['getCategory'] })
+      queryClient.invalidateQueries({ queryKey: ['useAllCategories'] })
       toast('Category created successfully', 'success')
     },
 
@@ -27,7 +27,7 @@ export const useCategoryActions = (pubId: string) => {
       API.patch(`${API_ENDPOINTS.CATEGORY.UPDATE}/${pubId}`, payload).then((res) => res.data.data),
 
     onSuccess: (updatedCategory) => {
-      queryClient.setQueryData(['getCategory'], (old: any[]) => {
+      queryClient.setQueryData(['useAllCategories'], (old: any[]) => {
         if (!Array.isArray(old)) return old
 
         return old.map((c) => (c._id === updatedCategory._id ? updatedCategory : c))
@@ -46,7 +46,7 @@ export const useCategoryActions = (pubId: string) => {
       API.delete(`${API_ENDPOINTS.CATEGORY.DELETE}/${pubId}`).then((res: any) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['getCategory'] })
+      queryClient.invalidateQueries({ queryKey: ['useAllCategories'] })
       toast('Category deleted successfully', 'success')
     },
 

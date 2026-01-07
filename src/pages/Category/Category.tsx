@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, IconButton, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Box, Button } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useDispatch } from 'react-redux'
@@ -11,12 +11,13 @@ import { FaEdit, FaTrash } from '@/components/icons'
 
 import CategoryModal, { CategoryFormValues } from '@/components/modals/CategoryModal'
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
-import { useCategory } from '@/hooks/useCategory'
+import { useAllCategories } from '@/hooks/useCategory'
 import { useCategoryActions } from '@/hooks/useCategoryActions'
 
 function Categories() {
   const dispatch = useDispatch()
 
+  const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
   const [editId, setEditId] = useState<string | null>(null)
@@ -24,11 +25,18 @@ function Categories() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
-
-  const { data, isLoading } = useCategory()
-  const categories = data ?? []
+  const limit = 20
 
   const { deleteCategory } = useCategoryActions(deleteId ?? '')
+  const { data, isLoading } = useAllCategories(limit, page)
+
+  const categories = data?.categories ?? []
+  const pagination = data?.pagination ?? {
+    currentPage: 1,
+    totalPages: 3,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  }
 
   useEffect(() => {
     dispatch(setHeader({ title: 'Categories' }))
@@ -169,6 +177,60 @@ function Categories() {
             actions={categoryActions}
           />
         </Box>
+        <Flex
+          justify="center"
+          align="center"
+          borderRadius="lg"
+          mt={2}
+          mb={2}
+          p={2}
+          bg={'white'}
+          shadow="lightGray"
+          gap={4}
+          width="100%"
+        >
+          <Button
+            onClick={() => setPage(pagination.currentPage - 1)}
+            disabled={!pagination.hasPreviousPage}
+            variant="outline"
+            bg="white"
+            rounded="lg"
+          >
+            <HStack>
+              <Text color="gray.800">Previous</Text>
+            </HStack>
+          </Button>
+
+          <HStack gap={2}>
+            {Array.from({ length: pagination.totalPages }).map((_, index) => {
+              const pg = index + 1
+              return (
+                <Button
+                  key={pg}
+                  onClick={() => setPage(pg)}
+                  rounded="lg"
+                  bg={pg === pagination.currentPage ? 'purple.100' : 'transparent'}
+                  color={pg === pagination.currentPage ? 'purple.600' : 'gray.700'}
+                  _hover={{ bg: 'purple.50' }}
+                >
+                  {pg}
+                </Button>
+              )
+            })}
+          </HStack>
+
+          <Button
+            onClick={() => setPage(pagination.currentPage + 1)}
+            disabled={!pagination.hasNextPage}
+            variant="outline"
+            bg="white"
+            rounded="lg"
+          >
+            <HStack>
+              <Text color="gray.800">Next</Text>
+            </HStack>
+          </Button>
+        </Flex>
       </Flex>
 
       <CategoryModal

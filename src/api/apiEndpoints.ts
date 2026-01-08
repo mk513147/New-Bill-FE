@@ -32,6 +32,13 @@ export const API_ENDPOINTS = {
     UPDATE: '/staff/update',
     DELETE: '/staff/delete',
   },
+
+  CATEGORY: {
+    BASE: '/category/list',
+    CREATE: '/category/create',
+    UPDATE: '/category/update',
+    DELETE: '/category/delete',
+  },
 }
 
 export default API_ENDPOINTS

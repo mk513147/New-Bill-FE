@@ -28,6 +28,9 @@ const config = defineConfig({
       },
       shadows: {
         lightGray: { value: '0px -1px 0px rgba(0, 0, 0, 0.03), 0px 6px 12px rgba(0, 0, 0, 0.21)' },
+        lighterGray: {
+          value: '0px -1px 0px rgba(0, 0, 0, 0.03), 0px 6px 12px rgba(0, 0, 0, 0.09)',
+        },
       },
     },
   },

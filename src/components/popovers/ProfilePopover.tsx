@@ -42,7 +42,7 @@ export const ProfilePopover = ({ trigger }: { trigger: React.ReactNode }) => {
             borderWidth="1px"
             borderColor="gray.200"
             borderRadius="lg"
-            boxShadow="lg"
+            shadow={'lightGray'}
             overflow="hidden"
           >
             <Box p={4}>

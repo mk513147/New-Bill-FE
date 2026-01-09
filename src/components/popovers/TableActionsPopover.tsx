@@ -23,8 +23,8 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ]
 
 type Props = {
-  sortBy: SortKey
-  sortOrder: 'asc' | 'desc'
+  sortBy?: SortKey
+  sortOrder?: 'asc' | 'desc'
   onSortChange: (key: SortKey, order: 'asc' | 'desc') => void
 }
 
@@ -77,7 +77,7 @@ export function TableActionsPopover({ sortBy, sortOrder, onSortChange }: Props) 
                 >
                   <VStack align="stretch" gap="1">
                     {SORT_OPTIONS.map((item) => {
-                      const active = item.key === sortBy
+                      const active = sortBy === item.key
 
                       return (
                         <HStack
@@ -92,7 +92,8 @@ export function TableActionsPopover({ sortBy, sortOrder, onSortChange }: Props) 
                             bg: active ? 'blue.500' : 'gray.100',
                           }}
                           onClick={() => {
-                            const nextOrder = active && sortOrder === 'asc' ? 'desc' : 'asc'
+                            const nextOrder =
+                              sortBy === item.key && sortOrder === 'asc' ? 'desc' : 'asc'
 
                             onSortChange(item.key, nextOrder)
                             setSortOpen(false)

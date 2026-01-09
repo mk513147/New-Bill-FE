@@ -26,9 +26,8 @@ function Customers() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
   // const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState<SortKey>('name')
-
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [sortBy, setSortBy] = useState<SortKey | undefined>(undefined)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined)
 
   const { deleteCustomer } = useCustomerActions(deleteId ?? '')
 
@@ -37,9 +36,7 @@ function Customers() {
   const { data, isLoading } = useCustomers({
     page,
     limit,
-    // search,
-    sortBy,
-    sortOrder,
+    ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
   })
 
   const customers = data?.customers ?? []

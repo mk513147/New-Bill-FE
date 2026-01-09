@@ -1,38 +1,31 @@
-import API_ENDPOINTS from '@/api/apiEndpoints.ts'
-import { API } from '@/api/api.ts'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 import { useQuery } from '@tanstack/react-query'
 
-export const getCustomer = async () => {
-  const res = await API.get(API_ENDPOINTS.CUSTOMERS.BASE)
-  return res.data?.data || null
+/* ---------------------------------- TYPES --------------------------------- */
+export type CustomerQueryParams = {
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
 }
 
-export const getAllCustomers = async (limit = 20, page = 1) => {
+/* ------------------------------ API FUNCTION ------------------------------- */
+export const getCustomers = async (params: CustomerQueryParams = {}) => {
   const res = await API.get(API_ENDPOINTS.CUSTOMERS.BASE, {
-    params: { limit, page },
+    params,
   })
 
   return res.data?.data || null
 }
 
-export const useCustomer = () => {
+/* ------------------------------- REACT QUERY -------------------------------- */
+export const useCustomers = (params: CustomerQueryParams = {}) => {
   return useQuery({
-    queryKey: ['getCustomer'],
-    queryFn: getCustomer,
-    retry: false,
-    staleTime: 1000 * 60 * 10,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
-}
-
-export const useAllCustomers = (limit = 20, page = 1) => {
-  return useQuery({
-    queryKey: ['allCustomers', limit, page],
-    queryFn: () => getAllCustomers(limit, page),
-    retry: false,
+    queryKey: ['customers', params],
+    queryFn: () => getCustomers(params),
     staleTime: 60 * 1000,
-    refetchOnWindowFocus: true,
+    retry: false,
   })
 }

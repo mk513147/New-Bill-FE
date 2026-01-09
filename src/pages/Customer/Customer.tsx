@@ -3,7 +3,8 @@ import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
 
 import { useEffect, useState } from 'react'
-import { useAllCustomers } from '@/hooks/useCustomer'
+import { useCustomers } from '@/hooks/useCustomer'
+
 import CustomerDialog, { CustomerFormValues } from '@/components/modals/CustomerModal'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
@@ -13,6 +14,7 @@ import { Plus } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
+import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
 function Customers() {
   const [page, setPage] = useState(1)
@@ -23,12 +25,22 @@ function Customers() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
+  // const [search, setSearch] = useState('')
+  const [sortBy, setSortBy] = useState<SortKey>('name')
+
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   const { deleteCustomer } = useCustomerActions(deleteId ?? '')
 
   const limit = 20
 
-  const { data, isLoading } = useAllCustomers(limit, page)
+  const { data, isLoading } = useCustomers({
+    page,
+    limit,
+    // search,
+    sortBy,
+    sortOrder,
+  })
 
   const customers = data?.customers ?? []
   const pagination = data?.pagination ?? {
@@ -173,7 +185,15 @@ function Customers() {
             </IconButton>
 
             <HStack justify="space-between" h="32px" _hover={{ bg: 'gray.300' }}>
-              <TableActionsPopover />
+              <TableActionsPopover
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={(key, order) => {
+                  // setPage(1)
+                  setSortBy(key)
+                  setSortOrder(order)
+                }}
+              />
             </HStack>
           </HStack>
         </Flex>

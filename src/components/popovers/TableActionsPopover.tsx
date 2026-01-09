@@ -12,20 +12,24 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-type SortKey = 'name' | 'company' | 'receivables' | 'unusedCredits' | 'createdAt' | 'updatedAt'
+export type SortKey = 'name' | 'balance' | 'totalPurchases' | 'createdAt' | 'updatedAt'
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'name', label: 'Name' },
-  { key: 'company', label: 'Company Name' },
-  { key: 'receivables', label: 'Receivables' },
-  { key: 'unusedCredits', label: 'Unused Credits' },
+  { key: 'balance', label: 'Balance' },
+  { key: 'totalPurchases', label: 'Total Purchases' },
   { key: 'createdAt', label: 'Created Time' },
   { key: 'updatedAt', label: 'Last Modified Time' },
 ]
 
-export function TableActionsPopover() {
+type Props = {
+  sortBy: SortKey
+  sortOrder: 'asc' | 'desc'
+  onSortChange: (key: SortKey, order: 'asc' | 'desc') => void
+}
+
+export function TableActionsPopover({ sortBy, sortOrder, onSortChange }: Props) {
   const [sortOpen, setSortOpen] = useState(false)
-  const [activeSort, setActiveSort] = useState<SortKey>('name')
 
   return (
     <Popover.Root positioning={{ placement: 'bottom-end', offset: { mainAxis: 8 } }}>
@@ -38,7 +42,7 @@ export function TableActionsPopover() {
       <Popover.Positioner>
         <Popover.Content w="260px" bg="white" borderRadius="lg" boxShadow="sm" p="2">
           <VStack align="stretch" gap="1">
-            {/* SORT BY (HOVER TRIGGER) */}
+            {/* SORT BY */}
             <Popover.Root
               open={sortOpen}
               onOpenChange={(e) => setSortOpen(e.open)}
@@ -61,7 +65,6 @@ export function TableActionsPopover() {
                 </HStack>
               </Popover.Trigger>
 
-              {/* IMPORTANT: NO PORTAL HERE */}
               <Popover.Positioner>
                 <Popover.Content
                   w="220px"
@@ -74,7 +77,7 @@ export function TableActionsPopover() {
                 >
                   <VStack align="stretch" gap="1">
                     {SORT_OPTIONS.map((item) => {
-                      const active = item.key === activeSort
+                      const active = item.key === sortBy
 
                       return (
                         <HStack
@@ -89,12 +92,26 @@ export function TableActionsPopover() {
                             bg: active ? 'blue.500' : 'gray.100',
                           }}
                           onClick={() => {
-                            setActiveSort(item.key)
+                            const nextOrder = active && sortOrder === 'asc' ? 'desc' : 'asc'
+
+                            onSortChange(item.key, nextOrder)
                             setSortOpen(false)
                           }}
                         >
                           <Text fontSize="sm">{item.label}</Text>
-                          {active && <ArrowUp size={14} style={{ marginLeft: 'auto' }} />}
+
+                          {active &&
+                            (sortOrder === 'asc' ? (
+                              <ArrowUp size={14} style={{ marginLeft: 'auto' }} />
+                            ) : (
+                              <ArrowUp
+                                size={14}
+                                style={{
+                                  marginLeft: 'auto',
+                                  transform: 'rotate(180deg)',
+                                }}
+                              />
+                            ))}
                         </HStack>
                       )
                     })}
@@ -105,7 +122,6 @@ export function TableActionsPopover() {
 
             <Separator my="1" />
 
-            {/* OTHER ACTIONS */}
             <ActionItem icon={Upload} label="Import" />
             <ActionItem icon={Download} label="Export" />
             <ActionItem icon={Settings} label="Preferences" />

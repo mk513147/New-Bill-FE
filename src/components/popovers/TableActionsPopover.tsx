@@ -26,9 +26,19 @@ type Props = {
   sortBy?: SortKey
   sortOrder?: 'asc' | 'desc'
   onSortChange: (key: SortKey, order: 'asc' | 'desc') => void
+  onImport: () => void
+  onExport: () => void
+  onRefresh?: () => void
 }
 
-export function TableActionsPopover({ sortBy, sortOrder, onSortChange }: Props) {
+export function TableActionsPopover({
+  sortBy,
+  sortOrder,
+  onSortChange,
+  onImport,
+  onExport,
+  onRefresh,
+}: Props) {
   const [sortOpen, setSortOpen] = useState(false)
 
   return (
@@ -123,10 +133,10 @@ export function TableActionsPopover({ sortBy, sortOrder, onSortChange }: Props) 
 
             <Separator my="1" />
 
-            <ActionItem icon={Upload} label="Import" />
-            <ActionItem icon={Download} label="Export" />
+            <ActionItem icon={Upload} label="Import" onClick={onImport} />
+            <ActionItem icon={Download} label="Export" onClick={onExport} />
             <ActionItem icon={Settings} label="Preferences" />
-            <ActionItem icon={RotateCcw} label="Refresh List" />
+            <ActionItem icon={RotateCcw} label="Refresh List" onClick={onRefresh} />
             <ActionItem icon={Columns} label="Reset Column Width" />
           </VStack>
         </Popover.Content>
@@ -135,9 +145,24 @@ export function TableActionsPopover({ sortBy, sortOrder, onSortChange }: Props) 
   )
 }
 
-function ActionItem({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
+function ActionItem({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: React.ElementType
+  label: string
+  onClick?: () => void
+}) {
   return (
-    <HStack px="3" py="2" borderRadius="md" cursor="pointer" _hover={{ bg: 'gray.100' }}>
+    <HStack
+      px="3"
+      py="2"
+      borderRadius="md"
+      cursor="pointer"
+      _hover={{ bg: 'gray.100' }}
+      onClick={onClick}
+    >
       <Icon size={16} />
       <Text fontSize="sm">{label}</Text>
     </HStack>

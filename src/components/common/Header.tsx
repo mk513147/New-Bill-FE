@@ -2,6 +2,8 @@ import { Box, Flex, Text, IconButton, HStack, Separator, Avatar } from '@chakra-
 import { useSelector } from 'react-redux'
 import { Plus, Bell, Settings } from 'lucide-react'
 import { ProfilePopover } from '@/components/popovers/ProfilePopover'
+import { NotificationsPopover } from '@/components/popovers/NotificationsPopover'
+
 export const Header = () => {
   const { title } = useSelector((state: any) => state.header)
 
@@ -45,14 +47,17 @@ export const Header = () => {
             <Plus size={18} />
           </IconButton>
 
-          <IconButton
-            aria-label="Notifications"
-            variant="ghost"
-            color="gray.800"
-            _hover={{ bg: 'gray.100', color: 'gray.900' }}
-          >
-            <Bell size={18} />
-          </IconButton>
+          <NotificationsPopover
+            trigger={
+              <IconButton
+                aria-label="Notifications"
+                color="gray.800"
+                _hover={{ bg: 'gray.100', color: 'gray.900' }}
+              >
+                <Bell size={18} />
+              </IconButton>
+            }
+          />
 
           <IconButton
             aria-label="Settings"

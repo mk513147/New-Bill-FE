@@ -9,51 +9,55 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Stock Data ------------------ */
+/* ------------------ Fake Shipment Data ------------------ */
 
-type Stock = {
+type Shipment = {
   id: string
-  name: string
-  sku: string
-  category: string
-  quantity: number
-  price: number
-  status: 'In Stock' | 'Out of Stock'
+  orderId: string
+  carrier: string
+  trackingNumber: string
+  shippedDate: string
+  deliveryDate: string
+  cost: number
+  status: 'Pending' | 'In Transit' | 'Delivered'
 }
 
-const FAKE_STOCKS: Stock[] = [
+const FAKE_SHIPMENTS: Shipment[] = [
   {
     id: '1',
-    name: 'Printed T-Shirt',
-    sku: 'SKU-TS-001',
-    category: 'Apparel',
-    quantity: 120,
-    price: 499,
-    status: 'In Stock',
+    orderId: 'ORD-1023',
+    carrier: 'Delhivery',
+    trackingNumber: 'DLV839201',
+    shippedDate: '2026-01-08',
+    deliveryDate: '2026-01-11',
+    cost: 120,
+    status: 'Delivered',
   },
   {
     id: '2',
-    name: 'Custom Mug',
-    sku: 'SKU-MG-002',
-    category: 'Accessories',
-    quantity: 0,
-    price: 299,
-    status: 'Out of Stock',
+    orderId: 'ORD-1027',
+    carrier: 'Blue Dart',
+    trackingNumber: 'BD774201',
+    shippedDate: '2026-01-10',
+    deliveryDate: '—',
+    cost: 180,
+    status: 'In Transit',
   },
   {
     id: '3',
-    name: 'Football Jersey',
-    sku: 'SKU-JS-003',
-    category: 'Sportswear',
-    quantity: 42,
-    price: 899,
-    status: 'In Stock',
+    orderId: 'ORD-1031',
+    carrier: 'India Post',
+    trackingNumber: 'IP553910',
+    shippedDate: '—',
+    deliveryDate: '—',
+    cost: 90,
+    status: 'Pending',
   },
 ]
 
 /* ------------------ Component ------------------ */
 
-const Stocks = () => {
+const Shipments = () => {
   const dispatch = useDispatch()
 
   const [page, setPage] = useState(1)
@@ -64,7 +68,7 @@ const Stocks = () => {
   const limit = 20
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Stocks' }))
+    dispatch(setHeader({ title: 'Shipments' }))
     return () => {
       dispatch(clearHeader())
     }
@@ -72,58 +76,91 @@ const Stocks = () => {
 
   /* ------------------ Filtering + Sorting ------------------ */
 
-  const filteredData = useMemo(() => {
-    let data = [...FAKE_STOCKS]
+  const data = useMemo(() => {
+    let rows = [...FAKE_SHIPMENTS]
 
     if (!filter.includes('all')) {
-      data = data.filter((s) => filter.includes(s.status === 'In Stock' ? 'in' : 'out'))
+      rows = rows.filter((s) =>
+        filter.includes(
+          s.status === 'Delivered'
+            ? 'delivered'
+            : s.status === 'In Transit'
+              ? 'transit'
+              : 'pending',
+        ),
+      )
     }
 
     if (sortBy && sortOrder) {
-      data.sort((a: any, b: any) => {
+      rows.sort((a: any, b: any) => {
         if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
         if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
         return 0
       })
     }
 
-    return data
+    return rows
   }, [filter, sortBy, sortOrder])
 
   /* ------------------ Columns ------------------ */
 
-  const stockColumns = [
-    { key: 'name', header: 'Product Name', render: (s: Stock) => s.name },
-    { key: 'sku', header: 'SKU', render: (s: Stock) => s.sku },
-    { key: 'category', header: 'Category', render: (s: Stock) => s.category },
+  const shipmentColumns = [
     {
-      key: 'quantity',
-      header: 'Quantity',
-      render: (s: Stock) => s.quantity,
+      key: 'orderId',
+      header: 'Order ID',
+      render: (s: Shipment) => s.orderId,
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (s: Stock) => `₹${s.price}`,
+      key: 'carrier',
+      header: 'Carrier',
+      render: (s: Shipment) => s.carrier,
+    },
+    {
+      key: 'trackingNumber',
+      header: 'Tracking No.',
+      render: (s: Shipment) => s.trackingNumber,
+    },
+    {
+      key: 'shippedDate',
+      header: 'Shipped Date',
+      render: (s: Shipment) => s.shippedDate,
+    },
+    {
+      key: 'deliveryDate',
+      header: 'Delivery Date',
+      render: (s: Shipment) => s.deliveryDate,
+    },
+    {
+      key: 'cost',
+      header: 'Shipping Cost',
+      render: (s: Shipment) => `₹${s.cost}`,
     },
     {
       key: 'status',
       header: 'Status',
-      render: (s: Stock) => (
-        <Text fontWeight="medium" color={s.status === 'In Stock' ? 'green.600' : 'red.500'}>
+      render: (s: Shipment) => (
+        <Text
+          fontWeight="medium"
+          color={
+            s.status === 'Delivered'
+              ? 'green.600'
+              : s.status === 'In Transit'
+                ? 'blue.600'
+                : 'orange.500'
+          }
+        >
           {s.status}
         </Text>
       ),
     },
   ]
 
-  const stockFilters = [
-    { label: 'All stock', value: 'all' },
-    { label: 'In stock', value: 'in' },
-    { label: 'Out of stock', value: 'out' },
+  const shipmentFilters = [
+    { label: 'All shipments', value: 'all' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'In transit', value: 'transit' },
+    { label: 'Delivered', value: 'delivered' },
   ]
-
-  /* ------------------ Pagination (Fake) ------------------ */
 
   const totalPages = 1
 
@@ -132,15 +169,15 @@ const Stocks = () => {
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect
-          options={stockFilters}
+          options={shipmentFilters}
           value={filter}
           defaultValue={['all']}
-          placeholder="All stock"
+          placeholder="All shipments"
           onChange={setFilter}
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Stock" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton aria-label="Add Shipment" colorPalette="blue" variant="solid" px={3} h="32px">
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -170,12 +207,7 @@ const Stocks = () => {
 
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable
-          columns={stockColumns}
-          data={filteredData}
-          isLoading={false}
-          rowKey={(s) => s.id}
-        />
+        <CommonTable columns={shipmentColumns} data={data} isLoading={false} rowKey={(s) => s.id} />
       </Box>
 
       {/* Pagination */}
@@ -192,4 +224,4 @@ const Stocks = () => {
   )
 }
 
-export default Stocks
+export default Shipments

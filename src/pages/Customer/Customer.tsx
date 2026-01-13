@@ -1,9 +1,8 @@
 import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
-
-import { useEffect, useState } from 'react'
-import { useAllCustomers } from '@/hooks/useCustomer'
+import { useEffect, useRef, useState } from 'react'
+import { useCustomers } from '@/hooks/useCustomer'
 import CustomerDialog, { CustomerFormValues } from '@/components/modals/CustomerModal'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
@@ -13,6 +12,11 @@ import { Plus } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
+import type { SortKey } from '@/components/popovers/TableActionsPopover'
+
+import { useCustomerImport } from '@/hooks/useCustomerImport'
+import { useCustomerExport } from '@/hooks/useCustomerExport'
+import { useQueryClient } from '@tanstack/react-query'
 
 function Customers() {
   const [page, setPage] = useState(1)
@@ -23,52 +27,43 @@ function Customers() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
+  const [sortBy, setSortBy] = useState<SortKey | undefined>(undefined)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined)
 
   const { deleteCustomer } = useCustomerActions(deleteId ?? '')
+  const importCustomers = useCustomerImport()
+  const exportCustomers = useCustomerExport()
+  const queryClient = useQueryClient()
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const limit = 20
 
-  const { data, isLoading } = useAllCustomers(limit, page)
+  const { data, isLoading } = useCustomers({
+    page,
+    limit,
+    ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+  })
 
   const customers = data?.customers ?? []
   const pagination = data?.pagination ?? {
     currentPage: 1,
-    totalPages: 3,
+    totalPages: 1,
     hasNextPage: false,
     hasPreviousPage: false,
   }
 
   const customerColumns = [
-    {
-      key: 'name',
-      header: 'Contact Name',
-      render: (c: any) => c.name,
-    },
+    { key: 'name', header: 'Contact Name', render: (c: any) => c.name },
     {
       key: 'customerId',
       header: 'Customer ID',
       render: (c: any) => `BC${c._id.slice(-8).toUpperCase()}`,
     },
-    {
-      key: 'email',
-      header: 'Email',
-      render: (c: any) => c.email,
-    },
-    {
-      key: 'address',
-      header: 'Address',
-      render: (c: any) => c.address,
-    },
-    {
-      key: 'phone',
-      header: 'Phone Number',
-      render: (c: any) => c.mobileNumber,
-    },
-    {
-      key: 'balance',
-      header: 'Balance',
-      render: (c: any) => c.balance,
-    },
+    { key: 'email', header: 'Email', render: (c: any) => c.email },
+    { key: 'address', header: 'Address', render: (c: any) => c.address },
+    { key: 'phone', header: 'Phone Number', render: (c: any) => c.mobileNumber },
+    { key: 'balance', header: 'Balance', render: (c: any) => c.balance },
   ]
 
   const customerActions = [
@@ -102,16 +97,12 @@ function Customers() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(
-      setHeader({
-        title: 'Customers',
-      }),
-    )
-
+    dispatch(setHeader({ title: 'Customers' }))
     return () => {
       dispatch(clearHeader())
     }
   }, [dispatch])
+
   const [value, setValue] = useState<string[]>([])
 
   const customerFilters = [
@@ -120,27 +111,37 @@ function Customers() {
     { label: 'Inactive', value: 'inactive' },
   ]
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    importCustomers.mutate(file)
+    e.target.value = ''
+  }
+
+  const handleExportClick = () => {
+    exportCustomers.mutate({
+      page,
+      limit,
+      ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+    })
+  }
+
   return (
     <>
-      <Flex
-        bg="gray.100"
-        width="100%"
-        height="100%"
-        overflowX="auto"
-        flexDir="column"
-        pl={{ base: 3, sm: 2, md: 6 }}
-        pr={{ base: 3, sm: 2, md: 6 }}
-        pt={{ base: 3, sm: 4, md: 1 }}
-        mb={3}
-      >
-        <Flex
-          justify="space-between"
-          align="center"
-          mt={8}
-          w="100%"
-          gap={4}
-          flexWrap={{ base: 'wrap', md: 'nowrap' }}
-        >
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx,.xls"
+        hidden
+        onChange={handleFileChange}
+      />
+
+      <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
+        <Flex justify="space-between" align="center" mt={8} w="100%">
           <FilterSelect
             options={customerFilters}
             value={value}
@@ -148,14 +149,13 @@ function Customers() {
             placeholder="All customers"
             onChange={setValue}
           />
+
           <HStack gap={2}>
             <IconButton
               aria-label="Add"
               colorPalette="blue"
               variant="solid"
               px={3}
-              minW="unset"
-              minH="unset"
               h="32px"
               onClick={() => {
                 setDialogMode('add')
@@ -166,28 +166,26 @@ function Customers() {
             >
               <HStack gap={1}>
                 <Plus size={18} />
-                <Text fontSize="sm" display={{ base: 'none', md: 'block' }}>
-                  New
-                </Text>
+                <Text fontSize="sm">New</Text>
               </HStack>
             </IconButton>
 
-            <HStack justify="space-between" h="32px" _hover={{ bg: 'gray.300' }}>
-              <TableActionsPopover />
-            </HStack>
+            <TableActionsPopover
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortChange={(key, order) => {
+                setPage(1)
+                setSortBy(key)
+                setSortOrder(order)
+              }}
+              onImport={handleImportClick}
+              onExport={handleExportClick}
+              onRefresh={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}
+            />
           </HStack>
         </Flex>
 
-        <Box
-          bg="white"
-          mt={6}
-          rounded="lg"
-          shadow={'lightGray'}
-          border="1px solid"
-          borderColor="gray.100"
-          w="100%"
-          p={{ base: 2, md: 4 }}
-        >
+        <Box bg="white" mt={6} rounded="lg" p={4}>
           <CommonTable
             columns={customerColumns}
             data={customers}
@@ -197,58 +195,32 @@ function Customers() {
           />
         </Box>
 
-        <Flex
-          justify="center"
-          align="center"
-          borderRadius="lg"
-          mt={2}
-          mb={2}
-          p={2}
-          bg={'white'}
-          shadow="lightGray"
-          gap={4}
-          width="100%"
-        >
+        <Flex justify="center" mt={4} gap={2}>
           <Button
             onClick={() => setPage(pagination.currentPage - 1)}
             disabled={!pagination.hasPreviousPage}
-            variant="outline"
-            bg="white"
-            rounded="lg"
           >
-            <HStack>
-              <Text color="gray.800">Previous</Text>
-            </HStack>
+            Previous
           </Button>
 
-          <HStack gap={2}>
-            {Array.from({ length: pagination.totalPages }).map((_, index) => {
-              const pg = index + 1
-              return (
-                <Button
-                  key={pg}
-                  onClick={() => setPage(pg)}
-                  rounded="lg"
-                  bg={pg === pagination.currentPage ? 'purple.100' : 'transparent'}
-                  color={pg === pagination.currentPage ? 'purple.600' : 'gray.700'}
-                  _hover={{ bg: 'purple.50' }}
-                >
-                  {pg}
-                </Button>
-              )
-            })}
-          </HStack>
+          {Array.from({ length: pagination.totalPages }).map((_, i) => {
+            const pg = i + 1
+            return (
+              <Button
+                key={pg}
+                bg={pg === pagination.currentPage ? 'purple.100' : 'transparent'}
+                onClick={() => setPage(pg)}
+              >
+                {pg}
+              </Button>
+            )
+          })}
 
           <Button
             onClick={() => setPage(pagination.currentPage + 1)}
             disabled={!pagination.hasNextPage}
-            variant="outline"
-            bg="white"
-            rounded="lg"
           >
-            <HStack>
-              <Text color="gray.800">Next</Text>
-            </HStack>
+            Next
           </Button>
         </Flex>
       </Flex>
@@ -260,19 +232,16 @@ function Customers() {
         pubId={editId ?? undefined}
         defaultValues={editDefaults}
       />
+
       <ConfirmDeleteDialog
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         title="Delete Customer"
-        description={`Are you sure you want to delete "${deleteName}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        description={`Are you sure you want to delete "${deleteName}"?`}
         loading={deleteCustomer.isPending}
         onConfirm={() => {
           deleteCustomer.mutate(undefined, {
-            onSuccess: () => {
-              setDeleteOpen(false)
-            },
+            onSuccess: () => setDeleteOpen(false),
           })
         }}
       />

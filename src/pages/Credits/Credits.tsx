@@ -9,51 +9,55 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Stock Data ------------------ */
+/* ------------------ Fake Credit Data ------------------ */
 
-type Stock = {
+type Credit = {
   id: string
-  name: string
-  sku: string
-  category: string
-  quantity: number
-  price: number
-  status: 'In Stock' | 'Out of Stock'
+  creditNumber: string
+  supplier: string
+  reference: string
+  creditDate: string
+  amount: number
+  appliedAmount: number
+  status: 'Open' | 'Partially Applied' | 'Applied'
 }
 
-const FAKE_STOCKS: Stock[] = [
+const FAKE_CREDITS: Credit[] = [
   {
     id: '1',
-    name: 'Printed T-Shirt',
-    sku: 'SKU-TS-001',
-    category: 'Apparel',
-    quantity: 120,
-    price: 499,
-    status: 'In Stock',
+    creditNumber: 'CR-2026-001',
+    supplier: 'ABC Packaging Ltd',
+    reference: 'Damaged boxes return',
+    creditDate: '2026-01-12',
+    amount: 1200,
+    appliedAmount: 1200,
+    status: 'Applied',
   },
   {
     id: '2',
-    name: 'Custom Mug',
-    sku: 'SKU-MG-002',
-    category: 'Accessories',
-    quantity: 0,
-    price: 299,
-    status: 'Out of Stock',
+    creditNumber: 'CR-2026-002',
+    supplier: 'XYZ Textiles',
+    reference: 'Size mismatch',
+    creditDate: '2026-01-18',
+    amount: 3000,
+    appliedAmount: 1500,
+    status: 'Partially Applied',
   },
   {
     id: '3',
-    name: 'Football Jersey',
-    sku: 'SKU-JS-003',
-    category: 'Sportswear',
-    quantity: 42,
-    price: 899,
-    status: 'In Stock',
+    creditNumber: 'CR-2026-003',
+    supplier: 'National Plastics',
+    reference: 'Order cancellation',
+    creditDate: '2026-01-22',
+    amount: 5000,
+    appliedAmount: 0,
+    status: 'Open',
   },
 ]
 
 /* ------------------ Component ------------------ */
 
-const Stocks = () => {
+const Credits = () => {
   const dispatch = useDispatch()
 
   const [page, setPage] = useState(1)
@@ -64,7 +68,7 @@ const Stocks = () => {
   const limit = 20
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Stocks' }))
+    dispatch(setHeader({ title: 'Credits' }))
     return () => {
       dispatch(clearHeader())
     }
@@ -72,58 +76,91 @@ const Stocks = () => {
 
   /* ------------------ Filtering + Sorting ------------------ */
 
-  const filteredData = useMemo(() => {
-    let data = [...FAKE_STOCKS]
+  const data = useMemo(() => {
+    let rows = [...FAKE_CREDITS]
 
     if (!filter.includes('all')) {
-      data = data.filter((s) => filter.includes(s.status === 'In Stock' ? 'in' : 'out'))
+      rows = rows.filter((c) =>
+        filter.includes(
+          c.status === 'Applied'
+            ? 'applied'
+            : c.status === 'Partially Applied'
+              ? 'partial'
+              : 'open',
+        ),
+      )
     }
 
     if (sortBy && sortOrder) {
-      data.sort((a: any, b: any) => {
+      rows.sort((a: any, b: any) => {
         if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
         if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
         return 0
       })
     }
 
-    return data
+    return rows
   }, [filter, sortBy, sortOrder])
 
   /* ------------------ Columns ------------------ */
 
-  const stockColumns = [
-    { key: 'name', header: 'Product Name', render: (s: Stock) => s.name },
-    { key: 'sku', header: 'SKU', render: (s: Stock) => s.sku },
-    { key: 'category', header: 'Category', render: (s: Stock) => s.category },
+  const creditColumns = [
     {
-      key: 'quantity',
-      header: 'Quantity',
-      render: (s: Stock) => s.quantity,
+      key: 'creditNumber',
+      header: 'Credit No.',
+      render: (c: Credit) => c.creditNumber,
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (s: Stock) => `₹${s.price}`,
+      key: 'supplier',
+      header: 'Supplier',
+      render: (c: Credit) => c.supplier,
+    },
+    {
+      key: 'reference',
+      header: 'Reference',
+      render: (c: Credit) => c.reference,
+    },
+    {
+      key: 'creditDate',
+      header: 'Credit Date',
+      render: (c: Credit) => c.creditDate,
+    },
+    {
+      key: 'amount',
+      header: 'Credit Amount',
+      render: (c: Credit) => `₹${c.amount}`,
+    },
+    {
+      key: 'appliedAmount',
+      header: 'Applied',
+      render: (c: Credit) => `₹${c.appliedAmount}`,
     },
     {
       key: 'status',
       header: 'Status',
-      render: (s: Stock) => (
-        <Text fontWeight="medium" color={s.status === 'In Stock' ? 'green.600' : 'red.500'}>
-          {s.status}
+      render: (c: Credit) => (
+        <Text
+          fontWeight="medium"
+          color={
+            c.status === 'Applied'
+              ? 'green.600'
+              : c.status === 'Partially Applied'
+                ? 'orange.500'
+                : 'blue.600'
+          }
+        >
+          {c.status}
         </Text>
       ),
     },
   ]
 
-  const stockFilters = [
-    { label: 'All stock', value: 'all' },
-    { label: 'In stock', value: 'in' },
-    { label: 'Out of stock', value: 'out' },
+  const creditFilters = [
+    { label: 'All credits', value: 'all' },
+    { label: 'Open', value: 'open' },
+    { label: 'Partially applied', value: 'partial' },
+    { label: 'Applied', value: 'applied' },
   ]
-
-  /* ------------------ Pagination (Fake) ------------------ */
 
   const totalPages = 1
 
@@ -132,15 +169,15 @@ const Stocks = () => {
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect
-          options={stockFilters}
+          options={creditFilters}
           value={filter}
           defaultValue={['all']}
-          placeholder="All stock"
+          placeholder="All credits"
           onChange={setFilter}
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Stock" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton aria-label="Add Credit" colorPalette="blue" variant="solid" px={3} h="32px">
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -170,12 +207,7 @@ const Stocks = () => {
 
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable
-          columns={stockColumns}
-          data={filteredData}
-          isLoading={false}
-          rowKey={(s) => s.id}
-        />
+        <CommonTable columns={creditColumns} data={data} isLoading={false} rowKey={(c) => c.id} />
       </Box>
 
       {/* Pagination */}
@@ -192,4 +224,4 @@ const Stocks = () => {
   )
 }
 
-export default Stocks
+export default Credits

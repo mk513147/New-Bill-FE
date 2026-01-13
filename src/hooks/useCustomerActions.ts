@@ -13,7 +13,7 @@ export const useCustomerActions = (pubId: string) => {
       API.post(API_ENDPOINTS.CUSTOMERS.CREATE, payload).then((res: any) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allCustomers'] })
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
       toast('Customer created successfully', 'success')
     },
 
@@ -27,7 +27,7 @@ export const useCustomerActions = (pubId: string) => {
       API.patch(`${API_ENDPOINTS.CUSTOMERS.UPDATE}/${pubId}`, payload).then((res) => res.data),
 
     onSuccess: (updatedCustomer) => {
-      queryClient.setQueriesData({ queryKey: ['allCustomers'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: ['customers'] }, (old: any) => {
         if (!old?.data) return old
 
         return {
@@ -35,7 +35,7 @@ export const useCustomerActions = (pubId: string) => {
           data: old.data.map((c: any) => (c._id === updatedCustomer._id ? updatedCustomer : c)),
         }
       })
-      queryClient.invalidateQueries({ queryKey: ['allCustomers'] })
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
       toast('Customer updated successfully', 'success')
     },
 
@@ -49,7 +49,7 @@ export const useCustomerActions = (pubId: string) => {
       API.delete(`${API_ENDPOINTS.CUSTOMERS.DELETE}/${pubId}`).then((res: any) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allCustomers'] })
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
       toast('Customer deleted successfully', 'success')
     },
 

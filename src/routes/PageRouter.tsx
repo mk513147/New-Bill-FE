@@ -25,6 +25,15 @@ import {
   SalesRoute,
   CategoryRoute,
   HelpRoute,
+  PaymentsReceivedRoute,
+  DeliveryReceiptsRoute,
+  PackagingRoute,
+  ShipmentsRoute,
+  PurchaseOrdersRoute,
+  PurchaseReceivedRoute,
+  BillRoute,
+  CreditsRoute,
+  RolesRoute,
 } from './importRoutes/index'
 import { useSelector } from 'react-redux'
 import Loading from '@/components/common/Loading'
@@ -58,6 +67,15 @@ const pages = () => (
     {InvoiceRoute()}
     {SalesOrderRoute()}
     {SalesReturnRoute()}
+    {PaymentsReceivedRoute()}
+    {DeliveryReceiptsRoute()}
+    {PackagingRoute()}
+    {ShipmentsRoute()}
+    {PurchaseOrdersRoute()}
+    {PurchaseReceivedRoute()}
+    {BillRoute()}
+    {CreditsRoute()}
+    {RolesRoute()}
   </>
 )
 

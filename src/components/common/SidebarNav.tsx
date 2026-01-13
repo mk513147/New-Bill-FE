@@ -43,7 +43,7 @@ const sections = [
     label: 'Inventory',
     icon: MdInventory,
     items: [
-      { label: 'Stock', path: '/stock', icon: MdInventory },
+      { label: 'Stock', path: '/stocks', icon: MdInventory },
       { label: 'Packaging', path: '/packaging', icon: FiShoppingBag },
       { label: 'Shipments', path: '/shipments', icon: MdLocalShipping },
     ],
@@ -55,8 +55,8 @@ const sections = [
     items: [
       { label: 'Purchase Orders', path: '/purchase-orders', icon: MdReceiptLong },
       { label: 'Purchase Received', path: '/purchase-received', icon: MdReceiptLong },
-      { label: 'Bills', path: '/bills', icon: MdReceiptLong },
-      { label: 'Payments', path: '/vendor-payments', icon: MdPayments },
+      { label: 'Bill', path: '/bill', icon: MdReceiptLong },
+      { label: 'Payments', path: '/payments', icon: MdPayments },
       { label: 'Credits', path: '/credits', icon: MdPayments },
     ],
   },

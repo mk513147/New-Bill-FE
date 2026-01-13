@@ -9,51 +9,55 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Stock Data ------------------ */
+/* ------------------ Fake Bill Data ------------------ */
 
-type Stock = {
+type BillItem = {
   id: string
-  name: string
-  sku: string
-  category: string
-  quantity: number
-  price: number
-  status: 'In Stock' | 'Out of Stock'
+  billNumber: string
+  supplier: string
+  poNumber: string
+  billDate: string
+  dueDate: string
+  amount: number
+  status: 'Unpaid' | 'Paid' | 'Overdue'
 }
 
-const FAKE_STOCKS: Stock[] = [
+const FAKE_BILLS: BillItem[] = [
   {
     id: '1',
-    name: 'Printed T-Shirt',
-    sku: 'SKU-TS-001',
-    category: 'Apparel',
-    quantity: 120,
-    price: 499,
-    status: 'In Stock',
+    billNumber: 'BILL-2026-001',
+    supplier: 'ABC Packaging Ltd',
+    poNumber: 'PO-2026-001',
+    billDate: '2026-01-10',
+    dueDate: '2026-01-20',
+    amount: 5950,
+    status: 'Paid',
   },
   {
     id: '2',
-    name: 'Custom Mug',
-    sku: 'SKU-MG-002',
-    category: 'Accessories',
-    quantity: 0,
-    price: 299,
-    status: 'Out of Stock',
+    billNumber: 'BILL-2026-002',
+    supplier: 'XYZ Textiles',
+    poNumber: 'PO-2026-002',
+    billDate: '2026-01-14',
+    dueDate: '2026-01-25',
+    amount: 10800,
+    status: 'Unpaid',
   },
   {
     id: '3',
-    name: 'Football Jersey',
-    sku: 'SKU-JS-003',
-    category: 'Sportswear',
-    quantity: 42,
-    price: 899,
-    status: 'In Stock',
+    billNumber: 'BILL-2026-003',
+    supplier: 'National Plastics',
+    poNumber: 'PO-2026-003',
+    billDate: '2026-01-15',
+    dueDate: '2026-01-22',
+    amount: 9000,
+    status: 'Overdue',
   },
 ]
 
 /* ------------------ Component ------------------ */
 
-const Stocks = () => {
+const Bill = () => {
   const dispatch = useDispatch()
 
   const [page, setPage] = useState(1)
@@ -64,7 +68,7 @@ const Stocks = () => {
   const limit = 20
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Stocks' }))
+    dispatch(setHeader({ title: 'Bills' }))
     return () => {
       dispatch(clearHeader())
     }
@@ -72,58 +76,83 @@ const Stocks = () => {
 
   /* ------------------ Filtering + Sorting ------------------ */
 
-  const filteredData = useMemo(() => {
-    let data = [...FAKE_STOCKS]
+  const data = useMemo(() => {
+    let rows = [...FAKE_BILLS]
 
     if (!filter.includes('all')) {
-      data = data.filter((s) => filter.includes(s.status === 'In Stock' ? 'in' : 'out'))
+      rows = rows.filter((b) =>
+        filter.includes(
+          b.status === 'Paid' ? 'paid' : b.status === 'Overdue' ? 'overdue' : 'unpaid',
+        ),
+      )
     }
 
     if (sortBy && sortOrder) {
-      data.sort((a: any, b: any) => {
+      rows.sort((a: any, b: any) => {
         if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
         if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
         return 0
       })
     }
 
-    return data
+    return rows
   }, [filter, sortBy, sortOrder])
 
   /* ------------------ Columns ------------------ */
 
-  const stockColumns = [
-    { key: 'name', header: 'Product Name', render: (s: Stock) => s.name },
-    { key: 'sku', header: 'SKU', render: (s: Stock) => s.sku },
-    { key: 'category', header: 'Category', render: (s: Stock) => s.category },
+  const billColumns = [
     {
-      key: 'quantity',
-      header: 'Quantity',
-      render: (s: Stock) => s.quantity,
+      key: 'billNumber',
+      header: 'Bill Number',
+      render: (b: BillItem) => b.billNumber,
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (s: Stock) => `₹${s.price}`,
+      key: 'supplier',
+      header: 'Supplier',
+      render: (b: BillItem) => b.supplier,
+    },
+    {
+      key: 'poNumber',
+      header: 'PO Number',
+      render: (b: BillItem) => b.poNumber,
+    },
+    {
+      key: 'billDate',
+      header: 'Bill Date',
+      render: (b: BillItem) => b.billDate,
+    },
+    {
+      key: 'dueDate',
+      header: 'Due Date',
+      render: (b: BillItem) => b.dueDate,
+    },
+    {
+      key: 'amount',
+      header: 'Amount',
+      render: (b: BillItem) => `₹${b.amount}`,
     },
     {
       key: 'status',
       header: 'Status',
-      render: (s: Stock) => (
-        <Text fontWeight="medium" color={s.status === 'In Stock' ? 'green.600' : 'red.500'}>
-          {s.status}
+      render: (b: BillItem) => (
+        <Text
+          fontWeight="medium"
+          color={
+            b.status === 'Paid' ? 'green.600' : b.status === 'Overdue' ? 'red.500' : 'orange.500'
+          }
+        >
+          {b.status}
         </Text>
       ),
     },
   ]
 
-  const stockFilters = [
-    { label: 'All stock', value: 'all' },
-    { label: 'In stock', value: 'in' },
-    { label: 'Out of stock', value: 'out' },
+  const billFilters = [
+    { label: 'All bills', value: 'all' },
+    { label: 'Paid', value: 'paid' },
+    { label: 'Unpaid', value: 'unpaid' },
+    { label: 'Overdue', value: 'overdue' },
   ]
-
-  /* ------------------ Pagination (Fake) ------------------ */
 
   const totalPages = 1
 
@@ -132,15 +161,15 @@ const Stocks = () => {
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect
-          options={stockFilters}
+          options={billFilters}
           value={filter}
           defaultValue={['all']}
-          placeholder="All stock"
+          placeholder="All bills"
           onChange={setFilter}
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Stock" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton aria-label="Add Bill" colorPalette="blue" variant="solid" px={3} h="32px">
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -170,12 +199,7 @@ const Stocks = () => {
 
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable
-          columns={stockColumns}
-          data={filteredData}
-          isLoading={false}
-          rowKey={(s) => s.id}
-        />
+        <CommonTable columns={billColumns} data={data} isLoading={false} rowKey={(b) => b.id} />
       </Box>
 
       {/* Pagination */}
@@ -192,4 +216,4 @@ const Stocks = () => {
   )
 }
 
-export default Stocks
+export default Bill

@@ -13,6 +13,8 @@ export const API_ENDPOINTS = {
     CREATE: '/customers/createCustomer',
     UPDATE: '/customers/updateCustomer',
     DELETE: '/customers/deleteCustomer',
+    IMPORT: '/customers/import',
+    EXPORT: '/customers/export',
   },
 
   PRODUCTS: {

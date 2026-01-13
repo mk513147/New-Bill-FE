@@ -2,6 +2,10 @@ import { Box, Flex, Text, IconButton, HStack, Separator, Avatar } from '@chakra-
 import { useSelector } from 'react-redux'
 import { Plus, Bell, Settings } from 'lucide-react'
 import { ProfilePopover } from '@/components/popovers/ProfilePopover'
+import { NotificationsPopover } from '@/components/popovers/NotificationsPopover'
+import { AddPopover } from '@/components/popovers/AddPopover'
+import { SettingsPopover } from '@/components/popovers/SettingsPopover'
+
 export const Header = () => {
   const { title } = useSelector((state: any) => state.header)
 
@@ -32,36 +36,44 @@ export const Header = () => {
         <HStack gap={3}>
           <Separator orientation="vertical" h="24px" />
 
-          <IconButton
-            aria-label="Add"
-            colorPalette="blue"
-            variant="solid"
-            p="6px"
-            minW="unset"
-            minH="unset"
-            w="32px"
-            h="32px"
-          >
-            <Plus size={18} />
-          </IconButton>
+          <AddPopover
+            trigger={
+              <IconButton
+                aria-label="Add"
+                colorPalette="blue"
+                p="6px"
+                minW="unset"
+                minH="unset"
+                w="32px"
+                h="32px"
+              >
+                <Plus size={18} />
+              </IconButton>
+            }
+          />
 
-          <IconButton
-            aria-label="Notifications"
-            variant="ghost"
-            color="gray.800"
-            _hover={{ bg: 'gray.100', color: 'gray.900' }}
-          >
-            <Bell size={18} />
-          </IconButton>
-
-          <IconButton
-            aria-label="Settings"
-            variant="ghost"
-            color="gray.800"
-            _hover={{ bg: 'gray.100', color: 'gray.900' }}
-          >
-            <Settings size={18} />
-          </IconButton>
+          <NotificationsPopover
+            trigger={
+              <IconButton
+                aria-label="Notifications"
+                color="gray.800"
+                _hover={{ bg: 'gray.100', color: 'gray.900' }}
+              >
+                <Bell size={18} />
+              </IconButton>
+            }
+          />
+          <SettingsPopover
+            trigger={
+              <IconButton
+                aria-label="Settings"
+                color="gray.800"
+                _hover={{ bg: 'gray.100', color: 'gray.900' }}
+              >
+                <Settings size={18} />
+              </IconButton>
+            }
+          />
 
           <ProfilePopover
             trigger={

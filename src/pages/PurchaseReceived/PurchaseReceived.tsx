@@ -9,51 +9,55 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Stock Data ------------------ */
+/* ------------------ Fake Purchase Received Data ------------------ */
 
-type Stock = {
+type PurchaseReceivedItem = {
   id: string
-  name: string
-  sku: string
-  category: string
-  quantity: number
-  price: number
-  status: 'In Stock' | 'Out of Stock'
+  grnNumber: string
+  poNumber: string
+  supplier: string
+  receivedDate: string
+  receivedItems: number
+  totalCost: number
+  status: 'Partial' | 'Completed'
 }
 
-const FAKE_STOCKS: Stock[] = [
+const FAKE_PURCHASE_RECEIVED: PurchaseReceivedItem[] = [
   {
     id: '1',
-    name: 'Printed T-Shirt',
-    sku: 'SKU-TS-001',
-    category: 'Apparel',
-    quantity: 120,
-    price: 499,
-    status: 'In Stock',
+    grnNumber: 'GRN-2026-001',
+    poNumber: 'PO-2026-001',
+    supplier: 'ABC Packaging Ltd',
+    receivedDate: '2026-01-09',
+    receivedItems: 480,
+    totalCost: 5950,
+    status: 'Completed',
   },
   {
     id: '2',
-    name: 'Custom Mug',
-    sku: 'SKU-MG-002',
-    category: 'Accessories',
-    quantity: 0,
-    price: 299,
-    status: 'Out of Stock',
+    grnNumber: 'GRN-2026-002',
+    poNumber: 'PO-2026-002',
+    supplier: 'XYZ Textiles',
+    receivedDate: '2026-01-14',
+    receivedItems: 120,
+    totalCost: 10800,
+    status: 'Partial',
   },
   {
     id: '3',
-    name: 'Football Jersey',
-    sku: 'SKU-JS-003',
-    category: 'Sportswear',
-    quantity: 42,
-    price: 899,
-    status: 'In Stock',
+    grnNumber: 'GRN-2026-003',
+    poNumber: 'PO-2026-003',
+    supplier: 'National Plastics',
+    receivedDate: '—',
+    receivedItems: 0,
+    totalCost: 0,
+    status: 'Partial',
   },
 ]
 
 /* ------------------ Component ------------------ */
 
-const Stocks = () => {
+const PurchaseReceived = () => {
   const dispatch = useDispatch()
 
   const [page, setPage] = useState(1)
@@ -64,7 +68,7 @@ const Stocks = () => {
   const limit = 20
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Stocks' }))
+    dispatch(setHeader({ title: 'Purchase Received' }))
     return () => {
       dispatch(clearHeader())
     }
@@ -72,58 +76,73 @@ const Stocks = () => {
 
   /* ------------------ Filtering + Sorting ------------------ */
 
-  const filteredData = useMemo(() => {
-    let data = [...FAKE_STOCKS]
+  const data = useMemo(() => {
+    let rows = [...FAKE_PURCHASE_RECEIVED]
 
     if (!filter.includes('all')) {
-      data = data.filter((s) => filter.includes(s.status === 'In Stock' ? 'in' : 'out'))
+      rows = rows.filter((r) => filter.includes(r.status === 'Completed' ? 'completed' : 'partial'))
     }
 
     if (sortBy && sortOrder) {
-      data.sort((a: any, b: any) => {
+      rows.sort((a: any, b: any) => {
         if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
         if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
         return 0
       })
     }
 
-    return data
+    return rows
   }, [filter, sortBy, sortOrder])
 
   /* ------------------ Columns ------------------ */
 
-  const stockColumns = [
-    { key: 'name', header: 'Product Name', render: (s: Stock) => s.name },
-    { key: 'sku', header: 'SKU', render: (s: Stock) => s.sku },
-    { key: 'category', header: 'Category', render: (s: Stock) => s.category },
+  const purchaseReceivedColumns = [
     {
-      key: 'quantity',
-      header: 'Quantity',
-      render: (s: Stock) => s.quantity,
+      key: 'grnNumber',
+      header: 'GRN Number',
+      render: (r: PurchaseReceivedItem) => r.grnNumber,
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (s: Stock) => `₹${s.price}`,
+      key: 'poNumber',
+      header: 'PO Number',
+      render: (r: PurchaseReceivedItem) => r.poNumber,
+    },
+    {
+      key: 'supplier',
+      header: 'Supplier',
+      render: (r: PurchaseReceivedItem) => r.supplier,
+    },
+    {
+      key: 'receivedDate',
+      header: 'Received Date',
+      render: (r: PurchaseReceivedItem) => r.receivedDate,
+    },
+    {
+      key: 'receivedItems',
+      header: 'Items Received',
+      render: (r: PurchaseReceivedItem) => r.receivedItems,
+    },
+    {
+      key: 'totalCost',
+      header: 'Total Cost',
+      render: (r: PurchaseReceivedItem) => `₹${r.totalCost}`,
     },
     {
       key: 'status',
       header: 'Status',
-      render: (s: Stock) => (
-        <Text fontWeight="medium" color={s.status === 'In Stock' ? 'green.600' : 'red.500'}>
-          {s.status}
+      render: (r: PurchaseReceivedItem) => (
+        <Text fontWeight="medium" color={r.status === 'Completed' ? 'green.600' : 'orange.500'}>
+          {r.status}
         </Text>
       ),
     },
   ]
 
-  const stockFilters = [
-    { label: 'All stock', value: 'all' },
-    { label: 'In stock', value: 'in' },
-    { label: 'Out of stock', value: 'out' },
+  const purchaseReceivedFilters = [
+    { label: 'All received', value: 'all' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Partial', value: 'partial' },
   ]
-
-  /* ------------------ Pagination (Fake) ------------------ */
 
   const totalPages = 1
 
@@ -132,15 +151,21 @@ const Stocks = () => {
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect
-          options={stockFilters}
+          options={purchaseReceivedFilters}
           value={filter}
           defaultValue={['all']}
-          placeholder="All stock"
+          placeholder="All received"
           onChange={setFilter}
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Stock" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton
+            aria-label="Add Purchase Received"
+            colorPalette="blue"
+            variant="solid"
+            px={3}
+            h="32px"
+          >
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -171,10 +196,10 @@ const Stocks = () => {
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
         <CommonTable
-          columns={stockColumns}
-          data={filteredData}
+          columns={purchaseReceivedColumns}
+          data={data}
           isLoading={false}
-          rowKey={(s) => s.id}
+          rowKey={(r) => r.id}
         />
       </Box>
 
@@ -192,4 +217,4 @@ const Stocks = () => {
   )
 }
 
-export default Stocks
+export default PurchaseReceived

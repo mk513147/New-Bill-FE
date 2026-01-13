@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Button, Box, Badge } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
@@ -9,51 +9,47 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Stock Data ------------------ */
+/* ------------------ Fake Roles Data ------------------ */
 
-type Stock = {
+type Role = {
   id: string
   name: string
-  sku: string
-  category: string
-  quantity: number
-  price: number
-  status: 'In Stock' | 'Out of Stock'
+  description: string
+  usersCount: number
+  permissions: string[]
+  status: 'Active' | 'Disabled'
 }
 
-const FAKE_STOCKS: Stock[] = [
+const FAKE_ROLES: Role[] = [
   {
     id: '1',
-    name: 'Printed T-Shirt',
-    sku: 'SKU-TS-001',
-    category: 'Apparel',
-    quantity: 120,
-    price: 499,
-    status: 'In Stock',
+    name: 'Admin',
+    description: 'Full system access',
+    usersCount: 2,
+    permissions: ['All'],
+    status: 'Active',
   },
   {
     id: '2',
-    name: 'Custom Mug',
-    sku: 'SKU-MG-002',
-    category: 'Accessories',
-    quantity: 0,
-    price: 299,
-    status: 'Out of Stock',
+    name: 'Manager',
+    description: 'Manage inventory and orders',
+    usersCount: 5,
+    permissions: ['Customers', 'Stocks', 'Orders', 'Bills'],
+    status: 'Active',
   },
   {
     id: '3',
-    name: 'Football Jersey',
-    sku: 'SKU-JS-003',
-    category: 'Sportswear',
-    quantity: 42,
-    price: 899,
-    status: 'In Stock',
+    name: 'Staff',
+    description: 'Limited operational access',
+    usersCount: 8,
+    permissions: ['Customers', 'Shipments'],
+    status: 'Disabled',
   },
 ]
 
 /* ------------------ Component ------------------ */
 
-const Stocks = () => {
+const Roles = () => {
   const dispatch = useDispatch()
 
   const [page, setPage] = useState(1)
@@ -64,7 +60,7 @@ const Stocks = () => {
   const limit = 20
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Stocks' }))
+    dispatch(setHeader({ title: 'Roles' }))
     return () => {
       dispatch(clearHeader())
     }
@@ -72,58 +68,71 @@ const Stocks = () => {
 
   /* ------------------ Filtering + Sorting ------------------ */
 
-  const filteredData = useMemo(() => {
-    let data = [...FAKE_STOCKS]
+  const data = useMemo(() => {
+    let rows = [...FAKE_ROLES]
 
     if (!filter.includes('all')) {
-      data = data.filter((s) => filter.includes(s.status === 'In Stock' ? 'in' : 'out'))
+      rows = rows.filter((r) => filter.includes(r.status === 'Active' ? 'active' : 'disabled'))
     }
 
     if (sortBy && sortOrder) {
-      data.sort((a: any, b: any) => {
+      rows.sort((a: any, b: any) => {
         if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
         if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
         return 0
       })
     }
 
-    return data
+    return rows
   }, [filter, sortBy, sortOrder])
 
   /* ------------------ Columns ------------------ */
 
-  const stockColumns = [
-    { key: 'name', header: 'Product Name', render: (s: Stock) => s.name },
-    { key: 'sku', header: 'SKU', render: (s: Stock) => s.sku },
-    { key: 'category', header: 'Category', render: (s: Stock) => s.category },
+  const roleColumns = [
     {
-      key: 'quantity',
-      header: 'Quantity',
-      render: (s: Stock) => s.quantity,
+      key: 'name',
+      header: 'Role Name',
+      render: (r: Role) => r.name,
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (s: Stock) => `₹${s.price}`,
+      key: 'description',
+      header: 'Description',
+      render: (r: Role) => r.description,
+    },
+    {
+      key: 'usersCount',
+      header: 'Users',
+      render: (r: Role) => r.usersCount,
+    },
+    {
+      key: 'permissions',
+      header: 'Permissions',
+      render: (r: Role) => (
+        <HStack gap={1} wrap="wrap">
+          {r.permissions.map((p) => (
+            <Badge key={p} colorPalette="purple" variant="subtle">
+              {p}
+            </Badge>
+          ))}
+        </HStack>
+      ),
     },
     {
       key: 'status',
       header: 'Status',
-      render: (s: Stock) => (
-        <Text fontWeight="medium" color={s.status === 'In Stock' ? 'green.600' : 'red.500'}>
-          {s.status}
+      render: (r: Role) => (
+        <Text fontWeight="medium" color={r.status === 'Active' ? 'green.600' : 'red.500'}>
+          {r.status}
         </Text>
       ),
     },
   ]
 
-  const stockFilters = [
-    { label: 'All stock', value: 'all' },
-    { label: 'In stock', value: 'in' },
-    { label: 'Out of stock', value: 'out' },
+  const roleFilters = [
+    { label: 'All roles', value: 'all' },
+    { label: 'Active', value: 'active' },
+    { label: 'Disabled', value: 'disabled' },
   ]
-
-  /* ------------------ Pagination (Fake) ------------------ */
 
   const totalPages = 1
 
@@ -132,15 +141,15 @@ const Stocks = () => {
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect
-          options={stockFilters}
+          options={roleFilters}
           value={filter}
           defaultValue={['all']}
-          placeholder="All stock"
+          placeholder="All roles"
           onChange={setFilter}
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Stock" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton aria-label="Add Role" colorPalette="blue" variant="solid" px={3} h="32px">
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -170,12 +179,7 @@ const Stocks = () => {
 
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable
-          columns={stockColumns}
-          data={filteredData}
-          isLoading={false}
-          rowKey={(s) => s.id}
-        />
+        <CommonTable columns={roleColumns} data={data} isLoading={false} rowKey={(r) => r.id} />
       </Box>
 
       {/* Pagination */}
@@ -192,4 +196,4 @@ const Stocks = () => {
   )
 }
 
-export default Stocks
+export default Roles

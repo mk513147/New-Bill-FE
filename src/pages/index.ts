@@ -30,3 +30,5 @@ export { default as PurchaseOrders } from './PurchaseOrders/PurchaseOrders.tsx'
 export { default as PurchaseReceived } from './PurchaseReceived/PurchaseReceived.tsx'
 export { default as Bill } from './Bill/Bill.tsx'
 export { default as Credits } from './Credits/Credits.tsx'
+
+export { default as Roles } from './Roles/Roles.tsx'

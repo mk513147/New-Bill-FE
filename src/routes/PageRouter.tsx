@@ -33,6 +33,7 @@ import {
   PurchaseReceivedRoute,
   BillRoute,
   CreditsRoute,
+  RolesRoute,
 } from './importRoutes/index'
 import { useSelector } from 'react-redux'
 import Loading from '@/components/common/Loading'
@@ -74,6 +75,7 @@ const pages = () => (
     {PurchaseReceivedRoute()}
     {BillRoute()}
     {CreditsRoute()}
+    {RolesRoute()}
   </>
 )
 

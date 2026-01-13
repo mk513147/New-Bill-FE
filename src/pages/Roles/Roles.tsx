@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Button, Box, Badge } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
@@ -9,55 +9,47 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Shipment Data ------------------ */
+/* ------------------ Fake Roles Data ------------------ */
 
-type Shipment = {
+type Role = {
   id: string
-  orderId: string
-  carrier: string
-  trackingNumber: string
-  shippedDate: string
-  deliveryDate: string
-  cost: number
-  status: 'Pending' | 'In Transit' | 'Delivered'
+  name: string
+  description: string
+  usersCount: number
+  permissions: string[]
+  status: 'Active' | 'Disabled'
 }
 
-const FAKE_SHIPMENTS: Shipment[] = [
+const FAKE_ROLES: Role[] = [
   {
     id: '1',
-    orderId: 'ORD-1023',
-    carrier: 'Delhivery',
-    trackingNumber: 'DLV839201',
-    shippedDate: '2026-01-08',
-    deliveryDate: '2026-01-11',
-    cost: 120,
-    status: 'Delivered',
+    name: 'Admin',
+    description: 'Full system access',
+    usersCount: 2,
+    permissions: ['All'],
+    status: 'Active',
   },
   {
     id: '2',
-    orderId: 'ORD-1027',
-    carrier: 'Blue Dart',
-    trackingNumber: 'BD774201',
-    shippedDate: '2026-01-10',
-    deliveryDate: '—',
-    cost: 180,
-    status: 'In Transit',
+    name: 'Manager',
+    description: 'Manage inventory and orders',
+    usersCount: 5,
+    permissions: ['Customers', 'Stocks', 'Orders', 'Bills'],
+    status: 'Active',
   },
   {
     id: '3',
-    orderId: 'ORD-1031',
-    carrier: 'India Post',
-    trackingNumber: 'IP553910',
-    shippedDate: '—',
-    deliveryDate: '—',
-    cost: 90,
-    status: 'Pending',
+    name: 'Staff',
+    description: 'Limited operational access',
+    usersCount: 8,
+    permissions: ['Customers', 'Shipments'],
+    status: 'Disabled',
   },
 ]
 
 /* ------------------ Component ------------------ */
 
-const Shipments = () => {
+const Roles = () => {
   const dispatch = useDispatch()
 
   const [page, setPage] = useState(1)
@@ -68,7 +60,7 @@ const Shipments = () => {
   const limit = 20
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Shipments' }))
+    dispatch(setHeader({ title: 'Roles' }))
     return () => {
       dispatch(clearHeader())
     }
@@ -77,18 +69,10 @@ const Shipments = () => {
   /* ------------------ Filtering + Sorting ------------------ */
 
   const data = useMemo(() => {
-    let rows = [...FAKE_SHIPMENTS]
+    let rows = [...FAKE_ROLES]
 
     if (!filter.includes('all')) {
-      rows = rows.filter((s) =>
-        filter.includes(
-          s.status === 'Delivered'
-            ? 'delivered'
-            : s.status === 'In Transit'
-              ? 'transit'
-              : 'pending',
-        ),
-      )
+      rows = rows.filter((r) => filter.includes(r.status === 'Active' ? 'active' : 'disabled'))
     }
 
     if (sortBy && sortOrder) {
@@ -104,62 +88,50 @@ const Shipments = () => {
 
   /* ------------------ Columns ------------------ */
 
-  const shipmentColumns = [
+  const roleColumns = [
     {
-      key: 'orderId',
-      header: 'Order ID',
-      render: (s: Shipment) => s.orderId,
+      key: 'name',
+      header: 'Role Name',
+      render: (r: Role) => r.name,
     },
     {
-      key: 'carrier',
-      header: 'Carrier',
-      render: (s: Shipment) => s.carrier,
+      key: 'description',
+      header: 'Description',
+      render: (r: Role) => r.description,
     },
     {
-      key: 'trackingNumber',
-      header: 'Tracking No.',
-      render: (s: Shipment) => s.trackingNumber,
+      key: 'usersCount',
+      header: 'Users',
+      render: (r: Role) => r.usersCount,
     },
     {
-      key: 'shippedDate',
-      header: 'Shipped Date',
-      render: (s: Shipment) => s.shippedDate,
-    },
-    {
-      key: 'deliveryDate',
-      header: 'Delivery Date',
-      render: (s: Shipment) => s.deliveryDate,
-    },
-    {
-      key: 'cost',
-      header: 'Shipping Cost',
-      render: (s: Shipment) => `₹${s.cost}`,
+      key: 'permissions',
+      header: 'Permissions',
+      render: (r: Role) => (
+        <HStack gap={1} wrap="wrap">
+          {r.permissions.map((p) => (
+            <Badge key={p} colorPalette="purple" variant="subtle">
+              {p}
+            </Badge>
+          ))}
+        </HStack>
+      ),
     },
     {
       key: 'status',
       header: 'Status',
-      render: (s: Shipment) => (
-        <Text
-          fontWeight="medium"
-          color={
-            s.status === 'Delivered'
-              ? 'green.600'
-              : s.status === 'In Transit'
-                ? 'blue.600'
-                : 'orange.500'
-          }
-        >
-          {s.status}
+      render: (r: Role) => (
+        <Text fontWeight="medium" color={r.status === 'Active' ? 'green.600' : 'red.500'}>
+          {r.status}
         </Text>
       ),
     },
   ]
 
-  const shipmentFilters = [
-    { label: 'All shipments', value: 'all' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'In transit', value: 'transit' },
-    { label: 'Delivered', value: 'delivered' },
+  const roleFilters = [
+    { label: 'All roles', value: 'all' },
+    { label: 'Active', value: 'active' },
+    { label: 'Disabled', value: 'disabled' },
   ]
 
   const totalPages = 1
@@ -169,15 +141,15 @@ const Shipments = () => {
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect
-          options={shipmentFilters}
+          options={roleFilters}
           value={filter}
           defaultValue={['all']}
-          placeholder="All shipments"
+          placeholder="All roles"
           onChange={setFilter}
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Shipment" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton aria-label="Add Role" colorPalette="blue" variant="solid" px={3} h="32px">
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -207,7 +179,7 @@ const Shipments = () => {
 
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable columns={shipmentColumns} data={data} isLoading={false} rowKey={(s) => s.id} />
+        <CommonTable columns={roleColumns} data={data} isLoading={false} rowKey={(r) => r.id} />
       </Box>
 
       {/* Pagination */}
@@ -224,4 +196,4 @@ const Shipments = () => {
   )
 }
 
-export default Shipments
+export default Roles

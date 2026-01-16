@@ -25,7 +25,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 type Props = {
   sortBy?: SortKey
   sortOrder?: 'asc' | 'desc'
-  onSortChange: (key: SortKey, order: 'asc' | 'desc') => void
+  onSortChange: (key: SortKey | undefined, order?: 'asc' | 'desc') => void
   onImport: () => void
   onExport: () => void
   onRefresh?: () => void

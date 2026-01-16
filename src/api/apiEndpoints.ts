@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
 
   CUSTOMERS: {
     BASE: '/customers/getCustomer',
+    SEARCH: '/customers/search',
     CREATE: '/customers/createCustomer',
     UPDATE: '/customers/updateCustomer',
     DELETE: '/customers/deleteCustomer',

@@ -1,24 +1,35 @@
-import { TableColumn, CommonTable } from '@/components/common/CommonTable'
-import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
-import { Box, Flex, Text, Button, Stack, Separator } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Box, Flex, Text, Button, Stack, Separator, Input } from '@chakra-ui/react'
 import { useDispatch } from 'react-redux'
+import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
+import { CommonTable, TableColumn } from '@/components/common/CommonTable'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
+import { useAllProducts } from '@/hooks/useProducts'
 
-type InvoiceItem = {
-  id: string
+type Product = {
+  _id: string
   name: string
-  qty: number
-  rate: number
+  barcode: string
+  sellingPrice: number
+  tax: number
 }
 
-const invoiceItems: InvoiceItem[] = [
-  { id: '1', name: 'Printed T-Shirt', qty: 2, rate: 499 },
-  { id: '2', name: 'Custom Mug', qty: 1, rate: 299 },
-  { id: '3', name: 'Hoodie', qty: 1, rate: 999 },
-]
+type InvoiceItem = {
+  _id: string
+  name: string
+  barcode: string
+  sellingPrice: number
+  tax: number
+  quantity: number
+}
 
 const Invoice = () => {
   const dispatch = useDispatch()
+  const { data } = useAllProducts(100, 1)
+  const products: Product[] = data?.products ?? []
+
+  const [items, setItems] = useState<InvoiceItem[]>([])
 
   useEffect(() => {
     dispatch(setHeader({ title: 'Invoice' }))
@@ -27,139 +38,261 @@ const Invoice = () => {
     }
   }, [dispatch])
 
-  const subtotal = invoiceItems.reduce((acc, item) => acc + item.qty * item.rate, 0)
-  const tax = Math.round(subtotal * 0.18)
-  const total = subtotal + tax
+  const addProduct = (product: Product) => {
+    setItems((prev) => {
+      const existing = prev.find((i) => i._id === product._id)
+      if (existing) {
+        return prev.map((i) => (i._id === product._id ? { ...i, quantity: i.quantity + 1 } : i))
+      }
+
+      return [
+        ...prev,
+        {
+          _id: product._id,
+          name: product.name,
+          barcode: product.barcode,
+          sellingPrice: product.sellingPrice,
+          tax: product.tax,
+          quantity: 1,
+        },
+      ]
+    })
+  }
+
+  const updateQty = (_id: string, qty: number) => {
+    setItems((prev) => prev.map((i) => (i._id === _id ? { ...i, quantity: Math.max(1, qty) } : i)))
+  }
+
+  const deleteItem = (_id: string) => {
+    setItems((prev) => prev.filter((i) => i._id !== _id))
+  }
+
+  const subtotal = useMemo(
+    () => items.reduce((acc, i) => acc + i.sellingPrice * i.quantity, 0),
+    [items],
+  )
+
+  const totalTax = useMemo(
+    () => items.reduce((acc, i) => acc + (i.sellingPrice * i.quantity * i.tax) / 100, 0),
+    [items],
+  )
+
+  const grandTotal = subtotal + totalTax
 
   const columns: TableColumn<InvoiceItem>[] = [
+    { key: 'name', header: 'Name', render: (r) => r.name },
     {
-      key: 'name',
-      header: 'Item',
-      width: '320px',
-      render: (row) => row.name,
+      key: 'barcode',
+      header: 'Barcode',
+      render: (r) => r.barcode,
     },
     {
-      key: 'qty',
+      key: 'sellingPrice',
+      header: 'Price',
+      render: (r) => `₹${r.sellingPrice}`,
+    },
+    {
+      key: 'tax',
+      header: 'Tax %',
+      render: (r) => `${r.tax}%`,
+    },
+    {
+      key: 'quantity',
       header: 'Qty',
-      render: (row) => row.qty,
+      render: (r) => (
+        <Input
+          type="number"
+          width="80px"
+          value={r.quantity}
+          onChange={(e) => updateQty(r._id, Number(e.target.value))}
+        />
+      ),
     },
     {
-      key: 'rate',
-      header: 'Rate',
-      render: (row) => `₹${row.rate}`,
+      key: 'beforeTax',
+      header: 'Before Tax',
+      render: (r) => `₹${r.sellingPrice * r.quantity}`,
     },
     {
-      key: 'amount',
-      header: 'Amount',
-      render: (row) => `₹${row.qty * row.rate}`,
+      key: 'afterTax',
+      header: 'After Tax',
+      render: (r) => `₹${Math.round(r.sellingPrice * r.quantity * (1 + r.tax / 100))}`,
+    },
+    {
+      key: 'actions',
+      header: '',
+      render: (r) => (
+        <Button size="xs" bg="red.500" color="white" onClick={() => deleteItem(r._id)}>
+          Delete
+        </Button>
+      ),
     },
   ]
 
+  const downloadPDF = async () => {
+    const el = document.getElementById('invoice-print-area')
+    if (!el) return
+
+    const canvas = await html2canvas(el, {
+      scale: 2,
+      useCORS: true,
+    })
+
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+
+    const pageWidth = 210
+    const pageHeight = 297
+
+    const imgHeight = (canvas.height * pageWidth) / canvas.width
+    let heightLeft = imgHeight
+    let position = 0
+
+    pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight)
+    heightLeft -= pageHeight
+
+    while (heightLeft > 0) {
+      position -= pageHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight)
+      heightLeft -= pageHeight
+    }
+
+    pdf.save('invoice.pdf')
+  }
+
   return (
-    <Box w="100%" minH="100vh" bg="white" color="gray.900" p={6}>
-      <Flex direction="column" h="100%">
-        {/* Header */}
-        <Flex justify="space-between" align="flex-start" mb={6}>
-          <Box>
-            <Text fontSize="2xl" fontWeight="600">
-              Invoice
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              Invoice #INV-1023
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              Date: 21 Aug 2026
-            </Text>
-          </Box>
-
-          <Stack direction="row" gap={2}>
-            <Button
-              size="sm"
-              px={4}
-              bg="white"
-              color="gray.700"
-              border="1px solid #E5E7EB"
-              _hover={{ bg: '#F5F6FA' }}
-              _active={{ bg: '#ECEFF4' }}
-            >
-              Download PDF
-            </Button>
-
-            <Button
-              size="sm"
-              px={4}
-              bg="#2563EB"
-              color="white"
-              _hover={{ bg: '#1D4ED8' }}
-              _active={{ bg: '#1E40AF' }}
-            >
-              Send Invoice
-            </Button>
-          </Stack>
-        </Flex>
-
-        <Separator mb={6} />
-
-        {/* Billing Info */}
-        <Flex justify="space-between" mb={8}>
-          <Box>
-            <Text fontWeight="500" mb={1}>
-              Billed To
-            </Text>
-            <Text fontSize="sm">Rahul Agarwal</Text>
-            <Text fontSize="sm" color="gray.600">
-              Ratu Road, Ranchi
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              rahul@gmail.com
-            </Text>
-          </Box>
-
-          <Box textAlign="right">
-            <Text fontWeight="500" mb={1}>
-              From
-            </Text>
-            <Text fontSize="sm">EBILL Pvt Ltd</Text>
-            <Text fontSize="sm" color="gray.600">
-              Doranda, Ranchi
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              support@ebill.com
-            </Text>
-          </Box>
-        </Flex>
-
-        {/* Table */}
-        <Box flex="1">
-          <CommonTable columns={columns} data={invoiceItems} rowKey={(row) => row.id} />
-        </Box>
-
-        {/* Totals */}
-        <Flex justify="flex-end" mt={6}>
-          <Box w="320px">
-            <Flex justify="space-between" mb={2}>
-              <Text fontSize="sm" color="gray.600">
-                Subtotal
+    <Box bg="gray.100">
+      {/* PRINT AREA */}
+      <Box
+        id="invoice-print-area"
+        maxW="1100px"
+        mx="auto"
+        my={6}
+        bg="white"
+        p={8}
+        color="gray.900"
+        css={{
+          '@media print': {
+            boxShadow: 'none',
+            borderRadius: 0,
+            margin: 0,
+            maxW: '100%',
+            width: '100%',
+          },
+        }}
+      >
+        <Flex direction="column" gap={6}>
+          {/* Header */}
+          <Flex justify="space-between">
+            <Box>
+              <Text fontSize="2xl" fontWeight="600">
+                Invoice
               </Text>
-              <Text fontSize="sm">₹{subtotal}</Text>
-            </Flex>
-
-            <Flex justify="space-between" mb={2}>
               <Text fontSize="sm" color="gray.600">
-                GST (18%)
+                Invoice #INV-1023
               </Text>
-              <Text fontSize="sm">₹{tax}</Text>
-            </Flex>
+              <Text fontSize="sm" color="gray.600">
+                Date: 21 Aug 2026
+              </Text>
+            </Box>
 
-            <Separator my={2} />
+            {/* ACTIONS — HIDDEN IN PRINT */}
+            <Stack
+              direction="row"
+              gap={2}
+              className="no-print"
+              css={{
+                '@media print': {
+                  display: 'none',
+                },
+              }}
+            >
+              <Button size="sm" border="1px solid #E5E7EB" onClick={downloadPDF}>
+                Download PDF
+              </Button>
+              <Button size="sm" bg="#2563EB" color="white" onClick={() => window.print()}>
+                Print
+              </Button>
+            </Stack>
+          </Flex>
 
-            <Flex justify="space-between">
-              <Text fontWeight="600">Total</Text>
-              <Text fontWeight="600">₹{total}</Text>
-            </Flex>
+          <Separator />
+
+          {/* Add Product — HIDDEN IN PRINT */}
+          <Box
+            maxW="360px"
+            css={{
+              '@media print': {
+                display: 'none',
+              },
+            }}
+          >
+            <Text fontSize="sm" mb={1} color="gray.600">
+              Add product
+            </Text>
+            <Box border="1px solid" borderColor="gray.300" borderRadius="md" px={3} py={2}>
+              <select
+                style={{
+                  width: '100%',
+                  outline: 'none',
+                  border: 'none',
+                  background: 'transparent',
+                }}
+                onChange={(e) => {
+                  const p = products.find((x) => String(x._id) === e.target.value)
+                  if (p) addProduct(p)
+                }}
+              >
+                <option value="">Select product</option>
+                {products.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {p.name} – ₹{p.sellingPrice}
+                  </option>
+                ))}
+              </select>
+            </Box>
           </Box>
+
+          {/* Table */}
+          <Box border="1px solid" borderColor="gray.200" borderRadius="md">
+            <Box
+              maxH="300px"
+              overflowY="auto"
+              css={{
+                '@media print': {
+                  maxHeight: 'none',
+                  overflow: 'visible',
+                },
+              }}
+            >
+              <CommonTable columns={columns} data={items} rowKey={(r) => r._id} />
+            </Box>
+          </Box>
+
+          {/* Totals */}
+          <Flex justify="flex-end" mt={6}>
+            <Box w="360px">
+              <Flex justify="space-between" mb={2}>
+                <Text color="gray.600">Subtotal (Before Tax)</Text>
+                <Text>₹{subtotal}</Text>
+              </Flex>
+
+              <Flex justify="space-between" mb={2}>
+                <Text color="gray.600">Total Tax</Text>
+                <Text>₹{totalTax}</Text>
+              </Flex>
+
+              <Separator my={3} />
+
+              <Flex justify="space-between" fontSize="lg" fontWeight="600">
+                <Text>Grand Total</Text>
+                <Text>₹{grandTotal}</Text>
+              </Flex>
+            </Box>
+          </Flex>
         </Flex>
-      </Flex>
+      </Box>
     </Box>
   )
 }

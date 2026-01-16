@@ -94,6 +94,7 @@ export const AddPopover = ({
             borderRadius="lg"
             shadow="lightGray"
             p={2}
+            zIndex={10}
           >
             <VStack align="stretch" gap={1}>
               {actions.map((action) => (

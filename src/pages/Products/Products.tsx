@@ -10,7 +10,7 @@ import { useAllProducts } from '@/hooks/useProducts'
 import { useProductActions } from '@/hooks/useProductActions'
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { useDispatch } from 'react-redux'
-import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
+import { SortKey, TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { Plus } from 'lucide-react'
 import { CommonTable } from '@/components/common/CommonTable'
 
@@ -158,7 +158,17 @@ function Products() {
             </IconButton>
 
             <HStack h="32px" _hover={{ bg: 'gray.300' }}>
-              <TableActionsPopover />
+              <TableActionsPopover
+                onSortChange={function (key: SortKey, order: 'asc' | 'desc'): void {
+                  throw new Error('Function not implemented.')
+                }}
+                onImport={function (): void {
+                  throw new Error('Function not implemented.')
+                }}
+                onExport={function (): void {
+                  throw new Error('Function not implemented.')
+                }}
+              />
             </HStack>
           </HStack>
         </Flex>

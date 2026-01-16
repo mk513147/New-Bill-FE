@@ -1,7 +1,7 @@
 import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCustomers } from '@/hooks/useCustomer'
 import CustomerDialog, { CustomerFormValues } from '@/components/modals/CustomerModal'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
@@ -13,13 +13,13 @@ import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
+import { isFrontendPagination } from '@/utils/isFrontendPagination'
 
 import { useCustomerImport } from '@/hooks/useCustomerImport'
 import { useCustomerExport } from '@/hooks/useCustomerExport'
 import { useQueryClient } from '@tanstack/react-query'
 
 function Customers() {
-  const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
   const [editId, setEditId] = useState<string | null>(null)
@@ -27,6 +27,8 @@ function Customers() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(search)
   const [sortBy, setSortBy] = useState<SortKey | undefined>(undefined)
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined)
 
@@ -37,21 +39,52 @@ function Customers() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
+  const [page, setPage] = useState(1)
   const limit = 20
+  const frontend = isFrontendPagination(sortBy, sortOrder)
 
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search), 400)
+    return () => clearTimeout(id)
+  }, [search])
+  // ✅ Correct params passed to backend
   const { data, isLoading } = useCustomers({
-    page,
-    limit,
-    ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+    search: debouncedSearch || undefined,
+    ...(frontend
+      ? { sortBy, sortOrder } // 🚫 no page / limit
+      : { page, limit }), // ✅ backend pagination
   })
 
-  const customers = data?.customers ?? []
-  const pagination = data?.pagination ?? {
-    currentPage: 1,
-    totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  }
+  // ✅ Normalize backend response
+  const rawCustomers = data?.customers ?? []
+
+  // ✅ Frontend pagination only when sorting
+  const customers = useMemo(() => {
+    if (!frontend) return rawCustomers
+
+    const start = (page - 1) * limit
+    return rawCustomers.slice(start, start + limit)
+  }, [rawCustomers, page, limit, frontend])
+
+  // ✅ Correct pagination object
+  const pagination = frontend
+    ? {
+        currentPage: page,
+        totalPages: Math.max(1, Math.ceil(rawCustomers.length / limit)),
+        hasNextPage: page * limit < rawCustomers.length,
+        hasPreviousPage: page > 1,
+      }
+    : (data?.pagination ?? {
+        currentPage: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
+
+  // ✅ Reset page on sort/search change
+  useEffect(() => {
+    setPage(1)
+  }, [sortBy, sortOrder, search])
 
   const customerColumns = [
     { key: 'name', header: 'Contact Name', render: (c: any) => c.name },
@@ -149,6 +182,20 @@ function Customers() {
             placeholder="All customers"
             onChange={setValue}
           />
+          <Box maxW="280px" w="100%">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search customers…"
+              style={{
+                width: '100%',
+                height: '32px',
+                padding: '0 10px',
+                borderRadius: '6px',
+                border: '1px solid #E2E8F0',
+              }}
+            />
+          </Box>
 
           <HStack gap={2}>
             <IconButton

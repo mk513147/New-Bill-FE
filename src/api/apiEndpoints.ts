@@ -25,16 +25,22 @@ export const API_ENDPOINTS = {
 
   PRODUCTS: {
     BASE: '/products/getProducts',
+    SEARCH: '/products/search',
     CREATE: '/products/createProduct',
     UPDATE: '/products/updateProduct',
     DELETE: '/products/deleteProduct',
+    IMPORT: '/products/import',
+    EXPORT: '/products/export',
   },
 
   CATEGORY: {
     BASE: '/category/list',
+    SEARCH: '/category/search',
     CREATE: '/category/create',
     UPDATE: '/category/update',
     DELETE: '/category/delete',
+    IMPORT: '/category/import',
+    EXPORT: '/category/export',
   },
 
   SUPPLIERS: {

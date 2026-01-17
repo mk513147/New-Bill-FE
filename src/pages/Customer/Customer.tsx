@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, IconButton, Button, Box, Input, VStack } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -8,7 +8,7 @@ import { useCustomerActions } from '@/hooks/useCustomerActions'
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { useDispatch } from 'react-redux'
-import { Plus, Search } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
@@ -48,18 +48,14 @@ function Customers() {
     const id = setTimeout(() => setDebouncedSearch(search), 400)
     return () => clearTimeout(id)
   }, [search])
-  // ✅ Correct params passed to backend
+
   const { data, isLoading } = useCustomers({
     search: debouncedSearch || undefined,
-    ...(frontend
-      ? { sortBy, sortOrder } // 🚫 no page / limit
-      : { page, limit }), // ✅ backend pagination
+    ...(frontend ? { sortBy, sortOrder } : { page, limit }),
   })
 
-  // ✅ Normalize backend response
   const rawCustomers = data?.customers ?? []
 
-  // ✅ Frontend pagination only when sorting
   const customers = useMemo(() => {
     if (!frontend) return rawCustomers
 
@@ -67,7 +63,6 @@ function Customers() {
     return rawCustomers.slice(start, start + limit)
   }, [rawCustomers, page, limit, frontend])
 
-  // ✅ Correct pagination object
   const pagination = frontend
     ? {
         currentPage: page,
@@ -82,7 +77,6 @@ function Customers() {
         hasPreviousPage: false,
       })
 
-  // ✅ Reset page on sort/search change
   useEffect(() => {
     setPage(1)
   }, [sortBy, sortOrder, search])

@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
-import { useAllProducts } from '@/hooks/useProducts'
+import { useProducts } from '@/hooks/useProducts'
 
 function PriceList() {
   const dispatch = useDispatch()
@@ -12,7 +12,7 @@ function PriceList() {
   const [page, setPage] = useState(1)
   const limit = 20
 
-  const { data, isLoading } = useAllProducts(limit, page)
+  const { data, isLoading } = useProducts()
 
   const products = data?.products ?? []
   const pagination = data?.pagination ?? {

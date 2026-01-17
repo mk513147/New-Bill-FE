@@ -109,7 +109,18 @@ export function CommonTable<T>({
                     overflow="hidden"
                     textOverflow="ellipsis"
                   >
-                    {c.render?.(row)}
+                    {(() => {
+                      const value = c.render?.(row)
+                      console.log(
+                        'TABLE CELL → column:',
+                        c.key,
+                        'value:',
+                        value,
+                        'type:',
+                        typeof value,
+                      )
+                      return value
+                    })()}
                   </Table.Cell>
                 ))}
 

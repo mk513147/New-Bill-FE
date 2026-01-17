@@ -5,7 +5,7 @@ import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable, TableColumn } from '@/components/common/CommonTable'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
-import { useAllProducts } from '@/hooks/useProducts'
+import { useProducts } from '@/hooks/useProducts'
 
 type Product = {
   _id: string
@@ -26,7 +26,7 @@ type InvoiceItem = {
 
 const Invoice = () => {
   const dispatch = useDispatch()
-  const { data } = useAllProducts(100, 1)
+  const { data } = useProducts()
   const products: Product[] = data?.products ?? []
 
   const [items, setItems] = useState<InvoiceItem[]>([])

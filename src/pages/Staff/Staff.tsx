@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 
 import { FaEdit, FaTrash } from '@/components/icons'
 import { CommonTable } from '@/components/common/CommonTable'
-import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
+import { SortKey, TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
 
@@ -37,6 +37,7 @@ function Staff() {
     hasPreviousPage: false,
   }
 
+  // console.log('Staff Data:', staff)
   /* ---------------- TABLE COLUMNS ---------------- */
 
   const staffColumns = [
@@ -169,7 +170,17 @@ function Staff() {
             </IconButton>
 
             <HStack h="32px" _hover={{ bg: 'gray.300' }}>
-              <TableActionsPopover />
+              <TableActionsPopover
+                onSortChange={function (key: SortKey, order: 'asc' | 'desc'): void {
+                  throw new Error('Function not implemented.')
+                }}
+                onImport={function (): void {
+                  throw new Error('Function not implemented.')
+                }}
+                onExport={function (): void {
+                  throw new Error('Function not implemented.')
+                }}
+              />
             </HStack>
           </HStack>
         </Flex>

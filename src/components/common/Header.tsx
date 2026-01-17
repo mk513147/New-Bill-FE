@@ -5,8 +5,18 @@ import { ProfilePopover } from '@/components/popovers/ProfilePopover'
 import { NotificationsPopover } from '@/components/popovers/NotificationsPopover'
 import { AddPopover } from '@/components/popovers/AddPopover'
 import { SettingsPopover } from '@/components/popovers/SettingsPopover'
+import CustomerDialog from '@/components/modals/CustomerModal'
+import ProductDialog from '../modals/ProductModal'
+import CategoryModal from '../modals/CategoryModal'
+import InvoiceModal from '../modals/InvoiceModal'
+import StockModal from '../modals/StockModal'
+import BillModal from '../modals/BillModal'
+import { useState } from 'react'
+
+type AddEntity = 'customer' | 'product' | 'invoice' | 'category' | 'stock' | 'bill' | null
 
 export const Header = () => {
+  const [openEntity, setOpenEntity] = useState<AddEntity>(null)
   const { title } = useSelector((state: any) => state.header)
 
   if (!title) return null
@@ -50,6 +60,12 @@ export const Header = () => {
                 <Plus size={18} />
               </IconButton>
             }
+            onAddCustomer={() => setOpenEntity('customer')}
+            onAddProduct={() => setOpenEntity('product')}
+            onAddInvoice={() => setOpenEntity('invoice')}
+            onAddCategory={() => setOpenEntity('category')}
+            onAddStock={() => setOpenEntity('stock')}
+            onAddBill={() => setOpenEntity('bill')}
           />
 
           <NotificationsPopover
@@ -86,6 +102,34 @@ export const Header = () => {
           />
         </HStack>
       </Flex>
+      {/* CUSTOMER */}
+      <CustomerDialog
+        open={openEntity === 'customer'}
+        mode="add"
+        onClose={() => setOpenEntity(null)}
+      />
+
+      {/* PRODUCT */}
+      <ProductDialog
+        open={openEntity === 'product'}
+        mode="add"
+        onClose={() => setOpenEntity(null)}
+      />
+
+      {/* INVOICE */}
+      <InvoiceModal
+        open={openEntity === 'invoice'}
+        mode="add"
+        onClose={() => setOpenEntity(null)}
+      />
+      <StockModal open={openEntity === 'stock'} mode="add" onClose={() => setOpenEntity(null)} />
+      <BillModal open={openEntity === 'bill'} mode="add" onClose={() => setOpenEntity(null)} />
+
+      <CategoryModal
+        open={openEntity === 'category'}
+        mode="add"
+        onClose={() => setOpenEntity(null)}
+      />
     </Box>
   )
 }

@@ -12,20 +12,18 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-export type SortKey = 'name' | 'balance' | 'totalPurchases' | 'createdAt' | 'updatedAt'
+export type SortOrder = 'asc' | 'desc'
 
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: 'name', label: 'Name' },
-  { key: 'balance', label: 'Balance' },
-  { key: 'totalPurchases', label: 'Total Purchases' },
-  { key: 'createdAt', label: 'Created Time' },
-  { key: 'updatedAt', label: 'Last Modified Time' },
-]
+export type SortOption = {
+  key: string
+  label: string
+}
 
 type Props = {
-  sortBy?: SortKey
-  sortOrder?: 'asc' | 'desc'
-  onSortChange: (key: SortKey, order: 'asc' | 'desc') => void
+  sortBy: string
+  sortOrder: 'asc' | 'desc'
+  sortOptions: SortOption[]
+  onSortChange: (key: string, order: 'asc' | 'desc') => void
   onImport: () => void
   onExport: () => void
   onRefresh?: () => void
@@ -34,6 +32,7 @@ type Props = {
 export function TableActionsPopover({
   sortBy,
   sortOrder,
+  sortOptions,
   onSortChange,
   onImport,
   onExport,
@@ -86,7 +85,7 @@ export function TableActionsPopover({
                   onMouseLeave={() => setSortOpen(false)}
                 >
                   <VStack align="stretch" gap="1">
-                    {SORT_OPTIONS.map((item) => {
+                    {sortOptions.map((item) => {
                       const active = sortBy === item.key
 
                       return (
@@ -102,8 +101,7 @@ export function TableActionsPopover({
                             bg: active ? 'blue.500' : 'gray.100',
                           }}
                           onClick={() => {
-                            const nextOrder =
-                              sortBy === item.key && sortOrder === 'asc' ? 'desc' : 'asc'
+                            const nextOrder = active && sortOrder === 'asc' ? 'desc' : 'asc'
 
                             onSortChange(item.key, nextOrder)
                             setSortOpen(false)

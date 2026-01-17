@@ -1,7 +1,7 @@
 import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCustomers } from '@/hooks/useCustomer'
 import CustomerDialog, { CustomerFormValues } from '@/components/modals/CustomerModal'
 import { useCustomerActions } from '@/hooks/useCustomerActions'
@@ -12,14 +12,15 @@ import { Plus } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
-import type { SortKey } from '@/components/popovers/TableActionsPopover'
+
+import { isFrontendPagination } from '@/utils/isFrontendPagination'
 
 import { useCustomerImport } from '@/hooks/useCustomerImport'
 import { useCustomerExport } from '@/hooks/useCustomerExport'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExpandableSearch } from '@/components/common/ExpandableSearch'
 
 function Customers() {
-  const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
   const [editId, setEditId] = useState<string | null>(null)
@@ -27,8 +28,10 @@ function Customers() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
-  const [sortBy, setSortBy] = useState<SortKey | undefined>(undefined)
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(search)
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   const { deleteCustomer } = useCustomerActions(deleteId ?? '')
   const importCustomers = useCustomerImport()
@@ -37,21 +40,46 @@ function Customers() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
+  const [page, setPage] = useState(1)
   const limit = 20
+  const frontend = isFrontendPagination(sortBy, sortOrder)
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search), 400)
+    return () => clearTimeout(id)
+  }, [search])
 
   const { data, isLoading } = useCustomers({
-    page,
-    limit,
-    ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+    search: debouncedSearch || undefined,
+    ...(frontend ? { sortBy, sortOrder } : { page, limit }),
   })
 
-  const customers = data?.customers ?? []
-  const pagination = data?.pagination ?? {
-    currentPage: 1,
-    totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  }
+  const rawCustomers = data?.customers ?? []
+
+  const customers = useMemo(() => {
+    if (!frontend) return rawCustomers
+
+    const start = (page - 1) * limit
+    return rawCustomers.slice(start, start + limit)
+  }, [rawCustomers, page, limit, frontend])
+
+  const pagination = frontend
+    ? {
+        currentPage: page,
+        totalPages: Math.max(1, Math.ceil(rawCustomers.length / limit)),
+        hasNextPage: page * limit < rawCustomers.length,
+        hasPreviousPage: page > 1,
+      }
+    : (data?.pagination ?? {
+        currentPage: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
+
+  useEffect(() => {
+    setPage(1)
+  }, [sortBy, sortOrder, search])
 
   const customerColumns = [
     { key: 'name', header: 'Contact Name', render: (c: any) => c.name },
@@ -92,6 +120,12 @@ function Customers() {
         setDeleteOpen(true)
       },
     },
+  ]
+
+  const CUSTOMER_SORT_OPTIONS = [
+    { key: 'name', label: 'Name' },
+    { key: 'balance', label: 'Balance' },
+    { key: 'createdAt', label: 'Created Time' },
   ]
 
   const dispatch = useDispatch()
@@ -142,14 +176,23 @@ function Customers() {
 
       <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
         <Flex justify="space-between" align="center" mt={8} w="100%">
-          <FilterSelect
-            options={customerFilters}
-            value={value}
-            defaultValue={['all']}
-            placeholder="All customers"
-            onChange={setValue}
-          />
+          <HStack gap={2}>
+            <ExpandableSearch
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search customers…"
+            />
 
+            {/* Filter */}
+            <FilterSelect
+              options={customerFilters}
+              value={value}
+              defaultValue={['all']}
+              placeholder="All customers"
+              onChange={setValue}
+              width="200px"
+            />
+          </HStack>
           <HStack gap={2}>
             <IconButton
               aria-label="Add"
@@ -173,6 +216,7 @@ function Customers() {
             <TableActionsPopover
               sortBy={sortBy}
               sortOrder={sortOrder}
+              sortOptions={CUSTOMER_SORT_OPTIONS}
               onSortChange={(key, order) => {
                 setPage(1)
                 setSortBy(key)
@@ -185,7 +229,16 @@ function Customers() {
           </HStack>
         </Flex>
 
-        <Box bg="white" mt={6} rounded="lg" p={4}>
+        <Box
+          bg="white"
+          mt={6}
+          rounded="lg"
+          shadow="lightGray"
+          border="1px solid"
+          borderColor="gray.100"
+          w="100%"
+          p={{ base: 2, md: 4 }}
+        >
           <CommonTable
             columns={customerColumns}
             data={customers}
@@ -195,7 +248,18 @@ function Customers() {
           />
         </Box>
 
-        <Flex justify="center" mt={4} gap={2}>
+        <Flex
+          justify="center"
+          align="center"
+          borderRadius="lg"
+          mt={2}
+          mb={2}
+          p={2}
+          bg={'white'}
+          shadow="lightGray"
+          gap={4}
+          width="100%"
+        >
           <Button
             onClick={() => setPage(pagination.currentPage - 1)}
             disabled={!pagination.hasPreviousPage}

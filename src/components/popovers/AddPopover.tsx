@@ -1,6 +1,17 @@
 import { Box, Text, VStack, HStack, Portal } from '@chakra-ui/react'
 import { Popover } from '@chakra-ui/react'
 import { UserPlus, Package, FileText, Tags, Layers, Receipt } from 'lucide-react'
+import { useState } from 'react'
+
+type AddPopoverProps = {
+  trigger: React.ReactNode
+  onAddCustomer: () => void
+  onAddProduct: () => void
+  onAddInvoice: () => void
+  onAddCategory: () => void
+  onAddStock: () => void
+  onAddBill: () => void
+}
 
 type AddAction = {
   label: string
@@ -8,14 +19,65 @@ type AddAction = {
   onClick: () => void
 }
 
-export const AddPopover = ({ trigger }: { trigger: React.ReactNode }) => {
+export const AddPopover = ({
+  trigger,
+  onAddCustomer,
+  onAddProduct,
+  onAddInvoice,
+  onAddCategory,
+  onAddStock,
+  onAddBill,
+}: AddPopoverProps) => {
+  const [open, setOpen] = useState(false)
   const actions: AddAction[] = [
-    { label: 'Customer', icon: <UserPlus size={16} />, onClick: () => {} },
-    { label: 'Product', icon: <Package size={16} />, onClick: () => {} },
-    { label: 'Invoice', icon: <FileText size={16} />, onClick: () => {} },
-    { label: 'Category', icon: <Tags size={16} />, onClick: () => {} },
-    { label: 'Stock', icon: <Layers size={16} />, onClick: () => {} },
-    { label: 'Bill', icon: <Receipt size={16} />, onClick: () => {} },
+    {
+      label: 'Customer',
+      icon: <UserPlus size={16} />,
+      onClick: () => {
+        setOpen(false)
+        onAddCustomer()
+      },
+    },
+    {
+      label: 'Product',
+      icon: <Package size={16} />,
+      onClick: () => {
+        setOpen(false)
+        onAddProduct()
+      },
+    },
+    {
+      label: 'Invoice',
+      icon: <FileText size={16} />,
+      onClick: () => {
+        setOpen(false)
+        onAddInvoice()
+      },
+    },
+    {
+      label: 'Category',
+      icon: <Tags size={16} />,
+      onClick: () => {
+        setOpen(false)
+        onAddCategory()
+      },
+    },
+    {
+      label: 'Stock',
+      icon: <Layers size={16} />,
+      onClick: () => {
+        setOpen(false)
+        onAddStock()
+      },
+    },
+    {
+      label: 'Bill',
+      icon: <Receipt size={16} />,
+      onClick: () => {
+        setOpen(false)
+        onAddBill()
+      },
+    },
   ]
 
   return (
@@ -32,6 +94,7 @@ export const AddPopover = ({ trigger }: { trigger: React.ReactNode }) => {
             borderRadius="lg"
             shadow="lightGray"
             p={2}
+            zIndex={10}
           >
             <VStack align="stretch" gap={1}>
               {actions.map((action) => (

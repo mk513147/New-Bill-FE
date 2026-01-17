@@ -1,38 +1,43 @@
-import API_ENDPOINTS from '@/api/apiEndpoints'
 import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 import { useQuery } from '@tanstack/react-query'
+import { isFrontendPagination } from '@/utils/isFrontendPagination'
 
-export const getProduct = async () => {
-  const res = await API.get(API_ENDPOINTS.PRODUCTS.BASE)
+export type ProductQueryParams = {
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
+export const getProducts = async (params: ProductQueryParams = {}) => {
+  const frontend = isFrontendPagination(params.sortBy, params.sortOrder)
+
+  const endpoint = frontend ? API_ENDPOINTS.PRODUCTS.SEARCH : API_ENDPOINTS.PRODUCTS.BASE
+
+  const res = await API.get(endpoint, { params })
+
   return res.data?.data || null
 }
 
-export const getAllProducts = async (limit = 20, page = 1) => {
-  const res = await API.get(API_ENDPOINTS.PRODUCTS.BASE, {
-    params: { limit, page },
-  })
+export const useProducts = (params: ProductQueryParams = {}) => {
+  const frontend = isFrontendPagination(params.sortBy, params.sortOrder)
 
-  return res.data?.data || null
-}
-
-export const useProduct = () => {
   return useQuery({
-    queryKey: ['getProduct'],
-    queryFn: getProduct,
-    retry: false,
-    staleTime: 1000 * 60 * 10,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
-}
-
-export const useAllProducts = (limit = 20, page = 1) => {
-  return useQuery({
-    queryKey: ['allProducts', limit, page],
-    queryFn: () => getAllProducts(limit, page),
-    retry: false,
+    queryKey: [
+      'products',
+      {
+        search: params.search,
+        sortBy: params.sortBy,
+        sortOrder: params.sortOrder,
+        mode: frontend ? 'frontend' : 'backend',
+        page: frontend ? undefined : params.page,
+        limit: frontend ? undefined : params.limit,
+      },
+    ],
+    queryFn: () => getProducts(params),
     staleTime: 60 * 1000,
-    refetchOnWindowFocus: true,
+    retry: false,
   })
 }

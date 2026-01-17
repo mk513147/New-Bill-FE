@@ -1,21 +1,26 @@
-import { Flex, HStack, Text, Heading, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
 import ProductDialog, { ProductFormValues } from '@/components/modals/ProductModal'
-import { useAllProducts } from '@/hooks/useProducts'
+import { useProducts } from '@/hooks/useProducts'
 import { useProductActions } from '@/hooks/useProductActions'
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { useDispatch } from 'react-redux'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { Plus } from 'lucide-react'
 import { CommonTable } from '@/components/common/CommonTable'
+import { useProductImport } from '@/hooks/useProductImport'
+import { useProductExport } from '@/hooks/useProductExport'
+import { useQueryClient } from '@tanstack/react-query'
+import { isFrontendPagination } from '@/utils/isFrontendPagination'
+import { ExpandableSearch } from '@/components/common/ExpandableSearch'
+import { FilterSelect } from '@/components/common/FilterSelect'
 
 function Products() {
-  const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add')
   const [editId, setEditId] = useState<string | null>(null)
@@ -23,18 +28,59 @@ function Products() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(search)
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
-  const limit = 20
   const { deleteProduct } = useProductActions(deleteId ?? '')
+  const importProducts = useProductImport()
+  const exportProducts = useProductExport()
+  const queryClient = useQueryClient()
 
-  const { data, isLoading } = useAllProducts(limit, page)
-  const products = data?.products ?? []
-  const pagination = data?.pagination ?? {
-    currentPage: 1,
-    totalPages: 3,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  }
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const [page, setPage] = useState(1)
+  const limit = 20
+
+  const frontend = isFrontendPagination(sortBy, sortOrder)
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search), 400)
+    return () => clearTimeout(id)
+  }, [search])
+
+  const { data, isLoading } = useProducts({
+    search: debouncedSearch || undefined,
+    ...(frontend ? { sortBy, sortOrder } : { page, limit }),
+  })
+
+  const rawProducts = data?.products ?? []
+
+  const products = useMemo(() => {
+    if (!frontend) return rawProducts
+
+    const start = (page - 1) * limit
+    return rawProducts.slice(start, start + limit)
+  }, [rawProducts, page, limit, frontend])
+
+  const pagination = frontend
+    ? {
+        currentPage: page,
+        totalPages: Math.max(1, Math.ceil(rawProducts.length / limit)),
+        hasNextPage: page * limit < rawProducts.length,
+        hasPreviousPage: page > 1,
+      }
+    : (data?.pagination ?? {
+        currentPage: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
+
+  useEffect(() => {
+    setPage(1)
+  }, [sortBy, sortOrder, search])
 
   const productColumns = [
     {
@@ -47,11 +93,13 @@ function Products() {
       header: 'Barcode',
       render: (p: any) => p.barcode,
     },
+
     {
       key: 'category',
       header: 'Category',
-      render: (p: any) => p.categoryId,
+      render: (p: any) => p.categoryId?.name ?? '—',
     },
+
     {
       key: 'sellingPrice',
       header: 'Selling Price',
@@ -99,6 +147,12 @@ function Products() {
     },
   ]
 
+  const PRODUCT_SORT_OPTIONS = [
+    { key: 'name', label: 'Name' },
+    { key: 'sellingPrice', label: 'Selling Price' },
+    { key: 'stock', label: 'Stock' },
+    { key: 'createdAt', label: 'Created Time' },
+  ]
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -108,31 +162,61 @@ function Products() {
     }
   }, [dispatch])
 
+  const [value, setValue] = useState<string[]>([])
+
+  const productFilters = [
+    { label: 'All Products', value: 'all' },
+    { label: 'Low Stock', value: 'active' },
+    { label: 'Out of Stock', value: 'inactive' },
+  ]
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    importProducts.mutate(file)
+    e.target.value = ''
+  }
+
+  const handleExportClick = () => {
+    exportProducts.mutate({
+      page,
+      limit,
+      ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+    })
+  }
+
   return (
     <>
-      <Flex
-        bg="gray.100"
-        width="100%"
-        height="100%"
-        overflowX="auto"
-        flexDir="column"
-        pl={{ base: 3, sm: 2, md: 6 }}
-        pr={{ base: 3, sm: 2, md: 6 }}
-        pt={{ base: 3, sm: 4, md: 1 }}
-        mb={3}
-      >
-        <Flex
-          justify="space-between"
-          align="center"
-          mt={8}
-          w="100%"
-          gap={4}
-          flexWrap={{ base: 'wrap', md: 'nowrap' }}
-        >
-          <Heading size="xl" color="gray.800" whiteSpace="nowrap">
-            Products
-          </Heading>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx,.xls"
+        hidden
+        onChange={handleFileChange}
+      />
+      <Flex bg="gray.100" width="100%" height="100%" overflowX="auto" flexDir="column" px={6}>
+        <Flex justify="space-between" align="center" mt={8} w="100%" gap={4}>
+          <HStack gap={2}>
+            <ExpandableSearch
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search Products"
+            />
 
+            {/* Filter */}
+            <FilterSelect
+              options={productFilters}
+              value={value}
+              defaultValue={['all']}
+              placeholder="All Products"
+              onChange={setValue}
+              width="200px"
+            />
+          </HStack>
           <HStack gap={2}>
             <IconButton
               aria-label="Add Product"
@@ -157,9 +241,19 @@ function Products() {
               </HStack>
             </IconButton>
 
-            <HStack h="32px" _hover={{ bg: 'gray.300' }}>
-              <TableActionsPopover />
-            </HStack>
+            <TableActionsPopover
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              sortOptions={PRODUCT_SORT_OPTIONS}
+              onSortChange={(key, order) => {
+                setPage(1)
+                setSortBy(key)
+                setSortOrder(order)
+              }}
+              onImport={handleImportClick}
+              onExport={handleExportClick}
+              onRefresh={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}
+            />
           </HStack>
         </Flex>
 

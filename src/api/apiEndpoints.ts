@@ -2,6 +2,11 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
+    SIGNUP: '/auth/signup',
+    VIEW: '/auth/view',
+    EDIT: '/auth/edit',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    SUBSCRIPTION: '/auth/subscription',
   },
 
   MERCHANT: {
@@ -10,6 +15,7 @@ export const API_ENDPOINTS = {
 
   CUSTOMERS: {
     BASE: '/customers/getCustomer',
+    SEARCH: '/customers/search',
     CREATE: '/customers/createCustomer',
     UPDATE: '/customers/updateCustomer',
     DELETE: '/customers/deleteCustomer',
@@ -19,13 +25,29 @@ export const API_ENDPOINTS = {
 
   PRODUCTS: {
     BASE: '/products/getProducts',
+    SEARCH: '/products/search',
     CREATE: '/products/createProduct',
     UPDATE: '/products/updateProduct',
     DELETE: '/products/deleteProduct',
+    IMPORT: '/products/import',
+    EXPORT: '/products/export',
+  },
+
+  CATEGORY: {
+    BASE: '/category/list',
+    SEARCH: '/category/search',
+    CREATE: '/category/create',
+    UPDATE: '/category/update',
+    DELETE: '/category/delete',
+    IMPORT: '/category/import',
+    EXPORT: '/category/export',
   },
 
   SUPPLIERS: {
-    BASE: '/suppliers',
+    BASE: '/supplier/list',
+    CREATE: '/supplier/create',
+    UPDATE: '/supplier/update',
+    DELETE: '/supplier/delete',
   },
 
   STAFF: {
@@ -35,11 +57,59 @@ export const API_ENDPOINTS = {
     DELETE: '/staff/delete',
   },
 
-  CATEGORY: {
-    BASE: '/category/list',
-    CREATE: '/category/create',
-    UPDATE: '/category/update',
-    DELETE: '/category/delete',
+  PURCHASE: {
+    BASE: '/purchase/list',
+    CREATE: '/purchase/create',
+    GET_BY_ID: '/purchase',
+    UPDATE: '/purchase/update',
+    DELETE: '/purchase/delete',
+  },
+
+  PURCHASE_RETURN: {
+    BASE: '/purchase-return/list',
+    CREATE: '/purchase-return/create',
+    GET_BY_ID: '/purchase-return',
+  },
+
+  SALE: {
+    BASE: '/sale/list',
+    CREATE: '/sale/create',
+    GET_BY_ID: '/sale',
+    UPDATE: '/sale/update',
+    DELETE: '/sale/delete',
+    INVOICE: '/sale/invoice',
+  },
+
+  SALE_RETURN: {
+    BASE: '/sale-return/list',
+    CREATE: '/sale-return/create',
+    GET_BY_ID: '/sale-return',
+  },
+
+  PAYMENT: {
+    BASE: '/payment/list',
+    CREATE: '/payment/create',
+    GET_BY_ID: '/payment',
+  },
+
+  STOCK_HISTORY: {
+    BASE: '/stock-history/list',
+    PRODUCT: '/stock-history/product',
+    ADJUST: '/stock-history/adjust',
+  },
+
+  DASHBOARD: {
+    STATS: '/dashboard/stats',
+  },
+
+  ATTENDANCE: {
+    MARK: '/attendance/mark',
+    STAFF: '/attendance/staff',
+    DATE: '/attendance/date',
+  },
+
+  SYSTEM: {
+    CHECK_CONNECTION: '/checkConnection',
   },
 }
 

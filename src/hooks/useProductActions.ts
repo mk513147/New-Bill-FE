@@ -13,7 +13,7 @@ export const useProductActions = (pubId: string) => {
       API.post(API_ENDPOINTS.PRODUCTS.CREATE, payload).then((res: any) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allProducts'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
       toast('Product created successfully', 'success')
     },
 
@@ -27,7 +27,7 @@ export const useProductActions = (pubId: string) => {
       API.patch(`${API_ENDPOINTS.PRODUCTS.UPDATE}/${pubId}`, payload).then((res: any) => res.data),
 
     onSuccess: (updatedProduct) => {
-      queryClient.setQueriesData({ queryKey: ['allProducts'] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: ['products'] }, (old: any) => {
         if (!old?.data) return old
 
         return {
@@ -36,7 +36,7 @@ export const useProductActions = (pubId: string) => {
         }
       })
 
-      queryClient.invalidateQueries({ queryKey: ['allProducts'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
       toast('Product updated successfully', 'success')
     },
 
@@ -50,7 +50,7 @@ export const useProductActions = (pubId: string) => {
       API.delete(`${API_ENDPOINTS.PRODUCTS.DELETE}/${pubId}`).then((res: any) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allProducts'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
       toast('Product deleted successfully', 'success')
     },
 

@@ -12,7 +12,7 @@ import { Plus } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
-import type { SortKey } from '@/components/popovers/TableActionsPopover'
+
 import { isFrontendPagination } from '@/utils/isFrontendPagination'
 
 import { useCustomerImport } from '@/hooks/useCustomerImport'
@@ -30,8 +30,8 @@ function Customers() {
   const [deleteName, setDeleteName] = useState('')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState(search)
-  const [sortBy, setSortBy] = useState<SortKey | undefined>(undefined)
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined)
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   const { deleteCustomer } = useCustomerActions(deleteId ?? '')
   const importCustomers = useCustomerImport()
@@ -122,6 +122,12 @@ function Customers() {
     },
   ]
 
+  const CUSTOMER_SORT_OPTIONS = [
+    { key: 'name', label: 'Name' },
+    { key: 'balance', label: 'Balance' },
+    { key: 'createdAt', label: 'Created Time' },
+  ]
+
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -210,6 +216,7 @@ function Customers() {
             <TableActionsPopover
               sortBy={sortBy}
               sortOrder={sortOrder}
+              sortOptions={CUSTOMER_SORT_OPTIONS}
               onSortChange={(key, order) => {
                 setPage(1)
                 setSortBy(key)

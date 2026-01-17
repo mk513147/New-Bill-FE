@@ -10,7 +10,7 @@ import { useProducts } from '@/hooks/useProducts'
 import { useProductActions } from '@/hooks/useProductActions'
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { useDispatch } from 'react-redux'
-import { SortKey, TableActionsPopover } from '@/components/popovers/TableActionsPopover'
+import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { Plus } from 'lucide-react'
 import { CommonTable } from '@/components/common/CommonTable'
 import { useProductImport } from '@/hooks/useProductImport'
@@ -30,8 +30,8 @@ function Products() {
   const [deleteName, setDeleteName] = useState('')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState(search)
-  const [sortBy, setSortBy] = useState<SortKey | undefined>(undefined)
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined)
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   const { deleteProduct } = useProductActions(deleteId ?? '')
   const importProducts = useProductImport()
@@ -147,6 +147,12 @@ function Products() {
     },
   ]
 
+  const PRODUCT_SORT_OPTIONS = [
+    { key: 'name', label: 'Name' },
+    { key: 'sellingPrice', label: 'Selling Price' },
+    { key: 'stock', label: 'Stock' },
+    { key: 'createdAt', label: 'Created Time' },
+  ]
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -238,6 +244,7 @@ function Products() {
             <TableActionsPopover
               sortBy={sortBy}
               sortOrder={sortOrder}
+              sortOptions={PRODUCT_SORT_OPTIONS}
               onSortChange={(key, order) => {
                 setPage(1)
                 setSortBy(key)

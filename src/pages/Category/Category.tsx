@@ -19,7 +19,6 @@ import { useCategoryActions } from '@/hooks/useCategoryActions'
 import { useCategoryImport } from '@/hooks/useCategoryImport'
 import { useCategoryExport } from '@/hooks/useCategoryExport'
 
-import type { SortKey } from '@/components/popovers/TableActionsPopover'
 import { isFrontendPagination } from '@/utils/isFrontendPagination'
 
 function Categories() {
@@ -36,8 +35,8 @@ function Categories() {
 
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState(search)
-  const [sortBy, setSortBy] = useState<SortKey | undefined>()
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>()
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   const [page, setPage] = useState(1)
   const limit = 20
@@ -138,6 +137,12 @@ function Categories() {
     },
   ]
 
+  const CATEGORY_SORT_OPTIONS = [
+    { key: 'name', label: 'Name' },
+    { key: 'createdAt', label: 'Created Time' },
+    { key: 'updatedAt', label: 'Last Modified Time' },
+  ]
+
   const handleImportClick = () => {
     fileInputRef.current?.click()
   }
@@ -209,6 +214,7 @@ function Categories() {
             <TableActionsPopover
               sortBy={sortBy}
               sortOrder={sortOrder}
+              sortOptions={CATEGORY_SORT_OPTIONS}
               onSortChange={(key, order) => {
                 setPage(1)
                 setSortBy(key)

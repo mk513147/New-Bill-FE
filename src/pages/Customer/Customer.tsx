@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, IconButton, Button, Box, Input, VStack } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons/index.ts'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -8,7 +8,7 @@ import { useCustomerActions } from '@/hooks/useCustomerActions'
 import ConfirmDeleteDialog from '@/components/modals/ConfirmDelete'
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { useDispatch } from 'react-redux'
-import { Plus } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { CommonTable } from '@/components/common/CommonTable'
 import { FilterSelect } from '@/components/common/FilterSelect'
@@ -18,6 +18,7 @@ import { isFrontendPagination } from '@/utils/isFrontendPagination'
 import { useCustomerImport } from '@/hooks/useCustomerImport'
 import { useCustomerExport } from '@/hooks/useCustomerExport'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExpandableSearch } from '@/components/common/ExpandableSearch'
 
 function Customers() {
   const [open, setOpen] = useState(false)
@@ -175,28 +176,23 @@ function Customers() {
 
       <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
         <Flex justify="space-between" align="center" mt={8} w="100%">
-          <FilterSelect
-            options={customerFilters}
-            value={value}
-            defaultValue={['all']}
-            placeholder="All customers"
-            onChange={setValue}
-          />
-          <Box maxW="280px" w="100%">
-            <input
+          <HStack gap={2}>
+            <ExpandableSearch
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search customers…"
-              style={{
-                width: '100%',
-                height: '32px',
-                padding: '0 10px',
-                borderRadius: '6px',
-                border: '1px solid #E2E8F0',
-              }}
             />
-          </Box>
 
+            {/* Filter */}
+            <FilterSelect
+              options={customerFilters}
+              value={value}
+              defaultValue={['all']}
+              placeholder="All customers"
+              onChange={setValue}
+              width="200px"
+            />
+          </HStack>
           <HStack gap={2}>
             <IconButton
               aria-label="Add"
@@ -232,7 +228,16 @@ function Customers() {
           </HStack>
         </Flex>
 
-        <Box bg="white" mt={6} rounded="lg" p={4}>
+        <Box
+          bg="white"
+          mt={6}
+          rounded="lg"
+          shadow="lightGray"
+          border="1px solid"
+          borderColor="gray.100"
+          w="100%"
+          p={{ base: 2, md: 4 }}
+        >
           <CommonTable
             columns={customerColumns}
             data={customers}
@@ -242,7 +247,18 @@ function Customers() {
           />
         </Box>
 
-        <Flex justify="center" mt={4} gap={2}>
+        <Flex
+          justify="center"
+          align="center"
+          borderRadius="lg"
+          mt={2}
+          mb={2}
+          p={2}
+          bg={'white'}
+          shadow="lightGray"
+          gap={4}
+          width="100%"
+        >
           <Button
             onClick={() => setPage(pagination.currentPage - 1)}
             disabled={!pagination.hasPreviousPage}

@@ -48,7 +48,7 @@ export const FilterSelect = ({
         defaultValue={defaultValue}
         onValueChange={(e) => onChange?.(e.value)}
         variant="subtle"
-        size="md"
+        size="sm"
       >
         <Select.HiddenSelect />
 

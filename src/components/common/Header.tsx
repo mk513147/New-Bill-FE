@@ -31,6 +31,11 @@ export const Header = () => {
       position="sticky"
       top={0}
       zIndex={999}
+      css={{
+        '@media print': {
+          display: 'none',
+        },
+      }}
     >
       <Flex h="100%" align="center" justify="space-between">
         <Text

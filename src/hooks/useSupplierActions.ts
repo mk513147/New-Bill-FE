@@ -10,6 +10,7 @@ export type SupplierPayload = {
   name: string
   mobileNumber: string
   address?: string
+  pendingAmount?: number
 }
 
 export const useSupplierActions = () => {

@@ -7,6 +7,7 @@ export interface SupplierFormValues {
   name: string
   mobileNumber: string
   address?: string
+  pendingAmount?: number
 }
 
 interface SupplierDialogProps {
@@ -28,6 +29,7 @@ export default function SupplierModal({
     name: '',
     mobileNumber: '',
     address: '',
+    pendingAmount: 0,
   })
 
   const { createSupplier, updateSupplier } = useSupplierActions()
@@ -40,12 +42,14 @@ export default function SupplierModal({
         name: '',
         mobileNumber: '',
         address: '',
+        pendingAmount: 0,
       })
     }
   }, [defaultValues, mode])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    const { name, value, type } = e.target
+    setFormData((prev) => ({ ...prev, [name]: type === 'number' ? Number(value) : value }))
   }
 
   function handleSubmit() {
@@ -53,6 +57,7 @@ export default function SupplierModal({
       name: formData.name.trim(),
       mobileNumber: formData.mobileNumber.trim(),
       address: formData.address?.trim() || '',
+      pendingAmount: formData.pendingAmount ?? 0,
     }
 
     if (mode === 'add') {
@@ -148,7 +153,7 @@ export default function SupplierModal({
                 />
               </Field.Root>
 
-              <Field.Root>
+              <Field.Root mb={3}>
                 <Field.Label color="gray.700" fontWeight="600">
                   Address
                 </Field.Label>
@@ -159,6 +164,22 @@ export default function SupplierModal({
                   placeholder="Enter address"
                   bg="white"
                   borderColor="gray.200"
+                />
+              </Field.Root>
+
+              <Field.Root>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Pending Amount (₹)
+                </Field.Label>
+                <Input
+                  name="pendingAmount"
+                  type="number"
+                  value={formData.pendingAmount ?? 0}
+                  onChange={handleChange}
+                  placeholder="0"
+                  bg="white"
+                  borderColor="gray.200"
+                  min={0}
                 />
               </Field.Root>
             </Dialog.Body>

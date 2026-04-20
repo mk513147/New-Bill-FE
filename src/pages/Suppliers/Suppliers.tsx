@@ -164,6 +164,7 @@ function Suppliers() {
           name: item.name,
           mobileNumber: item.mobileNumber,
           address: item.address,
+          pendingAmount: item.pendingAmount ?? 0,
         })
         setOpen(true)
       },

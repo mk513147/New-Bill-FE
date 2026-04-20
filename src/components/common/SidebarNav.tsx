@@ -1,7 +1,7 @@
 import { HStack, VStack, Text, Box } from '@chakra-ui/react'
 import { NavLink } from 'react-router-dom'
 import { FaRegClipboard } from 'react-icons/fa'
-import { FiUsers, FiTruck } from 'react-icons/fi'
+import { FiUsers, FiTruck, FiShoppingCart } from 'react-icons/fi'
 import {
   MdOutlineSell,
   MdReceiptLong,
@@ -30,6 +30,7 @@ const sections = [
       { label: 'Products', path: '/products', icon: RxBox },
       { label: 'Category', path: '/category', icon: MdCategory },
       { label: 'Suppliers', path: '/suppliers', icon: FiTruck },
+      { label: 'Purchase', path: '/purchase', icon: FiShoppingCart },
       { label: 'Stock', path: '/stocks', icon: MdInventory },
     ],
   },

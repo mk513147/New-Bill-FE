@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack } from '@chakra-ui/react'
+import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack, Badge } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
@@ -6,12 +6,22 @@ import { Plus } from 'lucide-react'
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
 import { ExpandableSearch } from '@/components/common/ExpandableSearch'
+import PaymentModal from '@/components/modals/PaymentModal'
 
 import { usePayment } from '@/hooks/usePayment'
+
+const paymentTypeColor = {
+  supplier: 'orange',
+  customer: 'blue',
+} as const
 
 const Payments = () => {
   const dispatch = useDispatch()
 
+  const [modalOpen, setModalOpen] = useState(false)
+  const [defaultType, setDefaultType] = useState<'supplier' | 'customer'>('supplier')
+
+  const [typeFilter, setTypeFilter] = useState<'all' | 'supplier' | 'customer'>('all')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState(search)
   const [page, setPage] = useState(1)
@@ -43,9 +53,12 @@ const Payments = () => {
 
   const filteredPayments = useMemo(() => {
     const keyword = debouncedSearch.trim().toLowerCase()
-    if (!keyword) return paymentData
 
     return paymentData.filter((p) => {
+      if (typeFilter !== 'all' && p.paidToType !== typeFilter) return false
+
+      if (!keyword) return true
+
       const haystack = [
         p.paidToType,
         p.supplierId?.name || '',
@@ -58,7 +71,7 @@ const Payments = () => {
 
       return haystack.includes(keyword)
     })
-  }, [paymentData, debouncedSearch])
+  }, [paymentData, debouncedSearch, typeFilter])
 
   const payments = useMemo(() => {
     const start = (page - 1) * limit
@@ -83,11 +96,14 @@ const Payments = () => {
     {
       key: 'paidToType',
       header: 'Type',
-      width: '100px',
+      width: '130px',
       render: (p: any) => (
-        <Text fontSize="sm" fontWeight="600" textTransform="capitalize">
-          {p.paidToType || '-'}
-        </Text>
+        <Badge
+          colorPalette={paymentTypeColor[p.paidToType as keyof typeof paymentTypeColor] || 'gray'}
+          textTransform="capitalize"
+        >
+          {p.paidToType === 'supplier' ? 'Pay Supplier' : 'From Customer'}
+        </Badge>
       ),
     },
     {
@@ -196,6 +212,63 @@ const Payments = () => {
               placeholder="Search payments..."
               expandedWidth="300px"
             />
+
+            <HStack bg="white" border="1px solid" borderColor="gray.100" borderRadius="10px" p={1}>
+              {(['all', 'supplier', 'customer'] as const).map((t) => (
+                <Button
+                  key={t}
+                  size="sm"
+                  variant={typeFilter === t ? 'solid' : 'ghost'}
+                  bg={typeFilter === t ? 'gray.900' : 'transparent'}
+                  color={typeFilter === t ? 'white' : 'gray.700'}
+                  _hover={{ bg: typeFilter === t ? 'gray.900' : 'gray.100' }}
+                  onClick={() => setTypeFilter(t)}
+                  textTransform="capitalize"
+                >
+                  {t === 'all' ? 'All' : t === 'supplier' ? 'Supplier' : 'Customer'}
+                </Button>
+              ))}
+            </HStack>
+          </HStack>
+
+          <HStack gap={2}>
+            <Button
+              bg="orange.500"
+              color="white"
+              h="38px"
+              px={4}
+              _hover={{ bg: 'orange.600' }}
+              onClick={() => {
+                setDefaultType('supplier')
+                setModalOpen(true)
+              }}
+            >
+              <HStack gap={1.5}>
+                <Plus size={16} />
+                <Text fontSize="sm" fontWeight="700">
+                  Pay Supplier
+                </Text>
+              </HStack>
+            </Button>
+
+            <Button
+              bg="blue.600"
+              color="white"
+              h="38px"
+              px={4}
+              _hover={{ bg: 'blue.700' }}
+              onClick={() => {
+                setDefaultType('customer')
+                setModalOpen(true)
+              }}
+            >
+              <HStack gap={1.5}>
+                <Plus size={16} />
+                <Text fontSize="sm" fontWeight="700">
+                  Receive from Customer
+                </Text>
+              </HStack>
+            </Button>
           </HStack>
         </Flex>
 
@@ -277,6 +350,11 @@ const Payments = () => {
           </Text>
         </VStack>
       </Flex>
+      <PaymentModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        defaultType={defaultType}
+      />
     </>
   )
 }

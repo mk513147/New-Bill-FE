@@ -15,6 +15,22 @@ const paymentTypeColor = {
   customer: 'blue',
 } as const
 
+const getInvoiceFromPayment = (payment: any) => {
+  const directInvoice =
+    payment?.invoiceNumber ||
+    payment?.billNumber ||
+    payment?.saleId?.invoiceNumber ||
+    payment?.purchaseId?.invoiceNumber
+
+  if (directInvoice) return String(directInvoice)
+
+  const note = String(payment?.note || '')
+  const invFromNote = note.match(/INV\s*:\s*([^|\n]+)/i)?.[1]?.trim()
+  if (invFromNote) return invFromNote
+
+  return ''
+}
+
 const Payments = () => {
   const dispatch = useDispatch()
 
@@ -59,10 +75,14 @@ const Payments = () => {
 
       if (!keyword) return true
 
+      const invoiceText = getInvoiceFromPayment(p)
+
       const haystack = [
         p.paidToType,
         p.supplierId?.name || '',
         p.customerId?.name || '',
+        p.partyName || '',
+        invoiceText,
         p.paymentMode,
         p.note || '',
       ]
@@ -110,7 +130,13 @@ const Payments = () => {
       key: 'entity',
       header: 'Entity',
       width: '200px',
-      render: (p: any) => p.supplierId?.name || p.customerId?.name || '-',
+      render: (p: any) => p.supplierId?.name || p.customerId?.name || p.partyName || '-',
+    },
+    {
+      key: 'invoiceNumber',
+      header: 'Invoice',
+      width: '160px',
+      render: (p: any) => getInvoiceFromPayment(p) || '-',
     },
     {
       key: 'paymentDate',
@@ -209,7 +235,7 @@ const Payments = () => {
             <ExpandableSearch
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search payments..."
+              placeholder="Search by invoice, party, mode, note..."
               expandedWidth="300px"
             />
 

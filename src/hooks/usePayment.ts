@@ -16,6 +16,17 @@ export type PaymentRecord = {
     name: string
     mobileNumber?: string
   } | null
+  partyName?: string
+  invoiceNumber?: string
+  billNumber?: string
+  saleId?: {
+    _id: string
+    invoiceNumber?: string
+  } | null
+  purchaseId?: {
+    _id: string
+    invoiceNumber?: string
+  } | null
   amount: number
   paymentMode: 'cash' | 'upi' | 'bank' | 'other'
   note?: string
@@ -29,11 +40,47 @@ const getPayments = async (): Promise<PaymentRecord[]> => {
   return res.data?.data || []
 }
 
+export type PartyDueRow = {
+  paidToType: 'supplier' | 'customer'
+  partyType: 'registered' | 'anonymous'
+  partyId?: string
+  partyName: string
+  mobileNumber?: string
+  totalDue: number
+  totalAmount?: number
+  totalPaid?: number
+  transactionCount?: number
+  lastTransactionDate?: string
+}
+
+export type PaymentDuesResponse = {
+  customers: PartyDueRow[]
+  suppliers: PartyDueRow[]
+}
+
+const getPaymentDues = async (): Promise<PaymentDuesResponse> => {
+  const res = await API.get(API_ENDPOINTS.PAYMENT.DUES)
+  return (
+    res.data?.data || {
+      customers: [],
+      suppliers: [],
+    }
+  )
+}
+
 export const usePayment = () => {
   return useQuery({
     queryKey: ['payments'],
     queryFn: getPayments,
 
+    retry: false,
+  })
+}
+
+export const usePaymentDues = () => {
+  return useQuery({
+    queryKey: ['payment-dues'],
+    queryFn: getPaymentDues,
     retry: false,
   })
 }

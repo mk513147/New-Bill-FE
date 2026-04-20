@@ -18,9 +18,13 @@ import { X } from 'lucide-react'
 import { useSupplier } from '@/hooks/useSupplier'
 import { useCustomers } from '@/hooks/useCustomer'
 import { usePaymentActions } from '@/hooks/usePaymentActions'
+import { usePaymentDues } from '@/hooks/usePayment'
+import { useSales } from '@/hooks/useSale'
+import { ToasterUtil } from '@/components/common/ToasterUtil'
 
 type PaymentType = 'supplier' | 'customer'
 type PaymentMode = 'cash' | 'upi' | 'bank' | 'other'
+type PartyMode = 'registered' | 'anonymous'
 
 interface PaymentModalProps {
   open: boolean
@@ -37,14 +41,20 @@ export default function PaymentModal({
   defaultType,
   defaultEntityId,
 }: PaymentModalProps) {
+  const toast = ToasterUtil()
   const [paidToType, setPaidToType] = useState<PaymentType>(defaultType ?? 'supplier')
+  const [partyMode, setPartyMode] = useState<PartyMode>('registered')
   const [entityId, setEntityId] = useState<string>(defaultEntityId ?? '')
+  const [partyName, setPartyName] = useState('')
+  const [invoiceRef, setInvoiceRef] = useState('')
   const [amount, setAmount] = useState('')
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('cash')
   const [note, setNote] = useState('')
 
   const { data: suppliers = [] } = useSupplier()
   const { data: customerData } = useCustomers({ limit: 200 })
+  const { data: sales = [] } = useSales()
+  const { data: duesData } = usePaymentDues()
   const customers = customerData?.customers ?? customerData ?? []
 
   const { createPayment } = usePaymentActions()
@@ -54,7 +64,10 @@ export default function PaymentModal({
   useEffect(() => {
     if (open) {
       setPaidToType(defaultType ?? 'supplier')
+      setPartyMode(defaultEntityId ? 'registered' : 'anonymous')
       setEntityId(defaultEntityId ?? '')
+      setPartyName('')
+      setInvoiceRef('')
       setAmount('')
       setPaymentMode('cash')
       setNote('')
@@ -107,19 +120,91 @@ export default function PaymentModal({
     ? (customers as any[]).find((c: any) => c._id === entityId)
     : null
 
+  const customerFromInvoice = useMemo(() => {
+    const normalizedInvoice = invoiceRef.trim().toLowerCase()
+    if (!normalizedInvoice || paidToType !== 'customer') return null
+
+    const matchedSale = sales.find(
+      (sale) => sale.invoiceNumber?.trim().toLowerCase() === normalizedInvoice,
+    )
+
+    if (!matchedSale?.customerId?._id) return null
+
+    return {
+      customerId: matchedSale.customerId._id,
+      customerName: matchedSale.customerId.name,
+      saleInvoice: matchedSale.invoiceNumber,
+    }
+  }, [invoiceRef, paidToType, sales])
+
+  useEffect(() => {
+    if (paidToType !== 'customer') return
+    if (!invoiceRef.trim()) return
+
+    if (customerFromInvoice?.customerId) {
+      setPartyMode('registered')
+      setEntityId(customerFromInvoice.customerId)
+      setPartyName('')
+    }
+  }, [paidToType, invoiceRef, customerFromInvoice])
+
+  const anonymousDue = useMemo(() => {
+    const normalizedName = partyName.trim().toLowerCase()
+    if (!normalizedName) return null
+
+    if (paidToType === 'supplier') {
+      const supplierDues = duesData?.suppliers || []
+      return (
+        supplierDues.find(
+          (d) => d.partyType === 'anonymous' && d.partyName.trim().toLowerCase() === normalizedName,
+        ) || null
+      )
+    }
+
+    const customerDues = duesData?.customers || []
+    return (
+      customerDues.find(
+        (d) => d.partyType === 'anonymous' && d.partyName.trim().toLowerCase() === normalizedName,
+      ) || null
+    )
+  }, [paidToType, partyName, duesData])
+
   function handleSubmit() {
     const parsedAmount = Number(amount)
-    if (!entityId || !parsedAmount) return
+    const normalizedPartyName = partyName.trim()
+    const normalizedInvoiceRef = invoiceRef.trim()
+    if (!parsedAmount) return
+
+    if (partyMode === 'registered' && !entityId) return
+    if (partyMode === 'anonymous' && !normalizedPartyName) return
+
+    if (paidToType === 'customer' && normalizedInvoiceRef && !customerFromInvoice?.customerId) {
+      toast('Customer not found from invoice. Please use a valid sale invoice.', 'error')
+      return
+    }
 
     const payload: any = {
       paidToType,
       amount: parsedAmount,
       paymentMode,
-      note: note.trim(),
+      invoiceNumber: normalizedInvoiceRef || undefined,
+      note: normalizedInvoiceRef
+        ? `${note.trim() ? `${note.trim()} | ` : ''}INV:${normalizedInvoiceRef}`
+        : note.trim(),
     }
 
-    if (paidToType === 'supplier') payload.supplierId = entityId
-    else payload.customerId = entityId
+    if (paidToType === 'supplier') {
+      if (partyMode === 'registered') payload.supplierId = entityId
+      else payload.supplierName = normalizedPartyName
+    } else {
+      if (customerFromInvoice?.customerId) {
+        payload.customerId = customerFromInvoice.customerId
+      } else if (partyMode === 'registered') {
+        payload.customerId = entityId
+      } else {
+        payload.customerName = normalizedPartyName
+      }
+    }
 
     createPayment.mutate(payload, { onSuccess: onClose })
   }
@@ -207,7 +292,30 @@ export default function PaymentModal({
                 <Field.Label color="gray.700" fontWeight="600">
                   {paidToType === 'supplier' ? 'Supplier' : 'Customer'}
                 </Field.Label>
-                {paidToType === 'supplier' ? (
+                <HStack mb={2} bg="gray.100" p={1} borderRadius="8px" w="fit-content">
+                  <Button
+                    size="xs"
+                    variant={partyMode === 'registered' ? 'solid' : 'ghost'}
+                    onClick={() => {
+                      setPartyMode('registered')
+                      setPartyName('')
+                    }}
+                  >
+                    Registered
+                  </Button>
+                  <Button
+                    size="xs"
+                    variant={partyMode === 'anonymous' ? 'solid' : 'ghost'}
+                    onClick={() => {
+                      setPartyMode('anonymous')
+                      setEntityId('')
+                    }}
+                  >
+                    Random / Walk-in
+                  </Button>
+                </HStack>
+
+                {partyMode === 'registered' && paidToType === 'supplier' ? (
                   <Select.Root
                     collection={supplierCollection}
                     value={entityId ? [entityId] : []}
@@ -234,7 +342,7 @@ export default function PaymentModal({
                       </Select.Content>
                     </Select.Positioner>
                   </Select.Root>
-                ) : (
+                ) : partyMode === 'registered' ? (
                   <Select.Root
                     collection={customerCollection}
                     value={entityId ? [entityId] : []}
@@ -261,6 +369,18 @@ export default function PaymentModal({
                       </Select.Content>
                     </Select.Positioner>
                   </Select.Root>
+                ) : (
+                  <Input
+                    value={partyName}
+                    onChange={(e) => setPartyName(e.target.value)}
+                    placeholder={
+                      paidToType === 'supplier'
+                        ? 'Enter random supplier name'
+                        : 'Enter walk-in customer name'
+                    }
+                    bg="white"
+                    borderColor="gray.200"
+                  />
                 )}
               </Field.Root>
 
@@ -307,6 +427,30 @@ export default function PaymentModal({
                 </Box>
               )}
 
+              {partyMode === 'anonymous' && partyName.trim() && (
+                <Box
+                  mb={3}
+                  px={3}
+                  py={2}
+                  bg={paidToType === 'supplier' ? 'orange.50' : 'blue.50'}
+                  borderRadius="10px"
+                  border="1px solid"
+                  borderColor={paidToType === 'supplier' ? 'orange.100' : 'blue.100'}
+                >
+                  <HStack justify="space-between">
+                    <Text fontSize="sm" color="gray.600">
+                      Open due for this name
+                    </Text>
+                    <Badge
+                      colorPalette={paidToType === 'supplier' ? 'orange' : 'blue'}
+                      fontSize="sm"
+                    >
+                      ₹{Number(anonymousDue?.totalDue || 0).toLocaleString('en-IN')}
+                    </Badge>
+                  </HStack>
+                </Box>
+              )}
+
               {/* Amount */}
               <Field.Root mb={3}>
                 <Field.Label color="gray.700" fontWeight="600">
@@ -322,6 +466,38 @@ export default function PaymentModal({
                   min={1}
                 />
               </Field.Root>
+
+              {/* Invoice / Reference */}
+              <Field.Root mb={3}>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Invoice / Reference Number
+                </Field.Label>
+                <Input
+                  value={invoiceRef}
+                  onChange={(e) => setInvoiceRef(e.target.value)}
+                  placeholder="e.g. INV-2026-001"
+                  bg="white"
+                  borderColor="gray.200"
+                />
+              </Field.Root>
+
+              {paidToType === 'customer' && invoiceRef.trim() && (
+                <Box
+                  mb={3}
+                  px={3}
+                  py={2}
+                  bg={customerFromInvoice ? 'green.50' : 'red.50'}
+                  borderRadius="10px"
+                  border="1px solid"
+                  borderColor={customerFromInvoice ? 'green.100' : 'red.100'}
+                >
+                  <Text fontSize="sm" color={customerFromInvoice ? 'green.700' : 'red.700'}>
+                    {customerFromInvoice
+                      ? `Customer auto-selected from invoice: ${customerFromInvoice.customerName}`
+                      : 'No registered customer found for this invoice.'}
+                  </Text>
+                </Box>
+              )}
 
               {/* Payment Mode */}
               <Field.Root mb={3}>
@@ -393,7 +569,10 @@ export default function PaymentModal({
                 _hover={{ opacity: 0.9 }}
                 loading={createPayment.isPending}
                 onClick={handleSubmit}
-                disabled={!entityId || !amount || Number(amount) <= 0}
+                disabled={
+                  Number(amount) <= 0 ||
+                  (partyMode === 'registered' ? !entityId : !partyName.trim())
+                }
               >
                 {paidToType === 'supplier' ? 'Pay Supplier' : 'Record Receipt'}
               </Button>

@@ -9,7 +9,9 @@ const toast = ToasterUtil()
 export type CreatePaymentPayload = {
   paidToType: 'supplier' | 'customer'
   supplierId?: string
+  supplierName?: string
   customerId?: string
+  customerName?: string
   amount: number
   paymentMode?: 'cash' | 'upi' | 'bank' | 'other'
   note?: string
@@ -20,6 +22,7 @@ export const usePaymentActions = () => {
 
   const invalidatePaymentRelatedData = () => {
     queryClient.invalidateQueries({ queryKey: ['payments'] })
+    queryClient.invalidateQueries({ queryKey: ['payment-dues'] })
     queryClient.invalidateQueries({ queryKey: ['suppliers'] })
     queryClient.invalidateQueries({ queryKey: ['customers'] })
   }

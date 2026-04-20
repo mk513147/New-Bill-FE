@@ -130,7 +130,7 @@ function Staff() {
       <Flex
         bg="gray.100"
         width="100%"
-        height="100%"
+        minH="100%"
         overflowX="auto"
         flexDir="column"
         pl={{ base: 3, sm: 2, md: 6 }}

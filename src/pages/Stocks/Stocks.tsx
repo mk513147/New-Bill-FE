@@ -143,7 +143,7 @@ const Stocks = () => {
       <Flex
         bg="linear-gradient(180deg, #eef2f6 0%, #e8edf3 48%, #e2e8f0 100%)"
         width="100%"
-        height="100%"
+        minH="100%"
         flexDir="column"
         px={{ base: 4, md: 6 }}
         py={{ base: 4, md: 5 }}

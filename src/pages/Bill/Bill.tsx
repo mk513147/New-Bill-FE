@@ -132,7 +132,7 @@ const Bill = () => {
   }
 
   return (
-    <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
+    <Flex bg="gray.100" width="100%" minH="100%" flexDir="column" px={6}>
       {/* Header Row */}
       <Flex justify="space-between" align="center" mt={8}>
         <FilterSelect

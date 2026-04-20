@@ -167,7 +167,7 @@ export default function InvoicePage() {
   }, [data, search, dateRange])
 
   return (
-    <Flex bg="gray.100" width="100%" height="100%" overflowX="auto" flexDir="column" px={6}>
+    <Flex bg="gray.100" width="100%" minH="100%" overflowX="auto" flexDir="column" px={6}>
       <VStack align="stretch" gap={6}>
         <HStack justify="space-between" mt={3}>
           <Text fontSize={'2xl'} fontWeight={'bold'}>

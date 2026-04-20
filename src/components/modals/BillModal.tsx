@@ -1,47 +1,107 @@
-import { useEffect, useState } from 'react'
-import { Dialog, Portal, Button, Input, Field, useMediaQuery } from '@chakra-ui/react'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Dialog,
+  Portal,
+  Button,
+  Input,
+  Field,
+  useMediaQuery,
+  Select,
+  VStack,
+  HStack,
+  Text,
+} from '@chakra-ui/react'
+import { createListCollection } from '@chakra-ui/react'
 import { X } from 'lucide-react'
+
+import { useSupplier } from '@/hooks/useSupplier'
+import { useBillActions } from '@/hooks/useBillActions'
 
 export interface BillFormValues {
   billNumber: string
-  supplierName: string
+  supplierId: string
+  poNumber?: string
+  billDate?: string
+  dueDate?: string
   amount: string
 }
 
 interface BillDialogProps {
   open: boolean
   onClose: () => void
-  mode: 'add' | 'edit'
-  defaultValues?: BillFormValues
+  defaultValues?: BillFormValues & { _id?: string }
 }
 
-export default function BillModal({ open, onClose, mode, defaultValues }: BillDialogProps) {
+export default function BillModal({ open, onClose, defaultValues }: BillDialogProps) {
   const [formData, setFormData] = useState<BillFormValues>({
     billNumber: '',
-    supplierName: '',
+    supplierId: '',
+    poNumber: '',
+    billDate: '',
+    dueDate: '',
     amount: '',
   })
 
+  const { data: suppliers = [] } = useSupplier()
+  const { createBill, updateBill } = useBillActions()
+
+  const supplierCollection = useMemo(
+    () =>
+      createListCollection({
+        items: suppliers.map((s: any) => ({
+          label: `${s.name} (${s.mobileNumber})`,
+          value: s._id,
+        })),
+      }),
+    [suppliers],
+  )
+
   useEffect(() => {
-    if (defaultValues) setFormData(defaultValues)
-    else {
+    if (defaultValues) {
       setFormData({
-        billNumber: '',
-        supplierName: '',
-        amount: '',
+        billNumber: defaultValues.billNumber,
+        supplierId: defaultValues.supplierId,
+        poNumber: defaultValues.poNumber || '',
+        billDate: defaultValues.billDate || '',
+        dueDate: defaultValues.dueDate || '',
+        amount: defaultValues.amount,
       })
+      return
     }
-  }, [defaultValues, mode])
+
+    setFormData({
+      billNumber: '',
+      supplierId: '',
+      poNumber: '',
+      billDate: '',
+      dueDate: '',
+      amount: '',
+    })
+  }, [defaultValues, open])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   function handleSubmit() {
-    onClose()
+    const payload = {
+      billNumber: formData.billNumber.trim(),
+      supplierId: formData.supplierId.trim(),
+      poNumber: formData.poNumber?.trim(),
+      billDate: formData.billDate,
+      dueDate: formData.dueDate,
+      amount: Number(formData.amount),
+    }
+
+    if (defaultValues?._id) {
+      updateBill.mutate({ billId: defaultValues._id, payload }, { onSuccess: onClose })
+    } else {
+      createBill.mutate(payload, { onSuccess: onClose })
+    }
   }
 
   const [isLarge] = useMediaQuery(['(min-width: 540px)'])
+  const isLoading = createBill.isPending || updateBill.isPending
 
   return (
     <Dialog.Root
@@ -54,45 +114,163 @@ export default function BillModal({ open, onClose, mode, defaultValues }: BillDi
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="white" rounded="lg" shadow="lg" p={4} width="100%" maxW="600px">
+          <Dialog.Content
+            bg="linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)"
+            rounded="2xl"
+            shadow="xl"
+            p={4}
+            width="100%"
+            maxW="600px"
+            border="1px solid"
+            borderColor="gray.100"
+          >
             <Dialog.Header px={1}>
-              <Dialog.Title fontSize="2xl" fontWeight="700">
-                {mode === 'add' ? 'Add Bill' : 'Edit Bill'}
+              <Dialog.Title fontSize="xl" fontWeight="800" color="gray.900" letterSpacing="-0.02em">
+                {defaultValues?._id ? 'Edit Bill' : 'Add Bill'}
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button size="xs" variant="ghost" p={1} minW="auto">
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
             </Dialog.Header>
 
             <Dialog.Body pt={4}>
-              <Field.Root mb={3}>
-                <Field.Label>Bill Number</Field.Label>
-                <Input name="billNumber" value={formData.billNumber} onChange={handleChange} />
-              </Field.Root>
+              <VStack align="stretch" gap={4}>
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Bill Number
+                  </Field.Label>
+                  <Input
+                    name="billNumber"
+                    value={formData.billNumber}
+                    onChange={handleChange}
+                    placeholder="e.g., BILL-2026-001"
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label>Supplier Name</Field.Label>
-                <Input name="supplierName" value={formData.supplierName} onChange={handleChange} />
-              </Field.Root>
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Supplier
+                  </Field.Label>
+                  <Select.Root
+                    collection={supplierCollection}
+                    value={formData.supplierId ? [formData.supplierId] : []}
+                    onValueChange={(details) =>
+                      setFormData((prev) => ({ ...prev, supplierId: details.value[0] || '' }))
+                    }
+                    positioning={{ strategy: 'fixed', hideWhenDetached: true }}
+                  >
+                    <Select.HiddenSelect name="supplierId" />
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select supplier" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content bg="white">
+                        {supplierCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
+                </Field.Root>
 
-              <Field.Root>
-                <Field.Label>Amount</Field.Label>
-                <Input name="amount" value={formData.amount} onChange={handleChange} />
-              </Field.Root>
+                <HStack gap={3} align="start" flexWrap="wrap">
+                  <Field.Root flex="1" minW="180px">
+                    <Field.Label color="gray.700" fontWeight="600">
+                      PO Number
+                    </Field.Label>
+                    <Input
+                      name="poNumber"
+                      value={formData.poNumber}
+                      onChange={handleChange}
+                      placeholder="Optional"
+                      bg="white"
+                      borderColor="gray.200"
+                    />
+                  </Field.Root>
+
+                  <Field.Root flex="1" minW="180px">
+                    <Field.Label color="gray.700" fontWeight="600">
+                      Bill Date
+                    </Field.Label>
+                    <Input
+                      name="billDate"
+                      type="date"
+                      value={formData.billDate}
+                      onChange={handleChange}
+                      bg="white"
+                      borderColor="gray.200"
+                    />
+                  </Field.Root>
+                </HStack>
+
+                <HStack gap={3} align="start" flexWrap="wrap">
+                  <Field.Root flex="1" minW="180px">
+                    <Field.Label color="gray.700" fontWeight="600">
+                      Due Date
+                    </Field.Label>
+                    <Input
+                      name="dueDate"
+                      type="date"
+                      value={formData.dueDate}
+                      onChange={handleChange}
+                      bg="white"
+                      borderColor="gray.200"
+                    />
+                  </Field.Root>
+
+                  <Field.Root flex="1" minW="180px">
+                    <Field.Label color="gray.700" fontWeight="600">
+                      Amount
+                    </Field.Label>
+                    <Input
+                      name="amount"
+                      type="number"
+                      value={formData.amount}
+                      onChange={handleChange}
+                      placeholder="0"
+                      bg="white"
+                      borderColor="gray.200"
+                    />
+                  </Field.Root>
+                </HStack>
+              </VStack>
             </Dialog.Body>
 
             <Dialog.Footer gap={3} justifyContent="flex-end">
               <Dialog.ActionTrigger asChild>
-                <Button variant="outline" width="50%">
+                <Button
+                  variant="outline"
+                  width="50%"
+                  color="gray.700"
+                  borderColor="gray.300"
+                  _hover={{ bg: 'gray.100' }}
+                >
                   Cancel
                 </Button>
               </Dialog.ActionTrigger>
 
-              <Button bg="#6730EC" color="white" width="50%" onClick={handleSubmit}>
-                {mode === 'add' ? 'Add Bill' : 'Save Changes'}
+              <Button
+                width="50%"
+                bg="gray.950"
+                color="white"
+                _hover={{ bg: 'gray.800' }}
+                loading={isLoading}
+                onClick={handleSubmit}
+              >
+                {defaultValues?._id ? 'Update Bill' : 'Create Bill'}
               </Button>
             </Dialog.Footer>
           </Dialog.Content>

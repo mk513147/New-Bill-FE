@@ -10,6 +10,7 @@ export interface StaffFormValues {
   mobileNumber: string
   role: string
   baseSalary: string
+  salaryPerWeek: string
   joinDate: string
 }
 
@@ -35,6 +36,7 @@ export default function StaffDialog({
     mobileNumber: '',
     role: '',
     baseSalary: '',
+    salaryPerWeek: '',
     joinDate: '',
   })
 
@@ -49,6 +51,7 @@ export default function StaffDialog({
         mobileNumber: '',
         role: '',
         baseSalary: '',
+        salaryPerWeek: '',
         joinDate: '',
       })
     }
@@ -64,6 +67,7 @@ export default function StaffDialog({
       mobileNumber: formData.mobileNumber,
       role: formData.role,
       baseSalary: Number(formData.baseSalary),
+      salaryPerWeek: Number(formData.salaryPerWeek),
       joinDate: formData.joinDate,
     }
 
@@ -135,6 +139,16 @@ export default function StaffDialog({
                   name="baseSalary"
                   type="number"
                   value={formData.baseSalary}
+                  onChange={handleChange}
+                />
+              </Field.Root>
+
+              <Field.Root mb={3}>
+                <Field.Label>Salary Per Week</Field.Label>
+                <Input
+                  name="salaryPerWeek"
+                  type="number"
+                  value={formData.salaryPerWeek}
                   onChange={handleChange}
                 />
               </Field.Root>

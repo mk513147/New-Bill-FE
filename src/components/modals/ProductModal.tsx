@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Dialog,
   Portal,
@@ -9,9 +9,12 @@ import {
   Select,
   SimpleGrid,
 } from '@chakra-ui/react'
-import { useProductActions } from '@/hooks/useProductActions'
 import { createListCollection } from '@chakra-ui/react'
 import { X } from 'lucide-react'
+
+import { useProductActions } from '@/hooks/useProductActions'
+import { useCategory } from '@/hooks/useCategory'
+import { useSupplier } from '@/hooks/useSupplier'
 
 const unitCollection = createListCollection({
   items: [
@@ -28,17 +31,14 @@ const unitCollection = createListCollection({
 
 export interface ProductFormValues {
   name: string
-  sku: string
-  barcode?: string
+  brand?: string
   categoryId?: string
+  newCategoryName?: string
   supplierId?: string
-  purchasePrice?: string
-  sellingPrice?: string
+  purchasePrice: string
+  sellingPrice: string
   unit?: string
-  tax?: string
-  lowStockAlert?: string
-  maxDiscount?: string
-  minDiscount?: string
+  stock?: string
 }
 
 interface ProductDialogProps {
@@ -58,20 +58,41 @@ export default function ProductDialog({
 }: ProductDialogProps) {
   const [formData, setFormData] = useState<ProductFormValues>({
     name: '',
-    sku: '',
-    barcode: '',
+    brand: '',
     categoryId: '',
+    newCategoryName: '',
     supplierId: '',
-    purchasePrice: '',
+    purchasePrice: '0',
     sellingPrice: '',
-    unit: '',
-    tax: '',
-    lowStockAlert: '',
-    maxDiscount: '',
-    minDiscount: '',
+    unit: 'pcs',
+    stock: '0',
   })
 
-  const { createProduct, updateProduct } = useProductActions(pubId ?? '')
+  const { createProduct, updateProduct } = useProductActions()
+  const { data: categoryData } = useCategory({ page: 1, limit: 50 })
+  const { data: suppliers = [] } = useSupplier()
+
+  const categoryCollection = useMemo(
+    () =>
+      createListCollection({
+        items: (categoryData?.categories || []).map((c: any) => ({
+          label: c.name,
+          value: c._id,
+        })),
+      }),
+    [categoryData?.categories],
+  )
+
+  const supplierCollection = useMemo(
+    () =>
+      createListCollection({
+        items: suppliers.map((s: any) => ({
+          label: `${s.name} (${s.mobileNumber})`,
+          value: s._id,
+        })),
+      }),
+    [suppliers],
+  )
 
   useEffect(() => {
     if (defaultValues) {
@@ -79,32 +100,55 @@ export default function ProductDialog({
     } else {
       setFormData({
         name: '',
-        sku: '',
-        barcode: '',
+        brand: '',
         categoryId: '',
+        newCategoryName: '',
         supplierId: '',
-        purchasePrice: '',
+        purchasePrice: '0',
         sellingPrice: '',
-        unit: '',
-        tax: '',
-        lowStockAlert: '',
-        maxDiscount: '',
-        minDiscount: '',
+        unit: 'pcs',
+        stock: '0',
       })
     }
   }, [defaultValues, mode])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    const { name, value } = e.target
 
-  function handleSubmit() {
-    if (mode === 'add') {
-      createProduct.mutate(formData, { onSuccess: onClose })
+    if (name === 'newCategoryName' && value.trim()) {
+      setFormData((prev) => ({ ...prev, newCategoryName: value, categoryId: '' }))
       return
     }
 
-    updateProduct.mutate(formData, { onSuccess: onClose })
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  function handleSubmit() {
+    const payload = {
+      name: formData.name.trim(),
+      brand: formData.brand?.trim() || '',
+      categoryId: formData.categoryId?.trim() || '',
+      newCategoryName: formData.newCategoryName?.trim() || '',
+      supplierId: formData.supplierId?.trim() || '',
+      purchasePrice: Number(formData.purchasePrice || 0),
+      sellingPrice: Number(formData.sellingPrice || 0),
+      unit: formData.unit?.trim() || 'pcs',
+      stock: Number(formData.stock || 0),
+    }
+
+    if (mode === 'add') {
+      createProduct.mutate(payload, { onSuccess: onClose })
+      return
+    }
+
+    if (!pubId) return
+
+    updateProduct.mutate(
+      { productId: pubId, payload },
+      {
+        onSuccess: onClose,
+      },
+    )
   }
 
   const [isLarge] = useMediaQuery(['(min-width: 540px)'])
@@ -123,16 +167,18 @@ export default function ProductDialog({
         <Dialog.Backdrop />
         <Dialog.Positioner>
           <Dialog.Content
-            bg="white"
-            rounded="lg"
-            shadow="lg"
+            bg="linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)"
+            rounded="2xl"
+            shadow="xl"
             p={4}
-            maxW="600px"
+            maxW="640px"
             w="100%"
             maxH="90vh"
+            border="1px solid"
+            borderColor="gray.100"
           >
             <Dialog.Header px={1}>
-              <Dialog.Title fontSize="2xl" fontWeight="700" color="gray.800">
+              <Dialog.Title fontSize="xl" fontWeight="800" color="gray.900" letterSpacing="-0.02em">
                 {mode === 'add' ? 'Add New Product' : 'Edit Product'}
               </Dialog.Title>
 
@@ -164,74 +210,60 @@ export default function ProductDialog({
             >
               <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
                 <Field.Root>
-                  <Field.Label>Product Name</Field.Label>
-                  <Input name="name" value={formData.name} onChange={handleChange} />
-                </Field.Root>
-
-                <Field.Root>
-                  <Field.Label>SKU</Field.Label>
-                  <Input name="sku" value={formData.sku} onChange={handleChange} />
-                </Field.Root>
-
-                <Field.Root>
-                  <Field.Label>Barcode</Field.Label>
-                  <Input name="barcode" value={formData.barcode} onChange={handleChange} />
-                </Field.Root>
-
-                <Field.Root>
-                  <Field.Label>Category ID</Field.Label>
-                  <Input name="categoryId" value={formData.categoryId} onChange={handleChange} />
-                </Field.Root>
-
-                <Field.Root>
-                  <Field.Label>Supplier ID</Field.Label>
-                  <Input name="supplierId" value={formData.supplierId} onChange={handleChange} />
-                </Field.Root>
-
-                <Field.Root>
-                  <Field.Label>Purchase Price</Field.Label>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Product Name
+                  </Field.Label>
                   <Input
-                    name="purchasePrice"
-                    value={formData.purchasePrice}
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
+                    bg="white"
+                    borderColor="gray.200"
                   />
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label>Selling Price</Field.Label>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Brand
+                  </Field.Label>
                   <Input
-                    name="sellingPrice"
-                    value={formData.sellingPrice}
+                    name="brand"
+                    value={formData.brand}
                     onChange={handleChange}
+                    placeholder="Optional"
+                    bg="white"
+                    borderColor="gray.200"
                   />
                 </Field.Root>
 
-                {/* UNIT SELECT */}
                 <Field.Root>
-                  <Field.Label>Unit</Field.Label>
-
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Category
+                  </Field.Label>
                   <Select.Root
-                    collection={unitCollection}
-                    value={formData.unit ? [formData.unit] : []}
+                    collection={categoryCollection}
+                    value={formData.categoryId ? [formData.categoryId] : []}
                     onValueChange={(details) =>
-                      setFormData((prev) => ({ ...prev, unit: details.value[0] }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        categoryId: details.value[0] || '',
+                        newCategoryName: '',
+                      }))
                     }
                     positioning={{ strategy: 'fixed', hideWhenDetached: true }}
                   >
-                    <Select.HiddenSelect name="unit" />
-
+                    <Select.HiddenSelect name="categoryId" />
                     <Select.Control>
                       <Select.Trigger>
-                        <Select.ValueText placeholder="Select unit" />
+                        <Select.ValueText placeholder="Select category" />
                       </Select.Trigger>
                       <Select.IndicatorGroup>
                         <Select.Indicator />
                       </Select.IndicatorGroup>
                     </Select.Control>
-
                     <Select.Positioner>
-                      <Select.Content bg={'white'}>
-                        {unitCollection.items.map((item) => (
+                      <Select.Content bg="white">
+                        {categoryCollection.items.map((item) => (
                           <Select.Item item={item} key={item.value}>
                             {item.label}
                             <Select.ItemIndicator />
@@ -243,27 +275,132 @@ export default function ProductDialog({
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label>Tax (%)</Field.Label>
-                  <Input name="tax" value={formData.tax} onChange={handleChange} />
-                </Field.Root>
-
-                <Field.Root>
-                  <Field.Label>Low Stock Alert</Field.Label>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    New Category Name
+                  </Field.Label>
                   <Input
-                    name="lowStockAlert"
-                    value={formData.lowStockAlert}
+                    name="newCategoryName"
+                    value={formData.newCategoryName}
                     onChange={handleChange}
+                    placeholder="Optional (creates category)"
+                    bg="white"
+                    borderColor="gray.200"
                   />
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label>Max Discount (%)</Field.Label>
-                  <Input name="maxDiscount" value={formData.maxDiscount} onChange={handleChange} />
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Supplier
+                  </Field.Label>
+                  <Select.Root
+                    collection={supplierCollection}
+                    value={formData.supplierId ? [formData.supplierId] : []}
+                    onValueChange={(details) =>
+                      setFormData((prev) => ({ ...prev, supplierId: details.value[0] || '' }))
+                    }
+                    positioning={{ strategy: 'fixed', hideWhenDetached: true }}
+                  >
+                    <Select.HiddenSelect name="supplierId" />
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select supplier" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content bg="white">
+                        {supplierCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label>Min Discount (%)</Field.Label>
-                  <Input name="minDiscount" value={formData.minDiscount} onChange={handleChange} />
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Purchase Price
+                  </Field.Label>
+                  <Input
+                    name="purchasePrice"
+                    value={formData.purchasePrice}
+                    onChange={handleChange}
+                    type="number"
+                    min={0}
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Selling Price
+                  </Field.Label>
+                  <Input
+                    name="sellingPrice"
+                    value={formData.sellingPrice}
+                    onChange={handleChange}
+                    type="number"
+                    min={0}
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Stock
+                  </Field.Label>
+                  <Input
+                    name="stock"
+                    value={formData.stock}
+                    onChange={handleChange}
+                    type="number"
+                    min={0}
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Unit
+                  </Field.Label>
+
+                  <Select.Root
+                    collection={unitCollection}
+                    value={formData.unit ? [formData.unit] : ['pcs']}
+                    onValueChange={(details) =>
+                      setFormData((prev) => ({ ...prev, unit: details.value[0] || 'pcs' }))
+                    }
+                    positioning={{ strategy: 'fixed', hideWhenDetached: true }}
+                  >
+                    <Select.HiddenSelect name="unit" />
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select unit" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+
+                    <Select.Positioner>
+                      <Select.Content bg="white">
+                        {unitCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
                 </Field.Root>
               </SimpleGrid>
             </Dialog.Body>
@@ -273,7 +410,7 @@ export default function ProductDialog({
                 <Button
                   variant="outline"
                   minW="120px"
-                  width={'50%'}
+                  width="50%"
                   color="gray.700"
                   borderColor="gray.300"
                   _hover={{ bg: 'gray.100' }}
@@ -283,9 +420,9 @@ export default function ProductDialog({
               </Dialog.ActionTrigger>
               <Button
                 width="50%"
-                bg="#6730EC"
+                bg="gray.950"
                 color="white"
-                _hover={{ bg: '#5b29d8' }}
+                _hover={{ bg: 'gray.800' }}
                 loading={createProduct.isPending || updateProduct.isPending}
                 onClick={handleSubmit}
               >

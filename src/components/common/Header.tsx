@@ -1,33 +1,26 @@
-import { Box, Flex, Text, IconButton, HStack, Separator, Avatar } from '@chakra-ui/react'
+import { Avatar, Box, Flex, HStack, Text, Stack, VStack } from '@chakra-ui/react'
 import { useSelector } from 'react-redux'
-import { Plus, Bell, Settings } from 'lucide-react'
 import { ProfilePopover } from '@/components/popovers/ProfilePopover'
-import { NotificationsPopover } from '@/components/popovers/NotificationsPopover'
-import { AddPopover } from '@/components/popovers/AddPopover'
-import { SettingsPopover } from '@/components/popovers/SettingsPopover'
-import CustomerDialog from '@/components/modals/CustomerModal'
-import ProductDialog from '../modals/ProductModal'
-import CategoryModal from '../modals/CategoryModal'
-import InvoiceModal from '../modals/InvoiceModal'
-import StockModal from '../modals/StockModal'
-import BillModal from '../modals/BillModal'
-import { useState } from 'react'
-
-type AddEntity = 'customer' | 'product' | 'invoice' | 'category' | 'stock' | 'bill' | null
+import type { RootState } from '@/redux/store'
+import { useProfile } from '@/hooks/useProfile'
 
 export const Header = () => {
-  const [openEntity, setOpenEntity] = useState<AddEntity>(null)
-  const { title } = useSelector((state: any) => state.header)
+  const { title, subtitle } = useSelector((state: RootState) => state.header)
+  const { data: profile } = useProfile()
+
+  const shopName = profile?.shopName || 'Ebill Workspace'
+  const userName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || 'Operator'
 
   if (!title) return null
 
   return (
     <Box
-      h="56px"
-      px={6}
-      bg="white"
+      px={{ base: 4, md: 6 }}
+      py={{ base: 1.5, md: 2 }}
+      bg="rgba(255,250,245,0.72)"
+      backdropFilter="blur(18px)"
       borderBottomWidth="1px"
-      borderColor="gray.200"
+      borderColor="whiteAlpha.800"
       position="sticky"
       top={0}
       zIndex={999}
@@ -37,104 +30,72 @@ export const Header = () => {
         },
       }}
     >
-      <Flex h="100%" align="center" justify="space-between">
-        <Text
-          fontSize={{ base: 'xl', md: '2xl' }}
-          fontWeight="700"
-          color="gray.900"
-          lineHeight="1.2"
-          letterSpacing="-0.02em"
+      <Box
+        position="relative"
+        overflow="hidden"
+        borderRadius={{ base: '20px', md: '22px' }}
+        border="1px solid rgba(255,255,255,0.9)"
+        bg="linear-gradient(135deg, rgba(255,255,255,0.86) 0%, rgba(255,247,237,0.92) 45%, rgba(240,253,250,0.88) 100%)"
+        boxShadow="0 14px 36px rgba(15,23,42,0.06)"
+      >
+        <Box
+          position="absolute"
+          inset="0"
+          bg="radial-gradient(circle at top right, rgba(249,115,22,0.16), transparent 28%), radial-gradient(circle at bottom left, rgba(20,184,166,0.12), transparent 24%)"
+          pointerEvents="none"
+        />
+
+        <Flex
+          position="relative"
+          align={{ base: 'start', lg: 'center' }}
+          justify="space-between"
+          direction={{ base: 'column', lg: 'row' }}
+          gap={{ base: 2.5, lg: 3 }}
+          px={{ base: 3.5, md: 4 }}
+          py={{ base: 2.5, md: 2.5 }}
         >
-          {title}
-        </Text>
-
-        <HStack gap={3}>
-          <Separator orientation="vertical" h="24px" />
-
-          <AddPopover
-            trigger={
-              <IconButton
-                aria-label="Add"
-                colorPalette="blue"
-                p="6px"
-                minW="unset"
-                minH="unset"
-                w="32px"
-                h="32px"
+          <Stack gap={1.5} flex="1" minW={0}>
+            <Box>
+              <Text
+                fontSize={{ base: 'lg', md: 'xl' }}
+                fontWeight="900"
+                color="gray.950"
+                lineHeight="1"
+                letterSpacing="-0.05em"
               >
-                <Plus size={18} />
-              </IconButton>
-            }
-            onAddCustomer={() => setOpenEntity('customer')}
-            onAddProduct={() => setOpenEntity('product')}
-            onAddInvoice={() => setOpenEntity('invoice')}
-            onAddCategory={() => setOpenEntity('category')}
-            onAddStock={() => setOpenEntity('stock')}
-            onAddBill={() => setOpenEntity('bill')}
-          />
+                {title}
+              </Text>
+              <Text mt={0.5} fontSize="xs" color="gray.600" maxW="720px" noOfLines={1}>
+                {subtitle || `Operational view for ${userName}.`}
+              </Text>
+            </Box>
+          </Stack>
 
-          <NotificationsPopover
-            trigger={
-              <IconButton
-                aria-label="Notifications"
-                color="gray.800"
-                _hover={{ bg: 'gray.100', color: 'gray.900' }}
-              >
-                <Bell size={18} />
-              </IconButton>
-            }
-          />
-          <SettingsPopover
-            trigger={
-              <IconButton
-                aria-label="Settings"
-                color="gray.800"
-                _hover={{ bg: 'gray.100', color: 'gray.900' }}
-              >
-                <Settings size={18} />
-              </IconButton>
-            }
-          />
-
-          <ProfilePopover
-            trigger={
-              <Box as="span">
-                <Avatar.Root size="sm" cursor="pointer">
-                  <Avatar.Fallback>U</Avatar.Fallback>
-                </Avatar.Root>
-              </Box>
-            }
-          />
-        </HStack>
-      </Flex>
-      {/* CUSTOMER */}
-      <CustomerDialog
-        open={openEntity === 'customer'}
-        mode="add"
-        onClose={() => setOpenEntity(null)}
-      />
-
-      {/* PRODUCT */}
-      <ProductDialog
-        open={openEntity === 'product'}
-        mode="add"
-        onClose={() => setOpenEntity(null)}
-      />
-
-      {/* INVOICE */}
-      <InvoiceModal
-        open={openEntity === 'invoice'}
-        mode="add"
-        onClose={() => setOpenEntity(null)}
-      />
-      <StockModal open={openEntity === 'stock'} mode="add" onClose={() => setOpenEntity(null)} />
-      <BillModal open={openEntity === 'bill'} mode="add" onClose={() => setOpenEntity(null)} />
-
-      <CategoryModal
-        open={openEntity === 'category'}
-        mode="add"
-        onClose={() => setOpenEntity(null)}
-      />
+          <VStack align={{ base: 'stretch', lg: 'end' }} gap={1.5} w={{ base: '100%', lg: 'auto' }}>
+            <ProfilePopover
+              trigger={
+                <Box as="span">
+                  <HStack
+                    gap={2}
+                    p={0.75}
+                    pl={{ base: 0.75, md: 1.25 }}
+                    borderRadius="999px"
+                    bg="white"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    boxShadow="0 8px 20px rgba(15,23,42,0.06)"
+                    cursor="pointer"
+                  >
+                    <Avatar.Root size="sm" borderWidth="2px" borderColor="orange.100">
+                      <Avatar.Fallback>{profile?.firstName?.[0] ?? 'U'}</Avatar.Fallback>
+                    </Avatar.Root>
+                  </HStack>
+                </Box>
+              }
+            />
+          </VStack>
+        </Flex>
+      </Box>
     </Box>
   )
 }

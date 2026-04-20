@@ -58,9 +58,45 @@ export const useStaffActions = (staffId: string) => {
     },
   })
 
+  const exportStaff = useMutation({
+    mutationFn: () =>
+      API.get(API_ENDPOINTS.STAFF.EXPORT, { responseType: 'blob' }).then((res) => res.data),
+    onSuccess: (data) => {
+      const url = window.URL.createObjectURL(new Blob([data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `staff_${Date.now()}.xlsx`
+      link.click()
+      window.URL.revokeObjectURL(url)
+      toast('Staff exported successfully', 'success')
+    },
+    onError: () => {
+      toast('Failed to export staff', 'error')
+    },
+  })
+
+  const importStaff = useMutation({
+    mutationFn: (file: File) => {
+      const fd = new FormData()
+      fd.append('file', file)
+      return API.post(API_ENDPOINTS.STAFF.IMPORT, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }).then((res) => res.data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getStaffList'] })
+      toast('Staff imported successfully', 'success')
+    },
+    onError: () => {
+      toast('Failed to import staff', 'error')
+    },
+  })
+
   return {
     createStaff,
     updateStaff,
     deleteStaff,
+    exportStaff,
+    importStaff,
   }
 }

@@ -9,12 +9,11 @@ import {
   FaArrowRightToBracket,
 } from 'react-icons/fa6'
 import { useState } from 'react'
-import { API } from '@/api/api.ts'
-import API_ENDPOINTS from '@/api/apiEndpoints.ts'
 import { resetProfile } from '@/redux/slices/profileSlice.ts'
 import { useDispatch } from 'react-redux'
 import { ToasterUtil } from './ToasterUtil.tsx'
 import Loading from './Loading.tsx'
+import { logoutService } from '@/utils/utils'
 
 const navItems = [
   { label: 'Home', icon: FaShop, path: '/dashboard' },
@@ -37,17 +36,14 @@ const DockNav = () => {
     setLoading(true)
 
     try {
-      const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
-
-      if (res.status !== 200) {
-        throw new Error('Logout failed')
-      }
+      await logoutService()
     } catch (error) {
       console.error('Logout error:', error)
       toastFunc('Error logging out. Please try again.', 'error')
+      setLoading(false)
+      return
     }
 
-    localStorage.clear()
     dispatch(resetProfile())
     navigate('/login', { replace: true })
 

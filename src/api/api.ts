@@ -1,12 +1,40 @@
 import { resetProfile } from '@/redux/slices/profileSlice'
 import { store } from '@/redux/store'
 import { logoutService } from '@/utils/utils'
+import { isAuthenticated } from '@/utils/authSession'
 import { ToasterUtil } from '@/components/common/ToasterUtil'
+import {
+  markSubscriptionInactive,
+  shouldNotifySubscriptionInactive,
+  SUBSCRIPTION_INACTIVE_MESSAGE,
+  SUBSCRIPTION_ROUTE,
+} from '@/utils/subscriptionAccess'
 
 import axios from 'axios'
 import API_ENDPOINTS from './apiEndpoints'
 
 const toast = ToasterUtil()
+
+const isAuthRoute = (url?: string) => {
+  if (!url) {
+    return false
+  }
+
+  return [API_ENDPOINTS.AUTH.LOGIN, API_ENDPOINTS.AUTH.LOGOUT].some((path) => url.includes(path))
+}
+
+const shouldForceLogout = (error: any) => {
+  const status = error?.response?.status
+  const message = error?.response?.data?.message
+
+  return status === 401 || message === 'Unauthorized: Access'
+}
+
+const isSubscriptionInactiveError = (error: any) => {
+  const message = error?.response?.data?.message
+
+  return message === SUBSCRIPTION_INACTIVE_MESSAGE
+}
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
@@ -21,27 +49,41 @@ API.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    const status = error?.response?.status
-    const currentPath = window.location.pathname
+    const requestUrl = error?.config?.url
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : ''
 
-    if (currentPath === '/login') {
+    if (isAuthRoute(requestUrl)) {
       return Promise.reject(error)
     }
 
-    if (status === 401) {
-      console.log('⛔ Unauthorized — clearing session')
+    if (
+      isSubscriptionInactiveError(error) &&
+      !requestUrl?.includes(API_ENDPOINTS.AUTH.SUBSCRIPTION)
+    ) {
+      markSubscriptionInactive()
 
-      if (error.config?.url?.includes(API_ENDPOINTS.AUTH.LOGOUT)) {
-        console.warn('Logout API returned 401 — ignoring')
-        return Promise.reject(error)
+      if (shouldNotifySubscriptionInactive()) {
+        toast('Subscription inactive. Choose a plan to continue.', 'warning')
       }
+
+      if (currentPath !== SUBSCRIPTION_ROUTE && currentPath !== '/login') {
+        window.location.replace(SUBSCRIPTION_ROUTE)
+      }
+
+      return Promise.reject(error)
+    }
+
+    if (shouldForceLogout(error) && isAuthenticated()) {
+      console.warn('Unauthorized response received, clearing client session')
 
       await logoutService()
 
       store.dispatch(resetProfile())
       toast('Session expired', 'error')
 
-      window.location.href = '/login'
+      if (currentPath !== '/login') {
+        window.location.replace('/login')
+      }
 
       return Promise.reject(error)
     }

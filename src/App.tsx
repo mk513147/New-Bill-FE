@@ -4,6 +4,7 @@ import { Provider as ReduxProvider } from 'react-redux'
 import { store } from '@/redux/store.ts'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Provider as UIProvider } from '@/components/ui/provider.tsx'
+import ScrollRestorationHandler from './utils/ScrollRestorationHandler.tsx'
 
 const queryClient = new QueryClient()
 const App = () => {

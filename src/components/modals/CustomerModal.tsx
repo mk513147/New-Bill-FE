@@ -34,7 +34,7 @@ export default function CustomerDialog({
     balance: '',
   })
 
-  const { createCustomer, updateCustomer } = useCustomerActions(pubId ?? '')
+  const { createCustomer, updateCustomer } = useCustomerActions()
 
   useEffect(() => {
     if (defaultValues) {
@@ -55,16 +55,29 @@ export default function CustomerDialog({
   }
 
   function handleSubmit() {
+    const payload = {
+      name: formData.name.trim(),
+      mobileNumber: formData.mobileNumber.trim(),
+      email: formData.email?.trim() || '',
+      address: formData.address?.trim() || '',
+      ...(formData.balance ? { balance: Number(formData.balance) } : {}),
+    }
+
     if (mode === 'add') {
-      createCustomer.mutate(formData, {
+      createCustomer.mutate(payload, {
         onSuccess: onClose,
       })
       return
     }
 
-    updateCustomer.mutate(formData, {
-      onSuccess: onClose,
-    })
+    if (!pubId) return
+
+    updateCustomer.mutate(
+      { customerId: pubId, payload },
+      {
+        onSuccess: onClose,
+      },
+    )
   }
 
   const [isLarge] = useMediaQuery(['(min-width: 540px)'])
@@ -82,9 +95,18 @@ export default function CustomerDialog({
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="white" rounded="lg" shadow="lg" p={4} width="100%" maxW="600px">
+          <Dialog.Content
+            bg="linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)"
+            rounded="2xl"
+            shadow="xl"
+            p={4}
+            width="100%"
+            maxW="600px"
+            border="1px solid"
+            borderColor="gray.100"
+          >
             <Dialog.Header px={1}>
-              <Dialog.Title fontSize="2xl" fontWeight="700" color="gray.800">
+              <Dialog.Title fontSize="xl" fontWeight="800" color="gray.900" letterSpacing="-0.02em">
                 {mode === 'add' ? 'Add New Customer' : 'Edit Customer'}
               </Dialog.Title>
 
@@ -107,52 +129,72 @@ export default function CustomerDialog({
 
             <Dialog.Body pt={4}>
               <Field.Root mb={3}>
-                <Field.Label>Full Name</Field.Label>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Full Name
+                </Field.Label>
                 <Input
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter Full Name"
+                  bg="white"
+                  borderColor="gray.200"
                 />
               </Field.Root>
 
               <Field.Root mb={3}>
-                <Field.Label>Phone Number</Field.Label>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Phone Number
+                </Field.Label>
                 <Input
                   name="mobileNumber"
                   value={formData.mobileNumber}
                   onChange={handleChange}
-                  placeholder="+1 955 000 0000"
+                  placeholder="10-digit mobile number"
+                  bg="white"
+                  borderColor="gray.200"
                 />
               </Field.Root>
 
               <Field.Root mb={3}>
-                <Field.Label>Email-ID</Field.Label>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Email
+                </Field.Label>
                 <Input
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your Email-ID"
+                  placeholder="Enter email"
+                  bg="white"
+                  borderColor="gray.200"
                 />
               </Field.Root>
 
-              <Field.Root flex={1}>
-                <Field.Label>Balance</Field.Label>
+              <Field.Root mb={3}>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Balance
+                </Field.Label>
                 <Input
                   name="balance"
                   value={formData.balance}
                   onChange={handleChange}
                   placeholder="Enter Balance"
+                  bg="white"
+                  borderColor="gray.200"
                 />
               </Field.Root>
 
               <Field.Root flex={1}>
-                <Field.Label>Address</Field.Label>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Address
+                </Field.Label>
                 <Input
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
                   placeholder="Enter Address"
+                  bg="white"
+                  borderColor="gray.200"
                 />
               </Field.Root>
             </Dialog.Body>
@@ -173,10 +215,10 @@ export default function CustomerDialog({
 
               <Button
                 minW="160px"
-                bg="#6730EC"
+                bg="gray.950"
                 color="white"
                 width={'50%'}
-                _hover={{ bg: '#5b29d8' }}
+                _hover={{ bg: 'gray.800' }}
                 loading={createCustomer.isPending || updateCustomer.isPending}
                 onClick={handleSubmit}
               >

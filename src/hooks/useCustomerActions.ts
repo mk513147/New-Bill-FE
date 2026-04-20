@@ -2,58 +2,80 @@ import { API } from '@/api/api.ts'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/api/apiEndpoints.ts'
 import { ToasterUtil } from '@/components/common/ToasterUtil'
+import { AxiosError } from 'axios'
 
 const toast = ToasterUtil()
 
-export const useCustomerActions = (pubId: string) => {
+export type CustomerPayload = {
+  name: string
+  mobileNumber: string
+  email?: string
+  address?: string
+  balance?: number
+}
+
+export const useCustomerActions = () => {
   const queryClient = useQueryClient()
 
+  const invalidateCustomers = () => {
+    queryClient.invalidateQueries({ queryKey: ['customers'] })
+  }
+
   const createCustomer = useMutation({
-    mutationFn: (payload: any) =>
-      API.post(API_ENDPOINTS.CUSTOMERS.CREATE, payload).then((res: any) => res.data),
+    mutationFn: (payload: CustomerPayload) =>
+      API.post(API_ENDPOINTS.CUSTOMERS.CREATE, payload).then((res) => res.data?.data ?? res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
+      invalidateCustomers()
       toast('Customer created successfully', 'success')
     },
 
-    onError: () => {
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || 'Failed to create customer', 'error')
+        return
+      }
+
       toast('Failed to create customer', 'error')
     },
   })
 
   const updateCustomer = useMutation({
-    mutationFn: (payload: any) =>
-      API.patch(`${API_ENDPOINTS.CUSTOMERS.UPDATE}/${pubId}`, payload).then((res) => res.data),
+    mutationFn: ({ customerId, payload }: { customerId: string; payload: CustomerPayload }) =>
+      API.patch(`${API_ENDPOINTS.CUSTOMERS.UPDATE}/${customerId}`, payload).then(
+        (res) => res.data?.data ?? res.data,
+      ),
 
-    onSuccess: (updatedCustomer) => {
-      queryClient.setQueriesData({ queryKey: ['customers'] }, (old: any) => {
-        if (!old?.data) return old
-
-        return {
-          ...old,
-          data: old.data.map((c: any) => (c._id === updatedCustomer._id ? updatedCustomer : c)),
-        }
-      })
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
+    onSuccess: () => {
+      invalidateCustomers()
       toast('Customer updated successfully', 'success')
     },
 
-    onError: () => {
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || 'Failed to update customer', 'error')
+        return
+      }
+
       toast('Failed to update customer', 'error')
     },
   })
 
   const deleteCustomer = useMutation({
-    mutationFn: () =>
-      API.delete(`${API_ENDPOINTS.CUSTOMERS.DELETE}/${pubId}`).then((res: any) => res.data),
+    mutationFn: (customerId: string) =>
+      API.delete(`${API_ENDPOINTS.CUSTOMERS.DELETE}/${customerId}`).then((res) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
+      invalidateCustomers()
       toast('Customer deleted successfully', 'success')
     },
 
-    onError: () => {
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || 'Failed to delete customer', 'error')
+        return
+      }
+
       toast('Failed to delete customer', 'error')
     },
   })

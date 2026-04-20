@@ -1,194 +1,385 @@
-import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack, Badge } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
-import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
-import { FilterSelect } from '@/components/common/FilterSelect'
-import type { SortKey } from '@/components/popovers/TableActionsPopover'
-
-/* ------------------ Fake Stock Data ------------------ */
-
-type Stock = {
-  id: string
-  name: string
-  sku: string
-  category: string
-  quantity: number
-  price: number
-  status: 'In Stock' | 'Out of Stock'
-}
-
-const FAKE_STOCKS: Stock[] = [
-  {
-    id: '1',
-    name: 'Printed T-Shirt',
-    sku: 'SKU-TS-001',
-    category: 'Apparel',
-    quantity: 120,
-    price: 499,
-    status: 'In Stock',
-  },
-  {
-    id: '2',
-    name: 'Custom Mug',
-    sku: 'SKU-MG-002',
-    category: 'Accessories',
-    quantity: 0,
-    price: 299,
-    status: 'Out of Stock',
-  },
-  {
-    id: '3',
-    name: 'Football Jersey',
-    sku: 'SKU-JS-003',
-    category: 'Sportswear',
-    quantity: 42,
-    price: 899,
-    status: 'In Stock',
-  },
-]
-
-/* ------------------ Component ------------------ */
+import { ExpandableSearch } from '@/components/common/ExpandableSearch'
+import StockAdjustmentModal from '@/components/modals/StockAdjustmentModal'
+import { useStockHistory } from '@/hooks/useStockHistory'
+import { useProducts } from '@/hooks/useProducts'
 
 const Stocks = () => {
   const dispatch = useDispatch()
 
-  const [page, setPage] = useState(1)
-  const [sortBy, setSortBy] = useState<SortKey | undefined>()
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>()
-  const [filter, setFilter] = useState<string[]>(['all'])
+  const [adjustOpen, setAdjustOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(search)
 
+  const [typeFilter, setTypeFilter] = useState<'all' | 'IN' | 'OUT'>('all')
+  const [sourceFilter, setSourceFilter] = useState<
+    'all' | 'purchase' | 'sale' | 'adjustment' | 'damage'
+  >('all')
+  const [productFilter, setProductFilter] = useState<'all' | string>('all')
+
+  const [page, setPage] = useState(1)
   const limit = 20
 
+  const { data: productData } = useProducts({ page: 1, limit: 50 })
+  const { data: historyData = [], isLoading } = useStockHistory({
+    ...(typeFilter !== 'all' ? { type: typeFilter } : {}),
+    ...(sourceFilter !== 'all' ? { source: sourceFilter } : {}),
+    ...(productFilter !== 'all' ? { productId: productFilter } : {}),
+  })
+
+  const products = productData?.products ?? []
+
   useEffect(() => {
-    dispatch(setHeader({ title: 'Stocks' }))
+    dispatch(
+      setHeader({
+        title: 'Stock History',
+        subtitle: 'Track all stock movements and adjust inventory manually when needed',
+      }),
+    )
     return () => {
       dispatch(clearHeader())
     }
   }, [dispatch])
 
-  /* ------------------ Filtering + Sorting ------------------ */
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search), 300)
+    return () => clearTimeout(id)
+  }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, typeFilter, sourceFilter, productFilter])
 
   const filteredData = useMemo(() => {
-    let data = [...FAKE_STOCKS]
+    const keyword = debouncedSearch.trim().toLowerCase()
+    if (!keyword) return historyData
 
-    if (!filter.includes('all')) {
-      data = data.filter((s) => filter.includes(s.status === 'In Stock' ? 'in' : 'out'))
-    }
+    return historyData.filter((row) => {
+      const haystack = [row.productId?.name || '', row.source || '', row.type || '', row.note || '']
+        .join(' ')
+        .toLowerCase()
 
-    if (sortBy && sortOrder) {
-      data.sort((a: any, b: any) => {
-        if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
-        if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
-        return 0
-      })
-    }
+      return haystack.includes(keyword)
+    })
+  }, [historyData, debouncedSearch])
 
-    return data
-  }, [filter, sortBy, sortOrder])
+  const pagedData = useMemo(() => {
+    const start = (page - 1) * limit
+    return filteredData.slice(start, start + limit)
+  }, [filteredData, page])
 
-  /* ------------------ Columns ------------------ */
+  const pagination = {
+    currentPage: page,
+    totalPages: Math.max(1, Math.ceil(filteredData.length / limit)),
+    hasNextPage: page * limit < filteredData.length,
+    hasPreviousPage: page > 1,
+  }
+
+  const totalIn = filteredData
+    .filter((row) => row.type === 'IN')
+    .reduce((sum, row) => sum + Number(row.quantity || 0), 0)
+
+  const totalOut = filteredData
+    .filter((row) => row.type === 'OUT')
+    .reduce((sum, row) => sum + Number(row.quantity || 0), 0)
+
+  const summary = {
+    total: filteredData.length,
+    totalIn,
+    totalOut,
+    netMovement: totalIn - totalOut,
+  }
 
   const stockColumns = [
-    { key: 'name', header: 'Product Name', render: (s: Stock) => s.name },
-    { key: 'sku', header: 'SKU', render: (s: Stock) => s.sku },
-    { key: 'category', header: 'Category', render: (s: Stock) => s.category },
+    {
+      key: 'product',
+      header: 'Product',
+      width: '220px',
+      render: (row: any) => row.productId?.name || '-',
+    },
+    {
+      key: 'type',
+      header: 'Type',
+      width: '110px',
+      render: (row: any) => (
+        <Badge colorPalette={row.type === 'IN' ? 'green' : 'red'}>{row.type}</Badge>
+      ),
+    },
+    {
+      key: 'source',
+      header: 'Source',
+      width: '140px',
+      render: (row: any) => row.source || '-',
+    },
     {
       key: 'quantity',
       header: 'Quantity',
-      render: (s: Stock) => s.quantity,
+      width: '120px',
+      render: (row: any) => row.quantity,
     },
     {
-      key: 'price',
-      header: 'Price',
-      render: (s: Stock) => `₹${s.price}`,
+      key: 'date',
+      header: 'Date',
+      width: '160px',
+      render: (row: any) =>
+        row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-IN') : '-',
     },
     {
-      key: 'status',
-      header: 'Status',
-      render: (s: Stock) => (
-        <Text fontWeight="medium" color={s.status === 'In Stock' ? 'green.600' : 'red.500'}>
-          {s.status}
-        </Text>
-      ),
+      key: 'note',
+      header: 'Note',
+      width: '260px',
+      render: (row: any) => row.note || '-',
     },
   ]
-
-  const stockFilters = [
-    { label: 'All stock', value: 'all' },
-    { label: 'In stock', value: 'in' },
-    { label: 'Out of stock', value: 'out' },
-  ]
-
-  /* ------------------ Pagination (Fake) ------------------ */
-
-  const totalPages = 1
 
   return (
-    <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
-      {/* Header Row */}
-      <Flex justify="space-between" align="center" mt={8}>
-        <FilterSelect
-          options={stockFilters}
-          value={filter}
-          defaultValue={['all']}
-          placeholder="All stock"
-          onChange={setFilter}
-        />
+    <>
+      <Flex
+        bg="linear-gradient(180deg, #eef2f6 0%, #e8edf3 48%, #e2e8f0 100%)"
+        width="100%"
+        height="100%"
+        flexDir="column"
+        px={{ base: 4, md: 6 }}
+        py={{ base: 4, md: 5 }}
+      >
+        <SimpleGrid columns={{ base: 2, md: 4 }} gap={3}>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Records
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.total}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Total In
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="green.700">
+              {summary.totalIn}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Total Out
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="red.700">
+              {summary.totalOut}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Net Movement
+            </Text>
+            <Text
+              mt={1}
+              fontSize="xl"
+              fontWeight="800"
+              color={summary.netMovement >= 0 ? 'blue.700' : 'orange.700'}
+            >
+              {summary.netMovement}
+            </Text>
+          </Box>
+        </SimpleGrid>
 
-        <HStack gap={2}>
-          <IconButton aria-label="Add Stock" colorPalette="blue" variant="solid" px={3} h="32px">
-            <HStack gap={1}>
-              <Plus size={18} />
-              <Text fontSize="sm">New</Text>
+        <Flex
+          justify="space-between"
+          align={{ base: 'stretch', md: 'center' }}
+          mt={4}
+          w="100%"
+          gap={4}
+          direction={{ base: 'column', md: 'row' }}
+        >
+          <HStack gap={2} align="center" flexWrap="wrap">
+            <ExpandableSearch
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search stock history..."
+              expandedWidth="300px"
+            />
+
+            <HStack bg="white" border="1px solid" borderColor="gray.100" borderRadius="10px" p={1}>
+              <Button
+                size="sm"
+                variant={typeFilter === 'all' ? 'solid' : 'ghost'}
+                bg={typeFilter === 'all' ? 'gray.900' : 'transparent'}
+                color={typeFilter === 'all' ? 'white' : 'gray.700'}
+                _hover={{ bg: typeFilter === 'all' ? 'gray.900' : 'gray.100' }}
+                onClick={() => setTypeFilter('all')}
+              >
+                All
+              </Button>
+              <Button
+                size="sm"
+                variant={typeFilter === 'IN' ? 'solid' : 'ghost'}
+                bg={typeFilter === 'IN' ? 'gray.900' : 'transparent'}
+                color={typeFilter === 'IN' ? 'white' : 'gray.700'}
+                _hover={{ bg: typeFilter === 'IN' ? 'gray.900' : 'gray.100' }}
+                onClick={() => setTypeFilter('IN')}
+              >
+                IN
+              </Button>
+              <Button
+                size="sm"
+                variant={typeFilter === 'OUT' ? 'solid' : 'ghost'}
+                bg={typeFilter === 'OUT' ? 'gray.900' : 'transparent'}
+                color={typeFilter === 'OUT' ? 'white' : 'gray.700'}
+                _hover={{ bg: typeFilter === 'OUT' ? 'gray.900' : 'gray.100' }}
+                onClick={() => setTypeFilter('OUT')}
+              >
+                OUT
+              </Button>
             </HStack>
-          </IconButton>
 
-          <TableActionsPopover
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onSortChange={(key, order) => {
-              setPage(1)
-              setSortBy(key)
-              setSortOrder(order)
-            }}
-            onRefresh={() => {
-              /* fake refresh */
-            }}
-            onImport={function (): void {
-              throw new Error('Function not implemented.')
-            }}
-            onExport={function (): void {
-              throw new Error('Function not implemented.')
-            }}
-          />
-        </HStack>
-      </Flex>
+            <HStack bg="white" border="1px solid" borderColor="gray.100" borderRadius="10px" p={1}>
+              <Button size="sm" variant="ghost" onClick={() => setSourceFilter('all')}>
+                Source: {sourceFilter}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setSourceFilter('purchase')}>
+                Purchase
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setSourceFilter('sale')}>
+                Sale
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setSourceFilter('adjustment')}>
+                Adjust
+              </Button>
+            </HStack>
 
-      {/* Table */}
-      <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable
-          columns={stockColumns}
-          data={filteredData}
-          isLoading={false}
-          rowKey={(s) => s.id}
-        />
-      </Box>
+            <HStack
+              bg="white"
+              border="1px solid"
+              borderColor="gray.100"
+              borderRadius="10px"
+              p={1}
+              flexWrap="wrap"
+            >
+              <Button
+                size="sm"
+                variant={productFilter === 'all' ? 'solid' : 'ghost'}
+                onClick={() => setProductFilter('all')}
+              >
+                All Products
+              </Button>
+              {products.slice(0, 4).map((product: any) => (
+                <Button
+                  key={product._id}
+                  size="sm"
+                  variant={productFilter === product._id ? 'solid' : 'ghost'}
+                  onClick={() => setProductFilter(product._id)}
+                >
+                  {product.name}
+                </Button>
+              ))}
+            </HStack>
+          </HStack>
 
-      {/* Pagination */}
-      <Flex justify="center" mt={4} gap={2}>
-        <Button disabled>Previous</Button>
-        {Array.from({ length: totalPages }).map((_, i) => (
-          <Button key={i} bg="purple.100">
-            {i + 1}
+          <Button
+            bg="gray.950"
+            color="white"
+            h="38px"
+            px={4}
+            _hover={{ bg: 'gray.800' }}
+            onClick={() => setAdjustOpen(true)}
+          >
+            <HStack gap={1.5}>
+              <Plus size={18} />
+              <Text fontSize="sm" fontWeight="700">
+                Adjust Stock
+              </Text>
+            </HStack>
           </Button>
-        ))}
-        <Button disabled>Next</Button>
+        </Flex>
+
+        <Box
+          bg="rgba(255,255,255,0.86)"
+          mt={6}
+          rounded="2xl"
+          shadow="lightGray"
+          border="1px solid"
+          borderColor="whiteAlpha.800"
+          w="100%"
+          p={{ base: 2, md: 4 }}
+        >
+          <CommonTable
+            columns={stockColumns}
+            data={pagedData}
+            isLoading={isLoading}
+            rowKey={(row) => row._id}
+            emptyMessage={
+              debouncedSearch ? 'No stock movements match your search.' : 'No stock history found.'
+            }
+          />
+        </Box>
+
+        <VStack
+          justify="center"
+          align="center"
+          mt={3}
+          p={3}
+          bg="rgba(255,255,255,0.86)"
+          borderRadius="18px"
+          border="1px solid"
+          borderColor="whiteAlpha.800"
+          gap={2}
+          width="100%"
+          flexWrap="wrap"
+        >
+          <HStack gap={2} flexWrap="wrap" justify="center">
+            <Button
+              onClick={() => setPage(pagination.currentPage - 1)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ bg: 'gray.50' }}
+              disabled={!pagination.hasPreviousPage}
+            >
+              Previous
+            </Button>
+
+            {Array.from({ length: pagination.totalPages }).map((_, i) => {
+              const pg = i + 1
+              return (
+                <Button
+                  key={pg}
+                  bg={pg === pagination.currentPage ? 'gray.900' : 'white'}
+                  color={pg === pagination.currentPage ? 'white' : 'gray.800'}
+                  border="1px solid"
+                  borderColor={pg === pagination.currentPage ? 'gray.900' : 'gray.200'}
+                  _hover={{ bg: pg === pagination.currentPage ? 'gray.900' : 'gray.100' }}
+                  onClick={() => setPage(pg)}
+                >
+                  {pg}
+                </Button>
+              )
+            })}
+
+            <Button
+              onClick={() => setPage(pagination.currentPage + 1)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ bg: 'gray.50' }}
+              disabled={!pagination.hasNextPage}
+            >
+              Next
+            </Button>
+          </HStack>
+
+          <Text fontSize="xs" color="gray.600">
+            Showing {pagedData.length} of {filteredData.length} stock movements
+          </Text>
+        </VStack>
       </Flex>
-    </Flex>
+
+      <StockAdjustmentModal open={adjustOpen} onClose={() => setAdjustOpen(false)} />
+    </>
   )
 }
 

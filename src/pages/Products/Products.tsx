@@ -1,4 +1,4 @@
-import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack } from '@chakra-ui/react'
 
 import { FaEdit, FaTrash } from '@/components/icons'
 
@@ -18,7 +18,6 @@ import { useProductExport } from '@/hooks/useProductExport'
 import { useQueryClient } from '@tanstack/react-query'
 import { isFrontendPagination } from '@/utils/isFrontendPagination'
 import { ExpandableSearch } from '@/components/common/ExpandableSearch'
-import { FilterSelect } from '@/components/common/FilterSelect'
 
 function Products() {
   const [open, setOpen] = useState(false)
@@ -33,7 +32,7 @@ function Products() {
   const [sortBy, setSortBy] = useState<string>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
-  const { deleteProduct } = useProductActions(deleteId ?? '')
+  const { deleteProduct } = useProductActions()
   const importProducts = useProductImport()
   const exportProducts = useProductExport()
   const queryClient = useQueryClient()
@@ -86,53 +85,88 @@ function Products() {
     {
       key: 'name',
       header: 'Product Name',
-      render: (p: any) => p.name,
+      width: '220px',
+      render: (p: any) => p.name || '-',
     },
     {
-      key: 'barcode',
-      header: 'Barcode',
-      render: (p: any) => p.barcode,
+      key: 'productId',
+      header: 'Product ID',
+      width: '170px',
+      render: (p: any) => (p?._id ? `PRD-${p._id.slice(-6).toUpperCase()}` : '-'),
     },
-
+    {
+      key: 'brand',
+      header: 'Brand',
+      width: '170px',
+      render: (p: any) => p.brand || '-',
+    },
     {
       key: 'category',
       header: 'Category',
+      width: '170px',
       render: (p: any) => p.categoryId?.name ?? '—',
+    },
+    {
+      key: 'supplier',
+      header: 'Supplier',
+      width: '220px',
+      render: (p: any) => p.supplierId?.name ?? '—',
     },
 
     {
+      key: 'purchasePrice',
+      header: 'Purchase Price',
+      width: '170px',
+      render: (p: any) =>
+        new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          maximumFractionDigits: 0,
+        }).format(Number(p.purchasePrice || 0)),
+    },
+    {
       key: 'sellingPrice',
       header: 'Selling Price',
-      render: (p: any) => p.sellingPrice,
+      width: '170px',
+      render: (p: any) =>
+        new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          maximumFractionDigits: 0,
+        }).format(Number(p.sellingPrice || 0)),
     },
     {
       key: 'unit',
       header: 'Unit',
-      render: (p: any) => p.unit,
+      width: '100px',
+      render: (p: any) => p.unit || 'pcs',
     },
     {
-      key: 'maxDiscount',
-      header: 'Maximum Discount',
-      width: '100px',
-
-      render: (p: any) => p.maxDiscount,
-    },
-    {
-      key: 'minDiscount',
-      header: 'Minimum Discount',
-      width: '100px',
-      render: (p: any) => p.minDiscount,
+      key: 'stock',
+      header: 'Stock',
+      width: '110px',
+      render: (p: any) => p.stock ?? 0,
     },
   ]
 
   const productActions = [
     {
       label: 'Edit',
-      icon: <FaEdit size="16px" color="#7C3AED" />,
+      icon: <FaEdit size="16px" color="#0f172a" />,
       onClick: (item: any) => {
         setDialogMode('edit')
         setEditId(item._id)
-        setEditDefaults(item)
+        setEditDefaults({
+          name: item.name,
+          brand: item.brand,
+          categoryId: item.categoryId?._id,
+          supplierId: item.supplierId?._id,
+          purchasePrice: String(item.purchasePrice ?? 0),
+          sellingPrice: String(item.sellingPrice ?? 0),
+          unit: item.unit || 'pcs',
+          stock: String(item.stock ?? 0),
+          newCategoryName: '',
+        })
         setOpen(true)
       },
     },
@@ -156,19 +190,16 @@ function Products() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(setHeader({ title: 'Products' }))
+    dispatch(
+      setHeader({
+        title: 'Products',
+        subtitle: 'Manage catalog, pricing, stock, and supplier mapping from one workspace',
+      }),
+    )
     return () => {
       dispatch(clearHeader())
     }
   }, [dispatch])
-
-  const [value, setValue] = useState<string[]>([])
-
-  const productFilters = [
-    { label: 'All Products', value: 'all' },
-    { label: 'Low Stock', value: 'active' },
-    { label: 'Out of Stock', value: 'inactive' },
-  ]
 
   const handleImportClick = () => {
     fileInputRef.current?.click()
@@ -189,6 +220,13 @@ function Products() {
     })
   }
 
+  const summary = {
+    total: rawProducts.length,
+    showing: products.length,
+    activePage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+  }
+
   return (
     <>
       <input
@@ -198,34 +236,85 @@ function Products() {
         hidden
         onChange={handleFileChange}
       />
-      <Flex bg="gray.100" width="100%" height="100%" overflowX="auto" flexDir="column" px={6}>
-        <Flex justify="space-between" align="center" mt={8} w="100%" gap={4}>
-          <HStack gap={2}>
+      <Flex
+        bg="linear-gradient(180deg, #eef2f6 0%, #e8edf3 48%, #e2e8f0 100%)"
+        width="100%"
+        height="100%"
+        overflowX="auto"
+        flexDir="column"
+        px={{ base: 4, md: 6 }}
+        py={{ base: 4, md: 5 }}
+      >
+        <SimpleGrid columns={{ base: 2, md: 4 }} gap={3}>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Total
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.total}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Showing
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.showing}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Page
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.activePage}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Total Pages
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.totalPages}
+            </Text>
+          </Box>
+        </SimpleGrid>
+
+        <Flex
+          justify="space-between"
+          align={{ base: 'stretch', md: 'center' }}
+          mt={4}
+          w="100%"
+          gap={4}
+          direction={{ base: 'column', md: 'row' }}
+        >
+          <HStack gap={2} align="center" flexWrap="wrap">
             <ExpandableSearch
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Products"
+              expandedWidth="300px"
             />
-
-            {/* Filter */}
-            <FilterSelect
-              options={productFilters}
-              value={value}
-              defaultValue={['all']}
-              placeholder="All Products"
-              onChange={setValue}
-              width="200px"
-            />
+            <Text
+              fontSize="xs"
+              color="gray.600"
+              bg="white"
+              px={3}
+              py={2}
+              borderRadius="10px"
+              border="1px solid"
+              borderColor="gray.100"
+            >
+              Sorted by {sortBy} ({sortOrder})
+            </Text>
           </HStack>
           <HStack gap={2}>
-            <IconButton
-              aria-label="Add Product"
-              colorPalette="blue"
-              variant="solid"
-              px={3}
-              minW="unset"
-              minH="unset"
-              h="32px"
+            <Button
+              bg="gray.950"
+              color="white"
+              h="38px"
+              px={4}
+              _hover={{ bg: 'gray.800' }}
               onClick={() => {
                 setDialogMode('add')
                 setEditId(null)
@@ -233,13 +322,13 @@ function Products() {
                 setOpen(true)
               }}
             >
-              <HStack gap={1}>
+              <HStack gap={1.5}>
                 <Plus size={18} />
-                <Text fontSize="sm" display={{ base: 'none', md: 'block' }}>
-                  New
+                <Text fontSize="sm" fontWeight="700">
+                  Add Product
                 </Text>
               </HStack>
-            </IconButton>
+            </Button>
 
             <TableActionsPopover
               sortBy={sortBy}
@@ -252,18 +341,18 @@ function Products() {
               }}
               onImport={handleImportClick}
               onExport={handleExportClick}
-              onRefresh={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}
+              onRefresh={() => queryClient.invalidateQueries({ queryKey: ['products'] })}
             />
           </HStack>
         </Flex>
 
         <Box
-          bg="white"
+          bg="rgba(255,255,255,0.86)"
           mt={6}
-          rounded="lg"
+          rounded="2xl"
           shadow="lightGray"
           border="1px solid"
-          borderColor="gray.100"
+          borderColor="whiteAlpha.800"
           w="100%"
           p={{ base: 2, md: 4 }}
         >
@@ -273,63 +362,68 @@ function Products() {
             isLoading={isLoading}
             rowKey={(p) => p._id}
             actions={productActions}
+            emptyMessage={debouncedSearch ? 'No products match your search.' : 'No products found.'}
           />
         </Box>
 
-        <Flex
+        <VStack
           justify="center"
           align="center"
-          borderRadius="lg"
-          mt={2}
-          mb={2}
-          p={2}
-          bg={'white'}
-          shadow="lightGray"
-          gap={4}
+          mt={3}
+          p={3}
+          bg="rgba(255,255,255,0.86)"
+          borderRadius="18px"
+          border="1px solid"
+          borderColor="whiteAlpha.800"
+          gap={2}
           width="100%"
+          flexWrap="wrap"
         >
-          <Button
-            onClick={() => setPage(pagination.currentPage - 1)}
-            disabled={!pagination.hasPreviousPage}
-            variant="outline"
-            bg="white"
-            rounded="lg"
-          >
-            <HStack>
-              <Text color="gray.800">Previous</Text>
-            </HStack>
-          </Button>
+          <HStack gap={2} flexWrap="wrap" justify="center">
+            <Button
+              onClick={() => setPage(pagination.currentPage - 1)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ bg: 'gray.50' }}
+              disabled={!pagination.hasPreviousPage}
+            >
+              Previous
+            </Button>
 
-          <HStack gap={2}>
             {Array.from({ length: pagination.totalPages }).map((_, index) => {
               const pg = index + 1
               return (
                 <Button
                   key={pg}
                   onClick={() => setPage(pg)}
-                  rounded="lg"
-                  bg={pg === pagination.currentPage ? 'purple.100' : 'transparent'}
-                  color={pg === pagination.currentPage ? 'purple.600' : 'gray.700'}
-                  _hover={{ bg: 'purple.50' }}
+                  bg={pg === pagination.currentPage ? 'gray.900' : 'white'}
+                  color={pg === pagination.currentPage ? 'white' : 'gray.800'}
+                  border="1px solid"
+                  borderColor={pg === pagination.currentPage ? 'gray.900' : 'gray.200'}
+                  _hover={{ bg: pg === pagination.currentPage ? 'gray.900' : 'gray.100' }}
                 >
                   {pg}
                 </Button>
               )
             })}
+
+            <Button
+              onClick={() => setPage(pagination.currentPage + 1)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ bg: 'gray.50' }}
+              disabled={!pagination.hasNextPage}
+            >
+              Next
+            </Button>
           </HStack>
 
-          <Button
-            onClick={() => setPage(pagination.currentPage + 1)}
-            disabled={!pagination.hasNextPage}
-            variant="outline"
-            bg="white"
-            rounded="lg"
-          >
-            <HStack>
-              <Text color="gray.800">Next</Text>
-            </HStack>
-          </Button>
-        </Flex>
+          <Text fontSize="xs" color="gray.600">
+            Showing {products.length} of {rawProducts.length} products
+          </Text>
+        </VStack>
       </Flex>
 
       <ProductDialog
@@ -348,7 +442,13 @@ function Products() {
         confirmText="Delete"
         cancelText="Cancel"
         loading={deleteProduct.isPending}
-        onConfirm={() => deleteProduct.mutate()}
+        onConfirm={() => {
+          if (!deleteId) return
+
+          deleteProduct.mutate(deleteId, {
+            onSuccess: () => setDeleteOpen(false),
+          })
+        }}
       />
     </>
   )

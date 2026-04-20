@@ -17,13 +17,13 @@ export const useCustomerImport = () => {
       return res.data
     },
 
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
-      toast('Customers imported successfully', 'success')
+      toast(response?.message || 'Customers imported successfully', 'success')
     },
 
-    onError: () => {
-      toast('Customer import failed', 'error')
+    onError: (error: any) => {
+      toast(error?.response?.data?.message || 'Customer import failed', 'error')
     },
   })
 }

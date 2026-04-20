@@ -1,222 +1,283 @@
-import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
+import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
-import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
-import { FilterSelect } from '@/components/common/FilterSelect'
-import type { SortKey } from '@/components/popovers/TableActionsPopover'
+import { ExpandableSearch } from '@/components/common/ExpandableSearch'
 
-/* ------------------ Fake Payments Data ------------------ */
-
-type Payment = {
-  id: string
-  paymentNumber: string
-  supplier: string
-  billNumber: string
-  paymentDate: string
-  amount: number
-  mode: 'Cash' | 'UPI' | 'Bank Transfer'
-  status: 'Completed' | 'Pending' | 'Failed'
-}
-
-const FAKE_PAYMENTS: Payment[] = [
-  {
-    id: '1',
-    paymentNumber: 'PAY-2026-001',
-    supplier: 'ABC Packaging Ltd',
-    billNumber: 'BILL-2026-001',
-    paymentDate: '2026-01-18',
-    amount: 5950,
-    mode: 'Bank Transfer',
-    status: 'Completed',
-  },
-  {
-    id: '2',
-    paymentNumber: 'PAY-2026-002',
-    supplier: 'XYZ Textiles',
-    billNumber: 'BILL-2026-002',
-    paymentDate: '2026-01-22',
-    amount: 5000,
-    mode: 'UPI',
-    status: 'Pending',
-  },
-  {
-    id: '3',
-    paymentNumber: 'PAY-2026-003',
-    supplier: 'National Plastics',
-    billNumber: 'BILL-2026-003',
-    paymentDate: '2026-01-23',
-    amount: 9000,
-    mode: 'Cash',
-    status: 'Failed',
-  },
-]
-
-/* ------------------ Component ------------------ */
+import { usePayment } from '@/hooks/usePayment'
 
 const Payments = () => {
   const dispatch = useDispatch()
 
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(search)
   const [page, setPage] = useState(1)
-  const [sortBy, setSortBy] = useState<SortKey | undefined>()
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>()
-  const [filter, setFilter] = useState<string[]>(['all'])
-
   const limit = 20
 
+  const { data: paymentData = [], isLoading } = usePayment()
+
   useEffect(() => {
-    dispatch(setHeader({ title: 'Payments' }))
+    const id = setTimeout(() => setDebouncedSearch(search), 350)
+    return () => clearTimeout(id)
+  }, [search])
+
+  useEffect(() => {
+    dispatch(
+      setHeader({
+        title: 'Payments',
+        subtitle: 'Track all supplier and customer payments',
+      }),
+    )
+
     return () => {
       dispatch(clearHeader())
     }
   }, [dispatch])
 
-  /* ------------------ Filtering + Sorting ------------------ */
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch])
 
-  const data = useMemo(() => {
-    let rows = [...FAKE_PAYMENTS]
+  const filteredPayments = useMemo(() => {
+    const keyword = debouncedSearch.trim().toLowerCase()
+    if (!keyword) return paymentData
 
-    if (!filter.includes('all')) {
-      rows = rows.filter((p) =>
-        filter.includes(
-          p.status === 'Completed' ? 'completed' : p.status === 'Failed' ? 'failed' : 'pending',
-        ),
-      )
-    }
+    return paymentData.filter((p) => {
+      const haystack = [
+        p.paidToType,
+        p.supplierId?.name || '',
+        p.customerId?.name || '',
+        p.paymentMode,
+        p.note || '',
+      ]
+        .join(' ')
+        .toLowerCase()
 
-    if (sortBy && sortOrder) {
-      rows.sort((a: any, b: any) => {
-        if (a[sortBy] < b[sortBy]) return sortOrder === 'asc' ? -1 : 1
-        if (a[sortBy] > b[sortBy]) return sortOrder === 'asc' ? 1 : -1
-        return 0
-      })
-    }
+      return haystack.includes(keyword)
+    })
+  }, [paymentData, debouncedSearch])
 
-    return rows
-  }, [filter, sortBy, sortOrder])
+  const payments = useMemo(() => {
+    const start = (page - 1) * limit
+    return filteredPayments.slice(start, start + limit)
+  }, [filteredPayments, page])
 
-  /* ------------------ Columns ------------------ */
+  const pagination = {
+    currentPage: page,
+    totalPages: Math.max(1, Math.ceil(filteredPayments.length / limit)),
+    hasNextPage: page * limit < filteredPayments.length,
+    hasPreviousPage: page > 1,
+  }
+
+  const summary = {
+    total: filteredPayments.length,
+    showing: payments.length,
+    activePage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+  }
 
   const paymentColumns = [
     {
-      key: 'paymentNumber',
-      header: 'Payment No.',
-      render: (p: Payment) => p.paymentNumber,
+      key: 'paidToType',
+      header: 'Type',
+      width: '100px',
+      render: (p: any) => (
+        <Text fontSize="sm" fontWeight="600" textTransform="capitalize">
+          {p.paidToType || '-'}
+        </Text>
+      ),
     },
     {
-      key: 'supplier',
-      header: 'Supplier',
-      render: (p: Payment) => p.supplier,
-    },
-    {
-      key: 'billNumber',
-      header: 'Bill No.',
-      render: (p: Payment) => p.billNumber,
+      key: 'entity',
+      header: 'Entity',
+      width: '200px',
+      render: (p: any) => p.supplierId?.name || p.customerId?.name || '-',
     },
     {
       key: 'paymentDate',
       header: 'Payment Date',
-      render: (p: Payment) => p.paymentDate,
+      width: '160px',
+      render: (p: any) =>
+        p.paymentDate ? new Date(p.paymentDate).toLocaleDateString('en-IN') : '-',
     },
     {
       key: 'amount',
       header: 'Amount',
-      render: (p: Payment) => `₹${p.amount}`,
+      width: '130px',
+      render: (p: any) =>
+        new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          maximumFractionDigits: 0,
+        }).format(Number(p.amount || 0)),
     },
     {
-      key: 'mode',
+      key: 'paymentMode',
       header: 'Payment Mode',
-      render: (p: Payment) => p.mode,
+      width: '130px',
+      render: (p: any) => (
+        <Text fontSize="sm" textTransform="capitalize">
+          {p.paymentMode || '-'}
+        </Text>
+      ),
     },
     {
-      key: 'status',
-      header: 'Status',
-      render: (p: Payment) => (
-        <Text
-          fontWeight="medium"
-          color={
-            p.status === 'Completed'
-              ? 'green.600'
-              : p.status === 'Failed'
-                ? 'red.500'
-                : 'orange.500'
-          }
-        >
-          {p.status}
+      key: 'note',
+      header: 'Note',
+      width: '150px',
+      render: (p: any) => (
+        <Text fontSize="sm" noOfLines={1}>
+          {p.note || '-'}
         </Text>
       ),
     },
   ]
 
-  const paymentFilters = [
-    { label: 'All payments', value: 'all' },
-    { label: 'Completed', value: 'completed' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Failed', value: 'failed' },
-  ]
-
-  const totalPages = 1
-
   return (
-    <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
-      {/* Header Row */}
-      <Flex justify="space-between" align="center" mt={8}>
-        <FilterSelect
-          options={paymentFilters}
-          value={filter}
-          defaultValue={['all']}
-          placeholder="All payments"
-          onChange={setFilter}
-        />
+    <>
+      <Flex
+        bg="linear-gradient(180deg, #eef2f6 0%, #e8edf3 48%, #e2e8f0 100%)"
+        width="100%"
+        height="100%"
+        flexDir="column"
+        px={{ base: 4, md: 6 }}
+        py={{ base: 4, md: 5 }}
+      >
+        <SimpleGrid columns={{ base: 2, md: 4 }} gap={3}>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Total
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.total}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Showing
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.showing}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Page
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.activePage}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Total Pages
+            </Text>
+            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
+              {summary.totalPages}
+            </Text>
+          </Box>
+        </SimpleGrid>
 
-        <HStack gap={2}>
-          <IconButton aria-label="Add Payment" colorPalette="blue" variant="solid" px={3} h="32px">
-            <HStack gap={1}>
-              <Plus size={18} />
-              <Text fontSize="sm">New</Text>
-            </HStack>
-          </IconButton>
+        <Flex
+          justify="space-between"
+          align={{ base: 'stretch', md: 'center' }}
+          mt={4}
+          w="100%"
+          gap={4}
+          direction={{ base: 'column', md: 'row' }}
+        >
+          <HStack gap={2} align="center" flexWrap="wrap">
+            <ExpandableSearch
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search payments..."
+              expandedWidth="300px"
+            />
+          </HStack>
+        </Flex>
 
-          <TableActionsPopover
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onSortChange={(key, order) => {
-              setPage(1)
-              setSortBy(key)
-              setSortOrder(order)
-            }}
-            onRefresh={() => {
-              /* fake refresh */
-            }}
-            onImport={function (): void {
-              throw new Error('Function not implemented.')
-            }}
-            onExport={function (): void {
-              throw new Error('Function not implemented.')
-            }}
+        <Box
+          bg="rgba(255,255,255,0.86)"
+          mt={6}
+          rounded="2xl"
+          shadow="lightGray"
+          border="1px solid"
+          borderColor="whiteAlpha.800"
+          w="100%"
+          p={{ base: 2, md: 4 }}
+        >
+          <CommonTable
+            columns={paymentColumns}
+            data={payments}
+            isLoading={isLoading}
+            rowKey={(p) => p._id}
+            emptyMessage={debouncedSearch ? 'No payments match your search.' : 'No payments found.'}
           />
-        </HStack>
-      </Flex>
+        </Box>
 
-      {/* Table */}
-      <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable columns={paymentColumns} data={data} isLoading={false} rowKey={(p) => p.id} />
-      </Box>
+        <VStack
+          justify="center"
+          align="center"
+          mt={3}
+          p={3}
+          bg="rgba(255,255,255,0.86)"
+          borderRadius="18px"
+          border="1px solid"
+          borderColor="whiteAlpha.800"
+          gap={2}
+          width="100%"
+          flexWrap="wrap"
+        >
+          <HStack gap={2} flexWrap="wrap" justify="center">
+            <Button
+              onClick={() => setPage(pagination.currentPage - 1)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ bg: 'gray.50' }}
+              disabled={!pagination.hasPreviousPage}
+            >
+              Previous
+            </Button>
 
-      {/* Pagination */}
-      <Flex justify="center" mt={4} gap={2}>
-        <Button disabled>Previous</Button>
-        {Array.from({ length: totalPages }).map((_, i) => (
-          <Button key={i} bg="purple.100">
-            {i + 1}
-          </Button>
-        ))}
-        <Button disabled>Next</Button>
+            {Array.from({ length: pagination.totalPages }).map((_, i) => {
+              const pg = i + 1
+              return (
+                <Button
+                  key={pg}
+                  bg={pg === pagination.currentPage ? 'gray.900' : 'white'}
+                  color={pg === pagination.currentPage ? 'white' : 'gray.800'}
+                  border="1px solid"
+                  borderColor={pg === pagination.currentPage ? 'gray.900' : 'gray.200'}
+                  _hover={{ bg: pg === pagination.currentPage ? 'gray.900' : 'gray.100' }}
+                  onClick={() => setPage(pg)}
+                >
+                  {pg}
+                </Button>
+              )
+            })}
+
+            <Button
+              onClick={() => setPage(pagination.currentPage + 1)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ bg: 'gray.50' }}
+              disabled={!pagination.hasNextPage}
+            >
+              Next
+            </Button>
+          </HStack>
+
+          <Text fontSize="xs" color="gray.600">
+            Showing {payments.length} of {filteredPayments.length} payments
+          </Text>
+        </VStack>
       </Flex>
-    </Flex>
+    </>
   )
 }
 

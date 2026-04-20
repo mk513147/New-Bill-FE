@@ -5,7 +5,6 @@ import { useCategoryActions } from '@/hooks/useCategoryActions'
 
 export interface CategoryFormValues {
   name: string
-  description?: string
 }
 
 interface CategoryDialogProps {
@@ -25,10 +24,9 @@ export default function CategoryModal({
 }: CategoryDialogProps) {
   const [formData, setFormData] = useState<CategoryFormValues>({
     name: '',
-    description: '',
   })
 
-  const { createCategory, updateCategory } = useCategoryActions(pubId ?? '')
+  const { createCategory, updateCategory } = useCategoryActions()
 
   useEffect(() => {
     if (defaultValues) {
@@ -36,7 +34,6 @@ export default function CategoryModal({
     } else {
       setFormData({
         name: '',
-        description: '',
       })
     }
   }, [defaultValues, mode])
@@ -53,9 +50,14 @@ export default function CategoryModal({
       return
     }
 
-    updateCategory.mutate(formData, {
-      onSuccess: onClose,
-    })
+    if (!pubId) return
+
+    updateCategory.mutate(
+      { categoryId: pubId, payload: formData },
+      {
+        onSuccess: onClose,
+      },
+    )
   }
 
   const [isLarge] = useMediaQuery(['(min-width: 540px)'])
@@ -73,9 +75,18 @@ export default function CategoryModal({
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="white" rounded="lg" shadow="lg" p={4} width="100%" maxW="600px">
+          <Dialog.Content
+            bg="linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)"
+            rounded="2xl"
+            shadow="xl"
+            p={4}
+            width="100%"
+            maxW="560px"
+            border="1px solid"
+            borderColor="gray.100"
+          >
             <Dialog.Header px={1}>
-              <Dialog.Title fontSize="2xl" fontWeight="700" color="gray.800">
+              <Dialog.Title fontSize="xl" fontWeight="800" color="gray.900" letterSpacing="-0.02em">
                 {mode === 'add' ? 'Add New Category' : 'Edit Category'}
               </Dialog.Title>
 
@@ -98,22 +109,20 @@ export default function CategoryModal({
 
             <Dialog.Body pt={4} zIndex={2000}>
               <Field.Root mb={3}>
-                <Field.Label>Category Name</Field.Label>
+                <Field.Label color="gray.700" fontWeight="600">
+                  Category Name
+                </Field.Label>
                 <Input
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter Category Name"
-                />
-              </Field.Root>
-
-              <Field.Root>
-                <Field.Label>Description</Field.Label>
-                <Input
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Enter Description"
+                  bg="white"
+                  borderColor="gray.200"
+                  _focus={{
+                    borderColor: 'gray.500',
+                    boxShadow: '0 0 0 1px var(--chakra-colors-gray-500)',
+                  }}
                 />
               </Field.Root>
             </Dialog.Body>
@@ -134,10 +143,10 @@ export default function CategoryModal({
 
               <Button
                 minW="160px"
-                bg="#6730EC"
+                bg="gray.950"
                 color="white"
                 width="50%"
-                _hover={{ bg: '#5b29d8' }}
+                _hover={{ bg: 'gray.800' }}
                 loading={createCategory.isPending || updateCategory.isPending}
                 onClick={handleSubmit}
               >

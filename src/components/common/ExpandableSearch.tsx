@@ -22,23 +22,16 @@ export const ExpandableSearch = ({
       role="group"
       display="flex"
       alignItems="center"
-      w="32px"
+      w={{ base: '32px', md: expandedWidth }}
       h={height}
       maxW={expandedWidth}
       border="1px solid"
       borderColor="gray.300"
       borderRadius="6px"
       bg="white"
-      transition="width 0.25s ease"
       shadow="lighterGray"
       overflow="hidden"
-      _hover={{ w: expandedWidth }}
-      _focusWithin={{
-        w: expandedWidth,
-        borderColor: 'blue.500',
-        boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)',
-        shadow: 'lighterGray',
-      }}
+      _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)' }}
     >
       <Box
         flexShrink={0}

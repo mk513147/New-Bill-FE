@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
+import { isAuthenticated } from '@/utils/authSession'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 
 const Auth = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const isLoggedIn = localStorage.getItem('eb_logged_in') === 'true'
+  const isLoggedIn = isAuthenticated()
 
   useEffect(() => {
     if (isLoggedIn && location.pathname === '/login') {

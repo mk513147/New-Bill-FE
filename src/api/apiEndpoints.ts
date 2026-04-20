@@ -55,6 +55,8 @@ export const API_ENDPOINTS = {
     CREATE: '/staff/create',
     UPDATE: '/staff/update',
     DELETE: '/staff/delete',
+    EXPORT: '/staff/export',
+    IMPORT: '/staff/import',
   },
 
   PURCHASE: {
@@ -104,8 +106,18 @@ export const API_ENDPOINTS = {
 
   ATTENDANCE: {
     MARK: '/attendance/mark',
+    MARK_BULK: '/attendance/mark-bulk',
     STAFF: '/attendance/staff',
     DATE: '/attendance/date',
+    WEEKLY_SALARY: '/attendance/weekly-salary',
+  },
+
+  BILL: {
+    BASE: '/bill/list',
+    CREATE: '/bill/create',
+    GET_BY_ID: '/bill',
+    UPDATE: '/bill/update',
+    DELETE: '/bill/delete',
   },
 
   SYSTEM: {

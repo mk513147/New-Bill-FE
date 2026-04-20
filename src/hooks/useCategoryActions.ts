@@ -2,58 +2,76 @@ import { API } from '@/api/api'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/api/apiEndpoints'
 import { ToasterUtil } from '@/components/common/ToasterUtil'
+import { AxiosError } from 'axios'
 
 const toast = ToasterUtil()
 
-export const useCategoryActions = (pubId: string) => {
+export type CategoryPayload = {
+  name: string
+}
+
+export const useCategoryActions = () => {
   const queryClient = useQueryClient()
 
+  const invalidateCategories = () => {
+    queryClient.invalidateQueries({ queryKey: ['categories'] })
+  }
+
   const createCategory = useMutation({
-    mutationFn: (payload: any) =>
-      API.post(API_ENDPOINTS.CATEGORY.CREATE, payload).then((res: any) => res.data),
+    mutationFn: (payload: CategoryPayload) =>
+      API.post(API_ENDPOINTS.CATEGORY.CREATE, payload).then((res) => res.data?.data ?? res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      invalidateCategories()
       toast('Category created successfully', 'success')
     },
 
-    onError: () => {
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || 'Failed to create category', 'error')
+        return
+      }
+
       toast('Failed to create category', 'error')
     },
   })
 
   const updateCategory = useMutation({
-    mutationFn: (payload: any) =>
-      API.patch(`${API_ENDPOINTS.CATEGORY.UPDATE}/${pubId}`, payload).then((res) => res.data.data),
+    mutationFn: ({ categoryId, payload }: { categoryId: string; payload: CategoryPayload }) =>
+      API.patch(`${API_ENDPOINTS.CATEGORY.UPDATE}/${categoryId}`, payload).then(
+        (res) => res.data?.data ?? res.data,
+      ),
 
-    onSuccess: (updatedCategory) => {
-      queryClient.setQueriesData({ queryKey: ['categories'] }, (old: any) => {
-        if (!old?.data) return old
-
-        return {
-          ...old,
-          data: old.data.map((c: any) => (c._id === updatedCategory._id ? updatedCategory : c)),
-        }
-      })
-
+    onSuccess: () => {
+      invalidateCategories()
       toast('Category updated successfully', 'success')
     },
 
-    onError: () => {
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || 'Failed to update category', 'error')
+        return
+      }
+
       toast('Failed to update category', 'error')
     },
   })
 
   const deleteCategory = useMutation({
-    mutationFn: () =>
-      API.delete(`${API_ENDPOINTS.CATEGORY.DELETE}/${pubId}`).then((res: any) => res.data),
+    mutationFn: (categoryId: string) =>
+      API.delete(`${API_ENDPOINTS.CATEGORY.DELETE}/${categoryId}`).then((res) => res.data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      invalidateCategories()
       toast('Category deleted successfully', 'success')
     },
 
-    onError: () => {
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast(error.response?.data?.message || 'Failed to delete category', 'error')
+        return
+      }
+
       toast('Failed to delete category', 'error')
     },
   })

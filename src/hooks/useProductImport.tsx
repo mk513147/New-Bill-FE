@@ -17,13 +17,13 @@ export const useProductImport = () => {
       return res.data
     },
 
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
-      toast('Products imported successfully', 'success')
+      toast(response?.message || 'Products imported successfully', 'success')
     },
 
-    onError: () => {
-      toast('Product import failed', 'error')
+    onError: (error: any) => {
+      toast(error?.response?.data?.message || 'Product import failed', 'error')
     },
   })
 }

@@ -37,7 +37,7 @@ export const useCustomers = (params: CustomerQueryParams = {}) => {
       },
     ],
     queryFn: () => getCustomers(params),
-    staleTime: 60 * 1000,
+
     retry: false,
   })
 }

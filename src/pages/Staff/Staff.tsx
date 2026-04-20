@@ -26,15 +26,15 @@ function Staff() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleteName, setDeleteName] = useState('')
 
-  const { data, isLoading } = useStaff()
-  const { deleteStaff } = useStaffActions(deleteId ?? '')
+  const { data, isLoading } = useStaff(page)
+  const { deleteStaff, exportStaff, importStaff } = useStaffActions(deleteId ?? '')
 
-  const staff = data ?? []
+  const staff = data?.staff ?? []
   const pagination = data?.pagination ?? {
     currentPage: 1,
     totalPages: 1,
     hasNextPage: false,
-    hasPreviousPage: false,
+    hasPrevPage: false,
   }
 
   // console.log('Staff Data:', staff)
@@ -67,6 +67,11 @@ function Staff() {
       render: (s: any) => s.baseSalary,
     },
     {
+      key: 'salaryPerWeek',
+      header: 'Weekly Salary',
+      render: (s: any) => s.salaryPerWeek ?? 0,
+    },
+    {
       key: 'joinDate',
       header: 'Join Date',
       render: (s: any) => new Date(s.joinDate).toLocaleDateString(),
@@ -87,6 +92,7 @@ function Staff() {
           mobileNumber: item.mobileNumber,
           role: item.role,
           baseSalary: String(item.baseSalary),
+          salaryPerWeek: String(item.salaryPerWeek ?? 0),
           joinDate: item.joinDate.split('T')[0],
         })
         setOpen(true)
@@ -174,12 +180,17 @@ function Staff() {
                 onSortChange={function (key: SortKey, order: 'asc' | 'desc'): void {
                   throw new Error('Function not implemented.')
                 }}
-                onImport={function (): void {
-                  throw new Error('Function not implemented.')
+                onImport={() => {
+                  const input = document.createElement('input')
+                  input.type = 'file'
+                  input.accept = '.xlsx,.xls'
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0]
+                    if (file) importStaff.mutate(file)
+                  }
+                  input.click()
                 }}
-                onExport={function (): void {
-                  throw new Error('Function not implemented.')
-                }}
+                onExport={() => exportStaff.mutate()}
               />
             </HStack>
           </HStack>
@@ -220,7 +231,7 @@ function Staff() {
         >
           <Button
             onClick={() => setPage(pagination.currentPage - 1)}
-            disabled={!pagination.hasPreviousPage}
+            disabled={!pagination.hasPrevPage}
             variant="outline"
             bg="white"
             rounded="lg"

@@ -1,7 +1,6 @@
 import { API } from '@/api/api.ts'
 import API_ENDPOINTS from '@/api/apiEndpoints.ts'
-
-let isLoggingOut = false
+import { logoutService } from '@/utils/utils'
 
 export const useAuth = () => {
   const login = async (payload: any) => {
@@ -10,15 +9,7 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    if (isLoggingOut) return
-    isLoggingOut = true
-
-    try {
-      await API.post(API_ENDPOINTS.AUTH.LOGOUT).catch(() => {})
-    } finally {
-      localStorage.clear()
-      sessionStorage.clear()
-    }
+    await logoutService()
   }
 
   return {

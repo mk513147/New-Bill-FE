@@ -1,5 +1,6 @@
-import { Table, Box, Skeleton, HStack, Button, Popover, Portal, VStack } from '@chakra-ui/react'
-import { MoreVertical } from 'lucide-react'
+import { Table, Box, Skeleton, HStack, Button, VStack, Text } from '@chakra-ui/react'
+import { Inbox } from 'lucide-react'
+
 type RowAction<T> = {
   label: string
   icon: React.ReactNode
@@ -20,10 +21,11 @@ type CommonTableProps<T> = {
   rowKey: (row: T) => string
   isLoading?: boolean
   actions?: RowAction<T>[]
+  emptyMessage?: string
 }
 
 const DEFAULT_COLUMN_WIDTH = '160px'
-const ACTION_COLUMN_WIDTH = '80px'
+const ACTION_COLUMN_WIDTH = '140px'
 
 export function CommonTable<T>({
   columns,
@@ -31,42 +33,68 @@ export function CommonTable<T>({
   rowKey,
   isLoading = false,
   actions,
+  emptyMessage = 'No records available.',
 }: CommonTableProps<T>) {
+  const hasRows = data.length > 0
+
   return (
     <Box
       w="100%"
       maxW="100%"
       maxH="480px"
-      // height={'480px'}
       overflow="auto"
+      border="1px solid"
+      borderColor="gray.200"
+      borderRadius="16px"
+      bg="white"
+      boxShadow="0 10px 30px rgba(15, 23, 42, 0.04)"
       css={{
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'thin',
+        msOverflowStyle: 'auto',
+        '&::-webkit-scrollbar': { height: '8px', width: '8px' },
+        '&::-webkit-scrollbar-track': { background: '#f8fafc' },
+        '&::-webkit-scrollbar-thumb': { background: '#cbd5e1', borderRadius: '999px' },
       }}
     >
-      <Table.Root size="md" stickyHeader variant="line" tableLayout="fixed">
-        <Table.Header borderBottom="1px solid #E5E7EB">
-          <Table.Row bg="#F5F6FA">
+      <Table.Root size="sm" stickyHeader variant="line" tableLayout="fixed">
+        <Table.Header
+          borderBottom="1px solid"
+          borderColor="gray.200"
+          position="sticky"
+          top={0}
+          zIndex={1}
+        >
+          <Table.Row bg="linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)">
             {columns.map((c) => (
               <Table.ColumnHeader
                 key={c.key}
-                fontWeight="600"
-                color="gray.600"
+                fontWeight="700"
+                color="gray.700"
+                fontSize="xs"
+                letterSpacing="0.06em"
+                textTransform="uppercase"
                 verticalAlign="middle"
-                textAlign="center"
+                textAlign="start"
                 width={c.width ?? DEFAULT_COLUMN_WIDTH}
                 maxW={c.width ?? DEFAULT_COLUMN_WIDTH}
+                px={4}
+                py={3.5}
               >
                 {c.header}
               </Table.ColumnHeader>
             ))}
             {actions && (
               <Table.ColumnHeader
-                fontWeight="600"
-                color="gray.600"
+                fontWeight="700"
+                color="gray.700"
+                fontSize="xs"
+                letterSpacing="0.06em"
+                textTransform="uppercase"
                 verticalAlign="middle"
                 textAlign="center"
+                width={ACTION_COLUMN_WIDTH}
+                px={2}
+                py={3.5}
               >
                 Actions
               </Table.ColumnHeader>
@@ -76,17 +104,17 @@ export function CommonTable<T>({
 
         {isLoading ? (
           <Table.Body>
-            {[...Array(10)].map((_, i) => (
-              <Table.Row key={i} height="50px" border={0} bg="white">
-                <Table.Cell colSpan={8}>
+            {[...Array(8)].map((_, i) => (
+              <Table.Row key={i} bg={i % 2 === 0 ? 'white' : 'gray.50'}>
+                <Table.Cell colSpan={columns.length + (actions ? 1 : 0)} px={4} py={3}>
                   <Box w="100%">
                     <Skeleton
-                      height="20px"
+                      height="18px"
                       width="100%"
                       variant="shine"
                       css={{
-                        '--start-color': 'var(--chakra-colors-gray-200)',
-                        '--end-color': 'var(--chakra-colors-gray-300)',
+                        '--start-color': 'var(--chakra-colors-gray-100)',
+                        '--end-color': 'var(--chakra-colors-gray-200)',
                       }}
                     />
                   </Box>
@@ -96,79 +124,90 @@ export function CommonTable<T>({
           </Table.Body>
         ) : (
           <Table.Body>
-            {data.map((row) => (
-              <Table.Row key={rowKey(row)} bg="white" _hover={{ bg: '#f6f6f6ff' }}>
-                {columns.map((c) => (
-                  <Table.Cell
-                    key={c.key}
-                    width={c.width ?? DEFAULT_COLUMN_WIDTH}
-                    maxW={c.width ?? DEFAULT_COLUMN_WIDTH}
-                    verticalAlign="middle"
-                    textAlign="center"
-                    whiteSpace="nowrap"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                  >
-                    {(() => {
-                      const value = c.render?.(row)
-                      console.log(
-                        'TABLE CELL → column:',
-                        c.key,
-                        'value:',
-                        value,
-                        'type:',
-                        typeof value,
-                      )
-                      return value
-                    })()}
-                  </Table.Cell>
-                ))}
+            {hasRows ? (
+              data.map((row) => (
+                <Table.Row
+                  key={rowKey(row)}
+                  bg="white"
+                  borderBottom="1px solid"
+                  borderColor="gray.100"
+                  _hover={{ bg: 'orange.50' }}
+                >
+                  {columns.map((c) => (
+                    <Table.Cell
+                      key={c.key}
+                      width={c.width ?? DEFAULT_COLUMN_WIDTH}
+                      maxW={c.width ?? DEFAULT_COLUMN_WIDTH}
+                      verticalAlign="middle"
+                      textAlign="start"
+                      whiteSpace="nowrap"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                      px={4}
+                      py={3}
+                      fontSize="sm"
+                      color="gray.700"
+                    >
+                      {c.render?.(row)}
+                    </Table.Cell>
+                  ))}
 
-                {actions && (
-                  <Table.Cell verticalAlign="middle" textAlign="center" width={ACTION_COLUMN_WIDTH}>
-                    <Popover.Root positioning={{ placement: 'bottom-end' }}>
-                      <Popover.Trigger asChild>
-                        <Button size="sm" variant="solid" bg={'transparent'}>
-                          <MoreVertical />
-                        </Button>
-                      </Popover.Trigger>
-
-                      <Portal>
-                        <Popover.Positioner>
-                          <Popover.Content
-                            w="160px"
-                            bg={'white'}
-                            shadow={'lightGray'}
-                            zIndex={1000}
+                  {actions && (
+                    <Table.Cell
+                      verticalAlign="middle"
+                      textAlign="center"
+                      width={ACTION_COLUMN_WIDTH}
+                      px={2}
+                      py={2}
+                    >
+                      <HStack gap={1} justify="center" flex="wrap">
+                        {actions.slice(0, 2).map((action, i) => (
+                          <Button
+                            key={i}
+                            onClick={() => action.onClick(row)}
+                            size="xs"
+                            variant="ghost"
+                            color={action.color || 'gray.600'}
+                            _hover={{ bg: 'gray.100' }}
+                            aria-label={action.label}
+                            title={action.label}
                           >
-                            <Popover.Body p={1}>
-                              <VStack gap={1} align="stretch">
-                                {actions.map((action, i) => (
-                                  <Button
-                                    key={i}
-                                    onClick={() => action.onClick(row)}
-                                    size="sm"
-                                    justifyContent="flex-start"
-                                    width="100%"
-                                    color="gray.600"
-                                    _hover={{ bg: 'gray.100' }}
-                                  >
-                                    <HStack gap={2}>
-                                      {action.icon}
-                                      {action.label}
-                                    </HStack>
-                                  </Button>
-                                ))}
-                              </VStack>
-                            </Popover.Body>
-                          </Popover.Content>
-                        </Popover.Positioner>
-                      </Portal>
-                    </Popover.Root>
-                  </Table.Cell>
-                )}
+                            {action.icon}
+                          </Button>
+                        ))}
+                      </HStack>
+                    </Table.Cell>
+                  )}
+                </Table.Row>
+              ))
+            ) : (
+              <Table.Row bg="white">
+                <Table.Cell
+                  colSpan={columns.length + (actions ? 1 : 0)}
+                  textAlign="center"
+                  py={12}
+                  color="gray.500"
+                  fontWeight="500"
+                >
+                  <VStack gap={2}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      borderRadius="full"
+                      bg="gray.100"
+                      display="grid"
+                      placeItems="center"
+                      color="gray.500"
+                    >
+                      <Inbox size={18} />
+                    </Box>
+                    <Text fontSize="sm" color="gray.600" fontWeight="600">
+                      {emptyMessage}
+                    </Text>
+                  </VStack>
+                </Table.Cell>
               </Table.Row>
-            ))}
+            )}
           </Table.Body>
         )}
       </Table.Root>

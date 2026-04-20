@@ -14,7 +14,7 @@ function Dashboard() {
     dispatch(
       setHeader({
         title: 'Dashboard',
-        subtitle: 'Overview & statistics',
+        subtitle: 'Live business analytics, collections, stock, and transaction flow',
       }),
     )
 
@@ -23,8 +23,13 @@ function Dashboard() {
     }
   }, [dispatch])
   return (
-    <Box height={'100%'} minH="100%" overflowY="scroll">
-      <Box px={6} py={4} bg="gray.50">
+    <Box
+      height={'100%'}
+      minH="100%"
+      overflowY="auto"
+      bg="linear-gradient(180deg, #fffaf5 0%, #f8fafc 36%, #eef2ff 100%)"
+    >
+      <Box px={{ base: 4, md: 6 }} py={{ base: 4, md: 6 }}>
         <DashboardGrid />
         <DashBoardFooter />
       </Box>

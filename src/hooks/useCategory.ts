@@ -37,7 +37,7 @@ export const useCategory = (params: CategoryQueryParams = {}) => {
       },
     ],
     queryFn: () => getCategories(params),
-    staleTime: 60 * 1000,
+
     retry: false,
   })
 }

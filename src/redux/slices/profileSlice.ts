@@ -8,6 +8,9 @@ export interface ProfileData {
   mobileNumber: string
   shopName: string
   archiveDay: number
+  subscriptionStatus?: string | null
+  subscriptionPlan?: string | null
+  subscriptionEndsAt?: string | null
 }
 
 interface ProfileState {

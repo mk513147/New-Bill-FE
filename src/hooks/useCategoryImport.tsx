@@ -17,13 +17,13 @@ export const useCategoryImport = () => {
       return res.data
     },
 
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
-      toast('Categories imported successfully', 'success')
+      toast(response?.message || 'Categories imported successfully', 'success')
     },
 
-    onError: () => {
-      toast('Category import failed', 'error')
+    onError: (error: any) => {
+      toast(error?.response?.data?.message || 'Category import failed', 'error')
     },
   })
 }

@@ -6,14 +6,21 @@ import { Header } from '@/components/common/Header'
 
 const Layout = () => {
   return (
-    <Flex height="100vh" width="100%" overflowX="hidden" overflowY={'auto'} position="relative">
+    <Flex
+      height="100vh"
+      width="100%"
+      overflowX="hidden"
+      overflowY={'auto'}
+      position="relative"
+      bg="#edf1f5"
+    >
       <Box zIndex="1000">
         <SideBar />
       </Box>
-      <Flex flex={1} direction="column" overflow="hidden">
+      <Flex flex={1} direction="column" overflow="hidden" bg="#edf1f5">
         <Header />
 
-        <Box flex={1} overflowY="hidden">
+        <Box flex={1} overflowY="hidden" bg="#edf1f5">
           <Outlet />
         </Box>
       </Flex>

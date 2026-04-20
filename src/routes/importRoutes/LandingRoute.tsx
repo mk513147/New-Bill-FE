@@ -1,9 +1,10 @@
 import { Landing } from '@/pages'
+import { isAuthenticated } from '@/utils/authSession'
 import { Route } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
 
 export const LandingRoute = () => {
-  const isLoggedIn = localStorage.getItem('eb_logged_in') === 'true'
+  const isLoggedIn = isAuthenticated()
 
   if (isLoggedIn) {
     return <Route path="/" element={<Navigate to="/dashboard" replace />} />

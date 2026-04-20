@@ -13,7 +13,6 @@ export const useProfile = () => {
     queryFn: getProfile,
     retry: false,
 
-    staleTime: 1000 * 60 * 10,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

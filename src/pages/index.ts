@@ -20,7 +20,6 @@ export { default as PriceList } from './PriceList/PriceList.tsx'
 
 export { default as Invoice } from './Invoice/Invoice.tsx'
 export { default as SalesOrder } from './Sales/SalesOrder.tsx'
-export { default as SalesReturn } from './Sales/SalesReturn.tsx'
 
 export { default as PaymentsReceived } from './PaymentsReceived/PaymentsReceived.tsx'
 export { default as DeliveryReceipts } from './DeliveryReceipts/DeliveryReceipts.tsx'
@@ -32,3 +31,4 @@ export { default as Bill } from './Bill/Bill.tsx'
 export { default as Credits } from './Credits/Credits.tsx'
 
 export { default as Roles } from './Roles/Roles.tsx'
+export { default as Subscription } from './Subscription/Subscription.tsx'

@@ -1,36 +1,28 @@
 import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-export const useProfileActions = (pubId: string) => {
+export type UpdateProfilePayload = {
+  firstName?: string
+  lastName?: string
+  mobileNumber?: string
+  shopName?: string
+}
+
+export const useProfileActions = () => {
   const queryClient = useQueryClient()
 
-  const createProfile = useMutation({
-    mutationFn: (payload: any) => API.post('/profile', payload).then((res) => res.data),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
-    },
-  })
-
   const updateProfile = useMutation({
-    mutationFn: (payload: any) => API.put(`/profile/${pubId}`, payload).then((res) => res.data),
+    mutationFn: (payload: UpdateProfilePayload) =>
+      API.put(API_ENDPOINTS.AUTH.EDIT, payload).then((res) => res.data?.data ?? res.data),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', pubId] })
-    },
-  })
-
-  const deleteProfile = useMutation({
-    mutationFn: () => API.delete(`/profile/${pubId}`),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
+    onSuccess: (updatedProfile) => {
+      queryClient.setQueryData(['getProfile'], updatedProfile)
+      queryClient.invalidateQueries({ queryKey: ['getProfile'] })
     },
   })
 
   return {
-    createProfile,
     updateProfile,
-    deleteProfile,
   }
 }

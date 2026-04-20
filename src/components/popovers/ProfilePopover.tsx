@@ -1,32 +1,39 @@
-import { Box, Text, HStack, VStack, Avatar, Separator, Button, Portal } from '@chakra-ui/react'
-import { Popover } from '@chakra-ui/react'
-import { LogOut, X } from 'lucide-react'
+import {
+  Box,
+  Text,
+  HStack,
+  VStack,
+  Avatar,
+  Separator,
+  Button,
+  Portal,
+  Popover,
+} from '@chakra-ui/react'
 import { useProfile } from '@/hooks/useProfile'
 import { useDispatch } from 'react-redux'
-import { API } from '@/api/api'
-import API_ENDPOINTS from '@/api/apiEndpoints'
 import { resetProfile } from '@/redux/slices/profileSlice'
 import { setLoading, clearLoading } from '@/redux/slices/uiSlice'
+import { logoutService } from '@/utils/utils'
+import { useNavigate } from 'react-router-dom'
 
 export const ProfilePopover = ({ trigger }: { trigger: React.ReactNode }) => {
   const { data } = useProfile()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const profile = data
 
   const handleLogout = async () => {
     dispatch(setLoading({ loading: true, message: 'Logging out...' }))
     try {
-      const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
-      if (res.status !== 200) throw new Error('Logout failed')
+      await logoutService()
+      dispatch(resetProfile())
+      navigate('/login', { replace: true })
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
       dispatch(clearLoading())
     }
-
-    localStorage.clear()
-    dispatch(resetProfile())
   }
 
   return (
@@ -36,102 +43,62 @@ export const ProfilePopover = ({ trigger }: { trigger: React.ReactNode }) => {
       <Portal>
         <Popover.Positioner>
           <Popover.Content
-            w="360px"
-            maxH="calc(100vh - 24px)"
+            w="300px"
             bg="white"
             borderWidth="1px"
             borderColor="gray.200"
-            borderRadius="lg"
-            shadow={'lightGray'}
+            borderRadius="16px"
+            shadow={'md'}
             overflow="hidden"
+            p={0}
           >
             <Box p={4}>
-              <HStack justify="space-between" align="start">
-                <HStack gap={3}>
-                  <Avatar.Root size="md">
-                    <Avatar.Fallback>{profile?.firstName?.[0] ?? 'U'}</Avatar.Fallback>
-                  </Avatar.Root>
-
-                  <Box>
-                    <Text fontWeight="semibold">
-                      {profile?.firstName} {profile?.lastName}
-                    </Text>
-                    <Text fontSize="sm" color="gray.500">
-                      {profile?.emailId}
-                    </Text>
-                  </Box>
-                </HStack>
-
-                <Popover.CloseTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    color="gray.500"
-                    _hover={{
-                      bg: 'gray.100',
-                      color: 'gray.700',
-                    }}
-                  >
-                    <X size={16} />
-                  </Button>
-                </Popover.CloseTrigger>
+              <HStack gap={3} align="start">
+                <Avatar.Root size="md">
+                  <Avatar.Fallback>{profile?.firstName?.[0] ?? 'U'}</Avatar.Fallback>
+                </Avatar.Root>
+                <Box flex="1">
+                  <Text fontWeight="700" fontSize="sm">
+                    {profile?.firstName} {profile?.lastName}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    {profile?.emailId}
+                  </Text>
+                </Box>
               </HStack>
             </Box>
 
-            <Separator borderColor={'gray.400'} />
+            <Separator borderColor="gray.200" />
 
-            <Box px={4} py={3} overflowY="auto" maxH="calc(100vh - 180px)">
-              <VStack gap={3} align="start">
-                <HStack gap={2}>
-                  <Text fontSize="sm" color="gray.600">
-                    Contact:
-                  </Text>
-                  <Text>{profile?.mobileNumber}</Text>
-                </HStack>
-
-                <HStack gap={2}>
-                  <Text fontSize="sm" color="gray.600">
-                    Shop Name:
-                  </Text>
-                  <Text>{profile?.shopName}</Text>
-                </HStack>
-
-                <HStack gap={2}>
-                  <Text fontSize="sm" color="gray.600">
-                    Subscription:
-                  </Text>
-                  <Text>{profile?.subscriptionStatus}</Text>
-                </HStack>
-              </VStack>
-            </Box>
-
-            <Separator borderColor={'gray.400'} />
-
-            <Box p={3}>
-              <VStack align="stretch" gap={2}>
+            <Box p={2}>
+              <VStack align="stretch" gap={0}>
                 <Button
                   variant="ghost"
                   justifyContent="flex-start"
-                  fontWeight="medium"
+                  fontSize="sm"
+                  fontWeight="500"
                   color="gray.800"
-                  _hover={{
-                    bg: 'gray.100',
-                    color: 'gray.900',
-                  }}
+                  h="36px"
+                  px={3}
+                  rounded="md"
+                  onClick={() => navigate('/profile')}
+                  _hover={{ bg: 'gray.100' }}
                 >
                   My Account
                 </Button>
-
                 <Button
                   variant="ghost"
-                  justifyContent="space-between"
+                  justifyContent="flex-start"
+                  fontSize="sm"
+                  fontWeight="500"
                   color="red.600"
-                  fontWeight="medium"
+                  h="36px"
+                  px={3}
+                  rounded="md"
                   _hover={{ bg: 'red.50' }}
                   onClick={handleLogout}
                 >
                   Sign Out
-                  <LogOut size={16} />
                 </Button>
               </VStack>
             </Box>

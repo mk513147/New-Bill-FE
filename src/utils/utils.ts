@@ -1,16 +1,25 @@
 import { API } from '@/api/api'
 import API_ENDPOINTS from '@/api/apiEndpoints'
+import { clearAuthSession } from './authSession'
 
-let isLoggingOut = false
+let logoutPromise: Promise<void> | null = null
 
 export const logoutService = async () => {
-  if (isLoggingOut) return
-  isLoggingOut = true
+  if (logoutPromise) {
+    return logoutPromise
+  }
+
+  logoutPromise = (async () => {
+    try {
+      await API.post(API_ENDPOINTS.AUTH.LOGOUT).catch(() => undefined)
+    } finally {
+      clearAuthSession()
+    }
+  })()
 
   try {
-    await API.post(API_ENDPOINTS.AUTH.LOGOUT).catch(() => {})
+    await logoutPromise
   } finally {
-    localStorage.clear()
-    sessionStorage.clear()
+    logoutPromise = null
   }
 }

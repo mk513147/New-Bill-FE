@@ -37,7 +37,7 @@ export const useProducts = (params: ProductQueryParams = {}) => {
       },
     ],
     queryFn: () => getProducts(params),
-    staleTime: 60 * 1000,
+
     retry: false,
   })
 }

@@ -1,49 +1,45 @@
 import {
   Box,
-  IconButton,
   Button,
   Drawer,
   Portal,
   useMediaQuery,
   CloseButton,
   Text,
-  Separator,
+  HStack,
 } from '@chakra-ui/react'
 
-import { FaSignOutAlt } from 'react-icons/fa'
-import { API } from '@/api/api.ts'
-import API_ENDPOINTS from '@/api/apiEndpoints.ts'
 import { resetProfile } from '@/redux/slices/profileSlice.ts'
 import { useDispatch } from 'react-redux'
 import { ToasterUtil } from './ToasterUtil'
 import { BsLayoutSidebarInset } from '@/components/icons'
 import { clearLoading, setLoading } from '@/redux/slices/uiSlice'
 import { SidebarNav } from './SidebarNav'
+import { logoutService } from '@/utils/utils'
+import { useNavigate } from 'react-router-dom'
+import { LogOut } from 'lucide-react'
+import { useState } from 'react'
 
 export const SideBar = () => {
   const toastFunc = ToasterUtil()
+  const navigate = useNavigate()
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
     dispatch(setLoading({ loading: true, message: 'Logging out...' }))
     try {
-      const res = await API.post(API_ENDPOINTS.AUTH.LOGOUT)
-
-      if (res.status !== 200) {
-        throw new Error('Logout failed')
-      }
+      await logoutService()
+      dispatch(resetProfile())
+      toastFunc('Logged out successfully', 'success')
+      navigate('/login', { replace: true })
     } catch (error) {
       console.error('Logout error:', error)
       toastFunc('Error logging out. Please try again.', 'error')
     } finally {
       dispatch(clearLoading())
     }
-
-    localStorage.clear()
-    dispatch(resetProfile())
-
-    toastFunc('Logged out Successfully', 'success')
   }
 
   const [isLarge] = useMediaQuery(['(min-width: 768px)'])
@@ -54,23 +50,30 @@ export const SideBar = () => {
         <Box
           w="280px"
           h="100vh"
-          bg="linear-gradient(180deg, #0F172A 0%, #1E293B 100%)"
+          bg="linear-gradient(180deg, #0f172a 0%, #111827 100%)"
           display={{ base: 'none', md: 'flex' }}
           flexDirection="column"
           position="relative"
-          shadow={'none'}
+          boxShadow="inset -1px 0 0 rgba(255,255,255,0.08)"
         >
-          <Box position="sticky" top="0" zIndex="1" p={3}>
-            <Text fontSize="2xl" fontWeight="bold" color="white" mb={3}>
-              EBILL
-            </Text>
-            <Separator borderColor="whiteAlpha.300" />
+          <Box position="sticky" top="0" zIndex="1" px={5} pt={5} pb={4}>
+            <Box
+              p={3}
+              borderRadius="14px"
+              bg="whiteAlpha.100"
+              border="1px solid"
+              borderColor="whiteAlpha.200"
+            >
+              <Text fontSize="lg" fontWeight="800" color="white" letterSpacing="0.02em">
+                EBILL
+              </Text>
+            </Box>
           </Box>
           <Box
             flex="1"
             overflowY="auto"
-            p={5}
-            pb="120px"
+            px={5}
+            pb="24px"
             css={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
@@ -78,29 +81,41 @@ export const SideBar = () => {
             }}
           >
             <SidebarNav />
-            <Box position="absolute" bottom="20px" left="0" w="100%" px={5}>
-              <IconButton
-                aria-label="logout"
-                size="md"
-                rounded="full"
-                position={'absolute'}
-                bottom={0}
-                right={2}
-                bg="whiteAlpha.200"
-                color="white"
-                _hover={{ bg: 'whiteAlpha.300' }}
-                shadow="sm"
-                onClick={handleLogout}
-              >
-                <FaSignOutAlt />
-              </IconButton>
-            </Box>
+          </Box>
+          <Box px={5} pb={5}>
+            <Button
+              aria-label="logout"
+              w="full"
+              h="40px"
+              justifyContent="space-between"
+              borderRadius="12px"
+              bg="whiteAlpha.200"
+              color="white"
+              border="1px solid"
+              borderColor="whiteAlpha.300"
+              _hover={{ bg: 'whiteAlpha.300' }}
+              onClick={handleLogout}
+            >
+              Logout
+              <LogOut size={15} />
+            </Button>
           </Box>
         </Box>
       ) : (
-        <Drawer.Root placement="start" size="xs">
+        <Drawer.Root
+          placement="start"
+          size="xs"
+          open={drawerOpen}
+          onOpenChange={(e) => setDrawerOpen(e.open)}
+        >
           <Drawer.Trigger asChild position="absolute" top="2" left="2">
-            <Button variant="solid" size="sm">
+            <Button
+              variant="solid"
+              size="sm"
+              bg="gray.950"
+              color="white"
+              _hover={{ bg: 'gray.800' }}
+            >
               <BsLayoutSidebarInset />
             </Button>
           </Drawer.Trigger>
@@ -110,7 +125,7 @@ export const SideBar = () => {
 
             <Drawer.Positioner>
               <Drawer.Content
-                bg="linear-gradient(180deg, #0F172A 0%, #1E293B 100%)"
+                bg="linear-gradient(180deg, #0f172a 0%, #111827 100%)"
                 h="100vh"
                 display="flex"
                 flexDirection="column"
@@ -118,20 +133,27 @@ export const SideBar = () => {
                 border="none"
               >
                 <Drawer.Header pb={0}>
-                  <Drawer.Title>
-                    <Text fontSize="2xl" fontWeight="bold" color="white">
-                      EBILL
-                    </Text>
+                  <Drawer.Title w="full">
+                    <Box
+                      p={3}
+                      borderRadius="14px"
+                      bg="whiteAlpha.100"
+                      border="1px solid"
+                      borderColor="whiteAlpha.200"
+                    >
+                      <Text fontSize="lg" fontWeight="800" color="white">
+                        EBILL
+                      </Text>
+                    </Box>
                   </Drawer.Title>
                 </Drawer.Header>
-                <Separator borderColor="whiteAlpha.300" mt={2} />
 
                 <Drawer.Body
                   flex="1"
                   overflowY="auto"
                   px={4}
-                  pt={2}
-                  pb="120px"
+                  pt={4}
+                  pb={4}
                   css={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
@@ -140,22 +162,26 @@ export const SideBar = () => {
                     },
                   }}
                 >
-                  <SidebarNav />
+                  <SidebarNav onNavigate={() => setDrawerOpen(false)} />
                 </Drawer.Body>
 
-                <Drawer.Footer bg="transparent" borderTop="1px solid" borderColor="whiteAlpha.300">
-                  <IconButton
+                <Drawer.Footer bg="transparent">
+                  <Button
                     aria-label="logout"
-                    size="md"
-                    rounded="full"
+                    w="full"
+                    h="40px"
+                    justifyContent="space-between"
+                    borderRadius="12px"
                     bg="whiteAlpha.200"
                     color="white"
+                    border="1px solid"
+                    borderColor="whiteAlpha.300"
                     _hover={{ bg: 'whiteAlpha.300' }}
-                    shadow="sm"
                     onClick={handleLogout}
                   >
-                    <FaSignOutAlt />
-                  </IconButton>
+                    Logout
+                    <LogOut size={15} />
+                  </Button>
                 </Drawer.Footer>
 
                 <Drawer.CloseTrigger asChild>

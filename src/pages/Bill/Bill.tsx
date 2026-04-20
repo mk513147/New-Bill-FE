@@ -1,71 +1,36 @@
 import { Flex, HStack, Text, IconButton, Button, Box } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Plus } from 'lucide-react'
+import { Plus, Trash2, Edit2 } from 'lucide-react'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
 import { TableActionsPopover } from '@/components/popovers/TableActionsPopover'
 import { FilterSelect } from '@/components/common/FilterSelect'
+import BillModal from '@/components/modals/BillModal'
+import { useBills, type BillRecord } from '@/hooks/useBill'
+import { useBillActions } from '@/hooks/useBillActions'
+import { ToasterUtil } from '@/components/common/ToasterUtil'
 import type { SortKey } from '@/components/popovers/TableActionsPopover'
 
-/* ------------------ Fake Bill Data ------------------ */
-
-type BillItem = {
-  id: string
-  billNumber: string
-  supplier: string
-  poNumber: string
-  billDate: string
-  dueDate: string
-  amount: number
-  status: 'Unpaid' | 'Paid' | 'Overdue'
-}
-
-const FAKE_BILLS: BillItem[] = [
-  {
-    id: '1',
-    billNumber: 'BILL-2026-001',
-    supplier: 'ABC Packaging Ltd',
-    poNumber: 'PO-2026-001',
-    billDate: '2026-01-10',
-    dueDate: '2026-01-20',
-    amount: 5950,
-    status: 'Paid',
-  },
-  {
-    id: '2',
-    billNumber: 'BILL-2026-002',
-    supplier: 'XYZ Textiles',
-    poNumber: 'PO-2026-002',
-    billDate: '2026-01-14',
-    dueDate: '2026-01-25',
-    amount: 10800,
-    status: 'Unpaid',
-  },
-  {
-    id: '3',
-    billNumber: 'BILL-2026-003',
-    supplier: 'National Plastics',
-    poNumber: 'PO-2026-003',
-    billDate: '2026-01-15',
-    dueDate: '2026-01-22',
-    amount: 9000,
-    status: 'Overdue',
-  },
-]
-
-/* ------------------ Component ------------------ */
+const toast = ToasterUtil()
 
 const Bill = () => {
   const dispatch = useDispatch()
-
   const [page, setPage] = useState(1)
   const [sortBy, setSortBy] = useState<SortKey | undefined>()
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>()
   const [filter, setFilter] = useState<string[]>(['all'])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingBill, setEditingBill] = useState<BillRecord | null>(null)
 
   const limit = 20
+
+  const { data: billsData, isLoading } = useBills({ page, limit, sortBy, sortOrder })
+  const { deleteBill } = useBillActions()
+
+  const bills = billsData?.bills ?? []
+  const totalPages = billsData?.totalPages ?? 1
 
   useEffect(() => {
     dispatch(setHeader({ title: 'Bills' }))
@@ -74,10 +39,9 @@ const Bill = () => {
     }
   }, [dispatch])
 
-  /* ------------------ Filtering + Sorting ------------------ */
-
+  /* Filtering + Sorting */
   const data = useMemo(() => {
-    let rows = [...FAKE_BILLS]
+    let rows = [...bills]
 
     if (!filter.includes('all')) {
       rows = rows.filter((b) =>
@@ -96,45 +60,44 @@ const Bill = () => {
     }
 
     return rows
-  }, [filter, sortBy, sortOrder])
+  }, [bills, filter, sortBy, sortOrder])
 
-  /* ------------------ Columns ------------------ */
-
+  /* Columns */
   const billColumns = [
     {
       key: 'billNumber',
       header: 'Bill Number',
-      render: (b: BillItem) => b.billNumber,
+      render: (b: BillRecord) => b.billNumber,
     },
     {
       key: 'supplier',
       header: 'Supplier',
-      render: (b: BillItem) => b.supplier,
+      render: (b: BillRecord) => b.supplier?.name || b.supplierId || 'N/A',
     },
     {
       key: 'poNumber',
       header: 'PO Number',
-      render: (b: BillItem) => b.poNumber,
+      render: (b: BillRecord) => b.poNumber || 'N/A',
     },
     {
       key: 'billDate',
       header: 'Bill Date',
-      render: (b: BillItem) => b.billDate,
+      render: (b: BillRecord) => (b.billDate ? new Date(b.billDate).toLocaleDateString() : 'N/A'),
     },
     {
       key: 'dueDate',
       header: 'Due Date',
-      render: (b: BillItem) => b.dueDate,
+      render: (b: BillRecord) => (b.dueDate ? new Date(b.dueDate).toLocaleDateString() : 'N/A'),
     },
     {
       key: 'amount',
       header: 'Amount',
-      render: (b: BillItem) => `₹${b.amount}`,
+      render: (b: BillRecord) => `₹${b.amount?.toFixed(2) ?? '0.00'}`,
     },
     {
       key: 'status',
       header: 'Status',
-      render: (b: BillItem) => (
+      render: (b: BillRecord) => (
         <Text
           fontWeight="medium"
           color={
@@ -154,7 +117,19 @@ const Bill = () => {
     { label: 'Overdue', value: 'overdue' },
   ]
 
-  const totalPages = 1
+  const handleDeleteBill = (billId: string) => {
+    deleteBill.mutate(billId)
+  }
+
+  const handleEditBill = (bill: BillRecord) => {
+    setEditingBill(bill)
+    setModalOpen(true)
+  }
+
+  const handleAddBill = () => {
+    setEditingBill(null)
+    setModalOpen(true)
+  }
 
   return (
     <Flex bg="gray.100" width="100%" height="100%" flexDir="column" px={6}>
@@ -169,7 +144,14 @@ const Bill = () => {
         />
 
         <HStack gap={2}>
-          <IconButton aria-label="Add Bill" colorPalette="blue" variant="solid" px={3} h="32px">
+          <IconButton
+            aria-label="Add Bill"
+            colorPalette="gray"
+            variant="solid"
+            px={3}
+            h="32px"
+            onClick={handleAddBill}
+          >
             <HStack gap={1}>
               <Plus size={18} />
               <Text fontSize="sm">New</Text>
@@ -185,13 +167,13 @@ const Bill = () => {
               setSortOrder(order)
             }}
             onRefresh={() => {
-              /* fake refresh */
+              /* refresh handled by React Query */
             }}
             onImport={function (): void {
-              throw new Error('Function not implemented.')
+              toast('Import not implemented', 'info')
             }}
             onExport={function (): void {
-              throw new Error('Function not implemented.')
+              toast('Export not implemented', 'info')
             }}
           />
         </HStack>
@@ -199,19 +181,72 @@ const Bill = () => {
 
       {/* Table */}
       <Box bg="white" mt={6} rounded="lg" p={4}>
-        <CommonTable columns={billColumns} data={data} isLoading={false} rowKey={(b) => b.id} />
+        <CommonTable
+          columns={billColumns}
+          data={data}
+          isLoading={isLoading}
+          rowKey={(b) => b._id}
+          actions={[
+            {
+              label: 'Edit',
+              icon: Edit2,
+              onClick: (row) => handleEditBill(row),
+            },
+            {
+              label: 'Delete',
+              icon: Trash2,
+              onClick: (row) => handleDeleteBill(row._id),
+            },
+          ]}
+        />
       </Box>
 
       {/* Pagination */}
       <Flex justify="center" mt={4} gap={2}>
-        <Button disabled>Previous</Button>
+        <Button disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+          Previous
+        </Button>
         {Array.from({ length: totalPages }).map((_, i) => (
-          <Button key={i} bg="purple.100">
+          <Button
+            key={i}
+            onClick={() => setPage(i + 1)}
+            bg={page === i + 1 ? 'gray.950' : 'white'}
+            color={page === i + 1 ? 'white' : 'gray.700'}
+            border="1px solid"
+            borderColor="gray.200"
+          >
             {i + 1}
           </Button>
         ))}
-        <Button disabled>Next</Button>
+        <Button
+          disabled={page === totalPages}
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+        >
+          Next
+        </Button>
       </Flex>
+
+      {/* Bill Modal */}
+      <BillModal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false)
+          setEditingBill(null)
+        }}
+        defaultValues={
+          editingBill
+            ? {
+                _id: editingBill._id,
+                billNumber: editingBill.billNumber,
+                supplierId: editingBill.supplierId || '',
+                poNumber: editingBill.poNumber,
+                billDate: editingBill.billDate,
+                dueDate: editingBill.dueDate,
+                amount: editingBill.amount.toString(),
+              }
+            : undefined
+        }
+      />
     </Flex>
   )
 }

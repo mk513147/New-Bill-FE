@@ -1,11 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { isAuthenticated } from '@/utils/authSession'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 const ProtectedRoutes = () => {
-  const isLoggedIn = localStorage.getItem('eb_logged_in') === 'true'
+  const location = useLocation()
+  const isLoggedIn = isAuthenticated()
 
   if (!isLoggedIn) {
-    localStorage.setItem('eb_logged_in', 'false')
-    return <Navigate to="/" replace />
+    return <Navigate to="/login" replace state={{ from: location }} />
   }
 
   return <Outlet />

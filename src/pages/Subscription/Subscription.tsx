@@ -2,6 +2,7 @@ import { API } from '@/api/api'
 import API_ENDPOINTS from '@/api/apiEndpoints'
 import { ToasterUtil } from '@/components/common/ToasterUtil'
 import { useProfile } from '@/hooks/useProfile'
+import { useAuth } from '@/hooks/useAuth'
 import {
   clearSubscriptionInactive,
   isInactiveSubscriptionStatus,
@@ -26,6 +27,7 @@ import {
   BadgeIndianRupee,
   CheckCircle2,
   Clock3,
+  LogOut,
   ShieldCheck,
   Sparkles,
 } from 'lucide-react'
@@ -68,9 +70,11 @@ const plans: Array<{
 const Subscription = () => {
   const navigate = useNavigate()
   const toast = ToasterUtil()
+  const { logout } = useAuth()
   const { data, refetch, isRefetching } = useProfile()
   const [selectedPlan, setSelectedPlan] = useState<PlanKey>('monthly')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const handlePlanCheckout = async (plan: PlanKey) => {
     setSelectedPlan(plan)
@@ -127,6 +131,18 @@ const Subscription = () => {
     }
 
     toast('Subscription is still inactive. Complete payment and try again.', 'warning')
+  }
+
+  const handleLoginToAnotherAccount = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logout()
+      toast('Logged out successfully. Redirecting to login.', 'success')
+      navigate('/login', { replace: true })
+    } catch (error: any) {
+      toast('Failed to logout. Please try again.', 'error')
+      setIsLoggingOut(false)
+    }
   }
 
   return (
@@ -428,6 +444,35 @@ const Subscription = () => {
                       loading={isRefetching}
                     >
                       I have renewed
+                    </Button>
+                  </HStack>
+                </Box>
+
+                <Separator />
+
+                <Box borderRadius="24px" bg="blue.50" p={4}>
+                  <HStack
+                    justify="space-between"
+                    align={{ base: 'start', md: 'center' }}
+                    flexWrap="wrap"
+                    gap={3}
+                  >
+                    <Box>
+                      <Text fontWeight="700" color="gray.900">
+                        Don't have a subscription?
+                      </Text>
+                      <Text color="gray.600" fontSize="sm">
+                        Sign in with another account that has an active subscription.
+                      </Text>
+                    </Box>
+                    <Button
+                      variant="outline"
+                      colorPalette="blue"
+                      onClick={handleLoginToAnotherAccount}
+                      loading={isLoggingOut}
+                    >
+                      <LogOut size={16} />
+                      Login to another account
                     </Button>
                   </HStack>
                 </Box>

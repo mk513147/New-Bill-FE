@@ -1,13 +1,6 @@
-import { API } from '@/api/api'
-import API_ENDPOINTS from '@/api/apiEndpoints'
 import { ToasterUtil } from '@/components/common/ToasterUtil'
 import { useProfile } from '@/hooks/useProfile'
 import { useAuth } from '@/hooks/useAuth'
-import {
-  clearSubscriptionInactive,
-  isInactiveSubscriptionStatus,
-  SUBSCRIPTION_INACTIVE_MESSAGE,
-} from '@/utils/subscriptionAccess'
 import {
   Badge,
   Box,
@@ -18,52 +11,45 @@ import {
   Heading,
   HStack,
   Separator,
-  Stack,
   Text,
   VStack,
 } from '@chakra-ui/react'
-import {
-  ArrowRight,
-  BadgeIndianRupee,
-  CheckCircle2,
-  Clock3,
-  LogOut,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+import { CheckCircle2, LogOut, MessageCircle, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-type PlanKey = 'weekly' | 'monthly'
+type PlanKey = 'weekly' | 'monthly' | 'yearly'
 
 const plans: Array<{
   key: PlanKey
   title: string
-  price: string
-  period: string
+  priceLabel: string
+  summary: string
   accent: string
   highlight?: string
-  summary: string
-  features: string[]
 }> = [
   {
     key: 'weekly',
-    title: 'Weekly rescue',
-    price: '200',
-    period: 'per week',
+    title: 'Weekly Plan',
+    priceLabel: '200 / week',
+    summary: 'Good for immediate restart with lower upfront cost.',
     accent: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
-    summary: 'Best when you need to reopen operations immediately.',
-    features: ['Full app access', 'Live billing and stock APIs', 'Continue without data loss'],
   },
   {
     key: 'monthly',
-    title: 'Monthly saver',
-    price: '900',
-    period: 'per month',
+    title: 'Monthly Plan',
+    priceLabel: '900 / month',
+    summary: 'Most chosen option for regular business operations.',
     accent: 'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)',
     highlight: 'Best value',
-    summary: 'Lower effective weekly cost for a store that runs daily.',
-    features: ['Priority continuity', 'Lower cost than weekly renewal', 'Best for active shops'],
+  },
+  {
+    key: 'yearly',
+    title: 'Yearly Plan',
+    priceLabel: '10000 / year',
+    summary: 'Best for long-term continuity and fewer renewals.',
+    accent: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+    highlight: 'Maximum savings',
   },
 ]
 
@@ -71,66 +57,33 @@ const Subscription = () => {
   const navigate = useNavigate()
   const toast = ToasterUtil()
   const { logout } = useAuth()
-  const { data, refetch, isRefetching } = useProfile()
+  const { data } = useProfile()
   const [selectedPlan, setSelectedPlan] = useState<PlanKey>('monthly')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handlePlanCheckout = async (plan: PlanKey) => {
-    setSelectedPlan(plan)
-    setIsSubmitting(true)
+  const selectedPlanMeta = plans.find((plan) => plan.key === selectedPlan) || plans[1]
+  const adminName =
+    [data?.firstName, data?.lastName].filter(Boolean).join(' ') || data?.shopName || 'Admin'
+  const adminId = data?._id || data?.id || data?.adminId || 'N/A'
+  const adminEmail = data?.emailId || data?.email || 'N/A'
 
-    try {
-      const response = await API.post(API_ENDPOINTS.AUTH.SUBSCRIPTION, {
-        plan,
-        billingCycle: plan,
-        amount: plan === 'weekly' ? 200 : 900,
-        currency: 'INR',
-      })
+  const handleContactOnWhatsApp = () => {
+    const waNumber = '9570036624'
+    const message = [
+      'Hello Ebill Team,',
+      'I want to restart my subscription plan.',
+      '',
+      `Selected Plan: ${selectedPlanMeta.priceLabel}`,
+      `Admin Name: ${adminName}`,
+      `Admin ID: ${adminId}`,
+      `Shop Name: ${data?.shopName || 'N/A'}`,
+      `Email: ${adminEmail}`,
+      '',
+      'Please activate my plan and guide me with next steps.',
+    ].join('\n')
 
-      const checkoutUrl =
-        response?.data?.data?.checkoutUrl ||
-        response?.data?.data?.paymentUrl ||
-        response?.data?.data?.url ||
-        response?.data?.checkoutUrl ||
-        response?.data?.paymentUrl ||
-        response?.data?.url
-
-      if (checkoutUrl && typeof checkoutUrl === 'string') {
-        window.location.href = checkoutUrl
-        return
-      }
-
-      toast(
-        response?.data?.message ||
-          'Subscription request created. Complete payment to unlock access.',
-        'success',
-      )
-    } catch (error: any) {
-      const message = error?.response?.data?.message
-
-      if (message && message !== SUBSCRIPTION_INACTIVE_MESSAGE) {
-        toast(message, 'error')
-      } else {
-        toast('Unable to start the subscription checkout right now.', 'error')
-      }
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleRefreshAccess = async () => {
-    const result = await refetch()
-    const nextStatus = result.data?.subscriptionStatus
-
-    if (!isInactiveSubscriptionStatus(nextStatus)) {
-      clearSubscriptionInactive()
-      toast('Subscription activated. Redirecting to dashboard.', 'success')
-      navigate('/dashboard', { replace: true })
-      return
-    }
-
-    toast('Subscription is still inactive. Complete payment and try again.', 'warning')
+    const waUrl = `https://wa.me/91${waNumber}?text=${encodeURIComponent(message)}`
+    window.open(waUrl, '_blank', 'noopener,noreferrer')
   }
 
   const handleLoginToAnotherAccount = async () => {
@@ -217,23 +170,20 @@ const Subscription = () => {
                     lineHeight="0.95"
                     letterSpacing="-0.04em"
                   >
-                    Keep billing, inventory, and customer history live.
+                    Restart your workspace in minutes.
                   </Heading>
                   <Text fontSize={{ base: 'md', md: 'lg' }} color="whiteAlpha.800" maxW="620px">
-                    Your workspace is authenticated, but feature access is locked because the
-                    subscription is inactive. Renew a plan to reopen the full product without losing
-                    store data.
+                    Plan purchase is now handled directly by our team for faster activation and
+                    support. Select your plan and send us your admin details on WhatsApp.
                   </Text>
                 </VStack>
 
                 <HStack wrap="wrap" gap={3}>
                   <HStack bg="whiteAlpha.100" px={4} py={2} borderRadius="full">
-                    <ShieldCheck size={16} />
-                    <Text fontSize="sm">Secure account still active</Text>
+                    <Text fontSize="sm">Contact support on WhatsApp</Text>
                   </HStack>
                   <HStack bg="whiteAlpha.100" px={4} py={2} borderRadius="full">
-                    <Clock3 size={16} />
-                    <Text fontSize="sm">Access restores after payment confirmation</Text>
+                    <Text fontSize="sm">Activation after manual confirmation</Text>
                   </HStack>
                 </HStack>
 
@@ -245,28 +195,28 @@ const Subscription = () => {
                 >
                   <Box bg="whiteAlpha.100" borderRadius="24px" p={5}>
                     <Text color="whiteAlpha.700" fontSize="sm" mb={2}>
-                      Workspace
+                      Admin Name
                     </Text>
                     <Text fontSize="2xl" fontWeight="700">
-                      {data?.shopName || 'Ebill Store'}
+                      {adminName}
                     </Text>
                   </Box>
 
                   <Box bg="whiteAlpha.100" borderRadius="24px" p={5}>
                     <Text color="whiteAlpha.700" fontSize="sm" mb={2}>
-                      Current status
+                      Admin ID
                     </Text>
-                    <Badge colorPalette="orange" fontSize="sm" px={3} py={1} borderRadius="full">
-                      {(data?.subscriptionStatus || 'Inactive').toString()}
-                    </Badge>
+                    <Text fontSize="lg" fontWeight="700" noOfLines={1}>
+                      {adminId}
+                    </Text>
                   </Box>
 
                   <Box bg="whiteAlpha.100" borderRadius="24px" p={5}>
                     <Text color="whiteAlpha.700" fontSize="sm" mb={2}>
-                      Support
+                      Workspace
                     </Text>
                     <Text fontSize="lg" fontWeight="700">
-                      Fast reactivation
+                      {data?.shopName || 'Ebill Store'}
                     </Text>
                   </Box>
                 </Grid>
@@ -280,27 +230,27 @@ const Subscription = () => {
                         fontSize="xs"
                         letterSpacing="0.12em"
                       >
-                        Why you are seeing this
+                        What to do now
                       </Text>
                       <Heading size="md" mt={2}>
-                        Access is intentionally locked before business data mutates.
+                        Share details on WhatsApp to start your selected plan.
                       </Heading>
                     </Box>
                     <Sparkles size={20} />
                   </HStack>
 
-                  <Stack gap={3}>
+                  <VStack align="stretch" gap={3}>
                     {[
-                      'Sales, stock, invoice, and customer APIs are blocked until the plan is active.',
-                      'Login, account identity, and renewal actions remain available so recovery is safe.',
-                      'Once payment is confirmed, you can refresh access and continue from the same account.',
+                      'Select one plan on the right panel.',
+                      'Tap Contact on WhatsApp to send your admin details automatically.',
+                      'After plan activation, logout and login again to unlock access.',
                     ].map((item) => (
                       <HStack key={item} align="start" gap={3}>
                         <CheckCircle2 size={18} color="#fdba74" style={{ marginTop: 2 }} />
                         <Text color="whiteAlpha.850">{item}</Text>
                       </HStack>
                     ))}
-                  </Stack>
+                  </VStack>
                 </Box>
               </VStack>
             </Box>
@@ -326,14 +276,13 @@ const Subscription = () => {
                     color="orange.600"
                     fontWeight="700"
                   >
-                    Choose a plan
+                    Plan Selection
                   </Text>
                   <Heading fontSize={{ base: '3xl', md: '4xl' }} color="gray.900" mt={2}>
-                    Restart access in one step.
+                    Choose your restart plan.
                   </Heading>
                   <Text color="gray.600" mt={2}>
-                    Pick the billing cycle that fits your store. Monthly is the better operating
-                    cost.
+                    No direct in-app purchase. Contact support and we will activate manually.
                   </Text>
                 </Box>
 
@@ -375,44 +324,21 @@ const Subscription = () => {
                           </VStack>
 
                           <Box px={3} py={2} borderRadius="20px" bg={plan.accent} color="white">
-                            <HStack gap={1} align="end">
-                              <BadgeIndianRupee size={18} />
-                              <Text fontSize="3xl" fontWeight="800" lineHeight="1">
-                                {plan.price}
-                              </Text>
-                            </HStack>
-                            <Text fontSize="xs" mt={1}>
-                              {plan.period}
+                            <Text fontSize="sm" fontWeight="800">
+                              {plan.priceLabel}
                             </Text>
                           </Box>
                         </HStack>
 
-                        <Stack gap={2} mb={5}>
-                          {plan.features.map((feature) => (
-                            <HStack key={feature} gap={3} align="start">
-                              <CheckCircle2
-                                size={16}
-                                color={isSelected ? '#34d399' : '#f97316'}
-                                style={{ marginTop: 2 }}
-                              />
-                              <Text color={isSelected ? 'whiteAlpha.900' : 'gray.700'}>
-                                {feature}
-                              </Text>
-                            </HStack>
-                          ))}
-                        </Stack>
-
                         <Button
                           w="full"
                           size="lg"
-                          bg={isSelected ? 'white' : 'gray.950'}
-                          color={isSelected ? 'gray.950' : 'white'}
+                          bg={isSelected ? 'white' : 'gray.100'}
+                          color={isSelected ? 'gray.950' : 'gray.800'}
                           _hover={{ opacity: 0.92 }}
-                          onClick={() => handlePlanCheckout(plan.key)}
-                          loading={isSubmitting && selectedPlan === plan.key}
+                          onClick={() => setSelectedPlan(plan.key)}
                         >
-                          Continue with {plan.title}
-                          <ArrowRight size={16} />
+                          {isSelected ? 'Selected Plan' : `Select ${plan.title}`}
                         </Button>
                       </Box>
                     )
@@ -421,7 +347,7 @@ const Subscription = () => {
 
                 <Separator />
 
-                <Box borderRadius="24px" bg="orange.50" p={4}>
+                <Box borderRadius="24px" bg="green.50" p={4}>
                   <HStack
                     justify="space-between"
                     align={{ base: 'start', md: 'center' }}
@@ -430,20 +356,20 @@ const Subscription = () => {
                   >
                     <Box>
                       <Text fontWeight="700" color="gray.900">
-                        Already paid?
+                        Buy Offer: Contact 9570036624
                       </Text>
                       <Text color="gray.600" fontSize="sm">
-                        Refresh your access after confirmation and we will reopen the app if the
-                        plan is active.
+                        We will open WhatsApp with selected plan, admin name, and admin id.
                       </Text>
                     </Box>
                     <Button
-                      variant="outline"
-                      colorPalette="orange"
-                      onClick={handleRefreshAccess}
-                      loading={isRefetching}
+                      bg="green.600"
+                      color="white"
+                      _hover={{ bg: 'green.700' }}
+                      onClick={handleContactOnWhatsApp}
                     >
-                      I have renewed
+                      <MessageCircle size={16} />
+                      Contact on WhatsApp
                     </Button>
                   </HStack>
                 </Box>
@@ -459,10 +385,10 @@ const Subscription = () => {
                   >
                     <Box>
                       <Text fontWeight="700" color="gray.900">
-                        Don't have a subscription?
+                        Got plan activated?
                       </Text>
                       <Text color="gray.600" fontSize="sm">
-                        Sign in with another account that has an active subscription.
+                        Logout and login again to refresh your session and unlock access.
                       </Text>
                     </Box>
                     <Button
@@ -472,7 +398,7 @@ const Subscription = () => {
                       loading={isLoggingOut}
                     >
                       <LogOut size={16} />
-                      Login to another account
+                      Logout and login again
                     </Button>
                   </HStack>
                 </Box>

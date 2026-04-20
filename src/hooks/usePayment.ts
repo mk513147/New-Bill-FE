@@ -58,6 +58,16 @@ export type PaymentDuesResponse = {
   suppliers: PartyDueRow[]
 }
 
+export type PaymentSummary = {
+  totalPayments: number
+  totalAmount: number
+  totalFromCustomers: number
+  totalToSuppliers: number
+  customerPaymentsCount: number
+  supplierPaymentsCount: number
+  thisMonthAmount: number
+}
+
 const getPaymentDues = async (): Promise<PaymentDuesResponse> => {
   const res = await API.get(API_ENDPOINTS.PAYMENT.DUES)
   return (
@@ -66,6 +76,52 @@ const getPaymentDues = async (): Promise<PaymentDuesResponse> => {
       suppliers: [],
     }
   )
+}
+
+const pickNumber = (obj: any, keys: string[]) => {
+  for (const key of keys) {
+    const value = obj?.[key]
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value
+    }
+  }
+  return 0
+}
+
+const getPaymentSummary = async (): Promise<PaymentSummary> => {
+  const res = await API.get(API_ENDPOINTS.PAYMENT.SUMMARY)
+  const raw = res.data?.data || res.data || {}
+  const customer = raw?.customer || {}
+  const supplier = raw?.supplier || {}
+
+  return {
+    totalPayments: pickNumber(raw, ['totalPayments', 'count', 'totalCount', 'paymentsCount']),
+    totalAmount:
+      pickNumber(raw, ['totalAmount', 'amount', 'total', 'grossAmount']) ||
+      pickNumber(customer, ['receivableAmount']) +
+        pickNumber(customer, ['advanceAmount']) +
+        pickNumber(supplier, ['payableAmount']) +
+        pickNumber(supplier, ['advancePaidAmount']),
+    totalFromCustomers:
+      pickNumber(raw, [
+        'totalFromCustomers',
+        'customerAmount',
+        'receivedFromCustomers',
+        'customerReceived',
+      ]) || pickNumber(customer, ['receivableAmount']) + pickNumber(customer, ['advanceAmount']),
+    totalToSuppliers:
+      pickNumber(raw, ['totalToSuppliers', 'supplierAmount', 'paidToSuppliers', 'supplierPaid']) ||
+      pickNumber(supplier, ['payableAmount']) + pickNumber(supplier, ['advancePaidAmount']),
+    customerPaymentsCount:
+      pickNumber(raw, ['customerPaymentsCount', 'customerCount', 'fromCustomerCount']) ||
+      pickNumber(customer, ['dueCount']) + pickNumber(customer, ['advanceCount']),
+    supplierPaymentsCount:
+      pickNumber(raw, ['supplierPaymentsCount', 'supplierCount', 'toSupplierCount']) ||
+      pickNumber(supplier, ['dueCount']) + pickNumber(supplier, ['advanceCount']),
+    thisMonthAmount:
+      pickNumber(raw, ['thisMonthAmount', 'monthAmount', 'monthlyAmount']) ||
+      Math.abs(pickNumber(raw, ['netOutstanding'])),
+  }
 }
 
 export const usePayment = () => {
@@ -81,6 +137,14 @@ export const usePaymentDues = () => {
   return useQuery({
     queryKey: ['payment-dues'],
     queryFn: getPaymentDues,
+    retry: false,
+  })
+}
+
+export const usePaymentSummary = () => {
+  return useQuery({
+    queryKey: ['payment-summary'],
+    queryFn: getPaymentSummary,
     retry: false,
   })
 }

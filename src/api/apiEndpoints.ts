@@ -92,6 +92,7 @@ export const API_ENDPOINTS = {
     BASE: '/payment/list',
     CREATE: '/payment/create',
     DUES: '/payment/dues',
+    SUMMARY: '/payment/summary',
     GET_BY_ID: '/payment',
   },
 

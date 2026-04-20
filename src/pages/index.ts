@@ -7,6 +7,7 @@ export { default as ForgotPassword } from './ForgotPassword/ForgotPassword.tsx'
 export { default as Suppliers } from './Suppliers/Suppliers.tsx'
 export { default as Stocks } from './Stocks/Stocks.tsx'
 export { default as Payments } from './Payments/Payments.tsx'
+export { default as PaymentDues } from './Payments/PaymentDues.tsx'
 export { default as Settings } from './Settings/Settings.tsx'
 
 export { default as Attendance } from './Attendance/Attendance.tsx'

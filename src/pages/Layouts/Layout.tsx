@@ -20,7 +20,7 @@ const Layout = () => {
       <Flex flex={1} direction="column" overflow="hidden" bg="#edf1f5">
         <Header />
 
-        <Box flex={1} overflowY="hidden" bg="#edf1f5">
+        <Box flex={1} overflowY="auto" bg="#edf1f5">
           <Outlet />
         </Box>
       </Flex>

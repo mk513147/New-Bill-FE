@@ -1,14 +1,15 @@
 import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack, Badge } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Plus } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Plus, ArrowRight } from 'lucide-react'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
 import { ExpandableSearch } from '@/components/common/ExpandableSearch'
 import PaymentModal from '@/components/modals/PaymentModal'
 
-import { usePayment } from '@/hooks/usePayment'
+import { usePayment, usePaymentSummary } from '@/hooks/usePayment'
 
 const paymentTypeColor = {
   supplier: 'orange',
@@ -43,7 +44,10 @@ const Payments = () => {
   const [page, setPage] = useState(1)
   const limit = 20
 
+  const navigate = useNavigate()
+
   const { data: paymentData = [], isLoading } = usePayment()
+  const { data: paymentSummary } = usePaymentSummary()
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 350)
@@ -183,45 +187,117 @@ const Payments = () => {
       <Flex
         bg="linear-gradient(180deg, #eef2f6 0%, #e8edf3 48%, #e2e8f0 100%)"
         width="100%"
-        height="100%"
+        minH="100%"
         flexDir="column"
         px={{ base: 4, md: 6 }}
         py={{ base: 4, md: 5 }}
+        overflowY="auto"
       >
         <SimpleGrid columns={{ base: 2, md: 4 }} gap={3}>
           <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
             <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
-              Total
+              Total Payments
             </Text>
             <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
-              {summary.total}
+              {paymentSummary?.totalPayments ?? summary.total}
             </Text>
           </Box>
           <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
             <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
-              Showing
+              Total Amount
             </Text>
             <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
-              {summary.showing}
+              {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+              }).format(Number(paymentSummary?.totalAmount ?? 0))}
             </Text>
           </Box>
           <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
             <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
-              Page
+              From Customers
             </Text>
             <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
-              {summary.activePage}
+              {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+              }).format(Number(paymentSummary?.totalFromCustomers ?? 0))}
             </Text>
           </Box>
           <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
             <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
-              Total Pages
+              To Suppliers
             </Text>
-            <Text mt={1} fontSize="xl" fontWeight="800" color="gray.900">
-              {summary.totalPages}
+            <Text mt={1} fontSize="xl" fontWeight="800" color="orange.600">
+              {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+              }).format(Number(paymentSummary?.totalToSuppliers ?? 0))}
             </Text>
           </Box>
         </SimpleGrid>
+
+        <SimpleGrid columns={{ base: 1, md: 3 }} gap={3} mt={3}>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              This Month
+            </Text>
+            <Text mt={1} fontSize="lg" fontWeight="700" color="gray.900">
+              {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0,
+              }).format(Number(paymentSummary?.thisMonthAmount ?? 0))}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Customer Payments Count
+            </Text>
+            <Text mt={1} fontSize="lg" fontWeight="700" color="gray.900">
+              {paymentSummary?.customerPaymentsCount ?? 0}
+            </Text>
+          </Box>
+          <Box bg="white" border="1px solid" borderColor="gray.100" borderRadius="16px" p={3}>
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="0.06em">
+              Supplier Payments Count
+            </Text>
+            <Text mt={1} fontSize="lg" fontWeight="700" color="gray.900">
+              {paymentSummary?.supplierPaymentsCount ?? 0}
+            </Text>
+          </Box>
+        </SimpleGrid>
+
+        {/* Outstanding Dues — View Details card */}
+        <Box
+          mt={3}
+          bg="white"
+          border="1px solid"
+          borderColor="gray.100"
+          borderRadius="16px"
+          p={4}
+          cursor="pointer"
+          _hover={{ borderColor: 'gray.300', shadow: 'sm' }}
+          onClick={() => navigate('/payments/dues')}
+        >
+          <Flex align="center" justify="space-between">
+            <VStack align="start" gap={0.5}>
+              <Text fontSize="sm" fontWeight="700" color="gray.800">
+                Outstanding Dues
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                See who owes you and who you owe — supplier & customer breakdown
+              </Text>
+            </VStack>
+            <HStack gap={1.5} color="blue.600" fontWeight="600" fontSize="sm">
+              <Text>View Details</Text>
+              <ArrowRight size={15} />
+            </HStack>
+          </Flex>
+        </Box>
 
         <Flex
           justify="space-between"

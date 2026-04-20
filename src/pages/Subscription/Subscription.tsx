@@ -206,7 +206,7 @@ const Subscription = () => {
                     <Text color="whiteAlpha.700" fontSize="sm" mb={2}>
                       Admin ID
                     </Text>
-                    <Text fontSize="lg" fontWeight="700" noOfLines={1}>
+                    <Text fontSize="lg" fontWeight="700">
                       {adminId}
                     </Text>
                   </Box>

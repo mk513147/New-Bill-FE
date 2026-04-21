@@ -26,6 +26,7 @@ type Props = {
   onSortChange?: (key: string, order: 'asc' | 'desc') => void
   onImport?: () => void
   onExport?: () => void
+  onDownloadTemplate?: () => void
   onRefresh?: () => void
 }
 
@@ -36,6 +37,7 @@ export function TableActionsPopover({
   onSortChange,
   onImport,
   onExport,
+  onDownloadTemplate,
   onRefresh,
 }: Props) {
   const [sortOpen, setSortOpen] = useState(false)
@@ -135,6 +137,7 @@ export function TableActionsPopover({
 
             <ActionItem icon={Upload} label="Import" onClick={onImport} />
             <ActionItem icon={Download} label="Export" onClick={onExport} />
+            <ActionItem icon={Download} label="Download Template" onClick={onDownloadTemplate} />
             <ActionItem icon={Settings} label="Preferences" />
             <ActionItem icon={RotateCcw} label="Refresh List" onClick={onRefresh} />
             <ActionItem icon={Columns} label="Reset Column Width" />

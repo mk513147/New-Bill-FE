@@ -19,6 +19,7 @@ import { Plus, Trash2, X } from 'lucide-react'
 import { useCustomers } from '@/hooks/useCustomer'
 import { useProducts } from '@/hooks/useProducts'
 import { useSaleActions } from '@/hooks/useSaleActions'
+import { DateInputWithIcon } from '@/components/common/DateInputWithIcon'
 
 type SaleFormItem = {
   productId: string
@@ -40,6 +41,12 @@ export interface SaleFormValues {
 interface SaleModalProps {
   open: boolean
   onClose: () => void
+}
+
+const getTodayDate = () => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  return now.toISOString().slice(0, 10)
 }
 
 export default function SaleModal({ open, onClose }: SaleModalProps) {
@@ -83,6 +90,15 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
     [products],
   )
 
+  const productById = useMemo(
+    () =>
+      products.reduce<Record<string, any>>((acc, product) => {
+        if (product?._id) acc[product._id] = product
+        return acc
+      }, {}),
+    [products],
+  )
+
   useEffect(() => {
     if (!open) return
     setCustomerMode('registered')
@@ -90,7 +106,7 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
       customerId: '',
       customerName: '',
       invoiceNumber: '',
-      saleDate: '',
+      saleDate: getTodayDate(),
       paidAmount: '0',
       note: '',
       items: [{ productId: '', quantity: '1', price: '0', discount: '0' }],
@@ -98,16 +114,41 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
   }, [open])
 
   const totals = useMemo(() => {
-    const totalAmount = formData.items.reduce((sum, item) => {
-      const qty = Number(item.quantity || 0)
-      const price = Number(item.price || 0)
-      const discount = Number(item.discount || 0)
-      return sum + (price - discount) * qty
-    }, 0)
+    const summary = formData.items.reduce(
+      (acc, item) => {
+        const qty = Number(item.quantity || 0)
+        const price = Number(item.price || 0)
+        const discount = Number(item.discount || 0)
+
+        const safeQty = Number.isFinite(qty) && qty > 0 ? qty : 0
+        const safePrice = Number.isFinite(price) && price > 0 ? price : 0
+        const safeDiscount = Number.isFinite(discount) && discount > 0 ? discount : 0
+        const baseAmount = Math.max(0, safePrice - safeDiscount) * safeQty
+
+        const product = productById[item.productId]
+        const gstPercentage = Number(product?.gstPercentage || 0)
+        const isGstInclusive = !!product?.gstInclusive
+        const gstAmount =
+          !isGstInclusive && gstPercentage > 0 ? (baseAmount * gstPercentage) / 100 : 0
+
+        acc.subtotal += baseAmount
+        acc.totalGst += gstAmount
+        return acc
+      },
+      { subtotal: 0, totalGst: 0 },
+    )
+
+    const totalAmount = summary.subtotal + summary.totalGst
     const paidAmount = Number(formData.paidAmount || 0)
-    const dueAmount = totalAmount - paidAmount
-    return { totalAmount, dueAmount }
-  }, [formData.items, formData.paidAmount])
+    const dueAmount = totalAmount - (Number.isFinite(paidAmount) ? paidAmount : 0)
+
+    return {
+      subtotal: summary.subtotal,
+      totalGst: summary.totalGst,
+      totalAmount,
+      dueAmount,
+    }
+  }, [formData.items, formData.paidAmount, productById])
 
   function updateItem(index: number, key: keyof SaleFormItem, value: string) {
     setFormData((prev) => {
@@ -281,14 +322,10 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
                     <Field.Label color="gray.700" fontWeight="600">
                       Sale Date
                     </Field.Label>
-                    <Input
-                      type="date"
-                      value={formData.saleDate}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, saleDate: e.target.value }))
-                      }
-                      bg="white"
-                      borderColor="gray.200"
+                    <DateInputWithIcon
+                      name="saleDate"
+                      value={formData.saleDate || getTodayDate()}
+                      onChange={(value) => setFormData((prev) => ({ ...prev, saleDate: value }))}
                     />
                   </Field.Root>
                 </HStack>
@@ -317,9 +354,20 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
                           <Select.Root
                             collection={productCollection}
                             value={item.productId ? [item.productId] : []}
-                            onValueChange={(details) =>
-                              updateItem(index, 'productId', details.value[0] || '')
-                            }
+                            onValueChange={(details) => {
+                              const selectedProductId = details.value[0] || ''
+                              updateItem(index, 'productId', selectedProductId)
+
+                              // Auto-fill price from product's sellingPrice
+                              if (selectedProductId) {
+                                const product = products.find(
+                                  (p: any) => p._id === selectedProductId,
+                                )
+                                if (product) {
+                                  updateItem(index, 'price', String(product.sellingPrice || 0))
+                                }
+                              }
+                            }}
                             positioning={{ strategy: 'fixed', hideWhenDetached: true }}
                           >
                             <Select.HiddenSelect />
@@ -386,6 +434,29 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
                           />
                         </Field.Root>
 
+                        <Box minW="120px" pb={1}>
+                          <Text fontSize="xs" color="gray.600" mb={1}>
+                            GST
+                          </Text>
+                          <Text fontSize="sm" color="gray.800" fontWeight="600">
+                            ₹
+                            {(() => {
+                              const product = productById[item.productId]
+                              const gstPercentage = Number(product?.gstPercentage || 0)
+                              const isGstInclusive = !!product?.gstInclusive
+                              const qty = Number(item.quantity || 0)
+                              const price = Number(item.price || 0)
+                              const discount = Number(item.discount || 0)
+                              const baseAmount = Math.max(0, price - discount) * Math.max(0, qty)
+                              const gstAmount =
+                                !isGstInclusive && gstPercentage > 0
+                                  ? (baseAmount * gstPercentage) / 100
+                                  : 0
+                              return gstAmount.toFixed(2)
+                            })()}
+                          </Text>
+                        </Box>
+
                         <Button
                           size="sm"
                           colorPalette="red"
@@ -433,37 +504,41 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
                 </HStack>
 
                 {/* Totals */}
-                <HStack justify="space-between" p={3} borderRadius="12px" bg="gray.50">
-                  <Text fontSize="sm" fontWeight="600" color="gray.700">
-                    Total: ₹{totals.totalAmount.toFixed(2)}
-                  </Text>
-                  <Text
-                    fontSize="sm"
-                    fontWeight="700"
-                    color={
-                      totals.dueAmount > 0
-                        ? 'orange.600'
-                        : totals.dueAmount < 0
-                          ? 'blue.600'
-                          : 'green.600'
-                    }
-                  >
-                    {totals.dueAmount < 0 ? 'Advance' : 'Due'}: ₹
-                    {Math.abs(totals.dueAmount).toFixed(2)}
-                  </Text>
-                </HStack>
+                <VStack align="stretch" gap={1} p={3} borderRadius="12px" bg="gray.50">
+                  <HStack justify="space-between">
+                    <Text fontSize="sm" fontWeight="600" color="gray.700">
+                      Subtotal: ₹{totals.subtotal.toFixed(2)}
+                    </Text>
+                    <Text fontSize="sm" fontWeight="600" color="gray.700">
+                      GST: ₹{totals.totalGst.toFixed(2)}
+                    </Text>
+                  </HStack>
+                  <HStack justify="space-between">
+                    <Text fontSize="sm" fontWeight="700" color="gray.900">
+                      Total: ₹{totals.totalAmount.toFixed(2)}
+                    </Text>
+                    <Text
+                      fontSize="sm"
+                      fontWeight="700"
+                      color={
+                        totals.dueAmount > 0
+                          ? 'orange.600'
+                          : totals.dueAmount < 0
+                            ? 'blue.600'
+                            : 'green.600'
+                      }
+                    >
+                      {totals.dueAmount < 0 ? 'Advance' : 'Due'}: ₹
+                      {Math.abs(totals.dueAmount).toFixed(2)}
+                    </Text>
+                  </HStack>
+                </VStack>
               </VStack>
             </Dialog.Body>
 
             <Dialog.Footer gap={3} justifyContent="flex-end">
               <Dialog.ActionTrigger asChild>
-                <Button
-                  variant="outline"
-                  width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
-                >
+                <Button variant="outline" width="50%" color="gray.700" borderColor="gray.300">
                   Cancel
                 </Button>
               </Dialog.ActionTrigger>
@@ -471,7 +546,6 @@ export default function SaleModal({ open, onClose }: SaleModalProps) {
                 width="50%"
                 bg="gray.950"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
                 loading={createSale.isPending}
                 onClick={handleSubmit}
               >

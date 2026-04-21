@@ -13,7 +13,9 @@ export const useCustomerImport = () => {
       const formData = new FormData()
       formData.append('file', file)
 
-      const res = await API.post(API_ENDPOINTS.CUSTOMERS.IMPORT, formData)
+      const res = await API.post(API_ENDPOINTS.CUSTOMERS.IMPORT, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
       return res.data
     },
 

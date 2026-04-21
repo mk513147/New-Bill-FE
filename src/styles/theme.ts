@@ -8,6 +8,29 @@ const config = defineConfig({
       color: 'gray.800',
       background: '#edf1f5',
     },
+    '[role="dialog"] button': {
+      transition: 'none !important',
+      transform: 'none !important',
+      boxShadow: 'none !important',
+    },
+    '[role="dialog"] button:hover': {
+      transition: 'none !important',
+      transform: 'none !important',
+      boxShadow: 'none !important',
+      filter: 'none !important',
+    },
+    '[role="dialog"] [role="option"]:hover': {
+      background: 'white !important',
+      color: 'inherit !important',
+    },
+    '[role="dialog"] [role="option"][data-highlighted]': {
+      background: 'white !important',
+      color: 'inherit !important',
+    },
+    '[role="dialog"] [data-scope="tabs"][data-part="trigger"]:hover': {
+      background: 'inherit !important',
+      color: 'inherit !important',
+    },
   },
   theme: {
     tokens: {
@@ -39,9 +62,9 @@ const config = defineConfig({
         base: {
           fontWeight: '600',
           borderRadius: 'md',
-          transitionProperty: 'all',
-          transitionDuration: '200ms',
-          transitionTimingFunction: 'ease-in-out',
+          transitionProperty: 'none',
+          transitionDuration: '0ms',
+          transitionTimingFunction: 'linear',
           cursor: 'pointer',
           _disabled: {
             opacity: 0.5,
@@ -51,7 +74,9 @@ const config = defineConfig({
         variants: {
           solid: {
             _hover: {
-              transform: 'translateY(-1px)',
+              transform: 'none',
+              boxShadow: 'none',
+              filter: 'none',
             },
             _active: {
               transform: 'translateY(0)',
@@ -60,13 +85,17 @@ const config = defineConfig({
           outline: {
             border: '1px solid',
             _hover: {
-              bg: 'gray.50',
+              transform: 'none',
+              boxShadow: 'none',
+              filter: 'none',
             },
           },
           ghost: {
             bg: 'transparent',
             _hover: {
-              bg: 'gray.100',
+              transform: 'none',
+              boxShadow: 'none',
+              filter: 'none',
             },
           },
         },

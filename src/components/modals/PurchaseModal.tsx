@@ -11,6 +11,7 @@ import {
   HStack,
   Text,
   Box,
+  Tabs,
 } from '@chakra-ui/react'
 import { createListCollection } from '@chakra-ui/react'
 import { Plus, Trash2, X } from 'lucide-react'
@@ -18,15 +19,18 @@ import { Plus, Trash2, X } from 'lucide-react'
 import { useSupplier } from '@/hooks/useSupplier'
 import { useProducts } from '@/hooks/useProducts'
 import { usePurchaseActions } from '@/hooks/usePurchaseActions'
+import { DateInputWithIcon } from '@/components/common/DateInputWithIcon'
 
 type PurchaseFormItem = {
   productId: string
   quantity: string
   price: string
+  discount?: string
 }
 
 export interface PurchaseFormValues {
   supplierId?: string
+  supplierName?: string
   invoiceNumber?: string
   purchaseDate?: string
   paidAmount?: string
@@ -40,14 +44,22 @@ interface PurchaseDialogProps {
   defaultValues?: PurchaseFormValues
 }
 
+const getTodayDate = () => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  return now.toISOString().slice(0, 10)
+}
+
 export default function PurchaseModal({ open, onClose, defaultValues }: PurchaseDialogProps) {
+  const [supplierMode, setSupplierMode] = useState<'registered' | 'walkin'>('registered')
   const [formData, setFormData] = useState<PurchaseFormValues>({
     supplierId: '',
+    supplierName: '',
     invoiceNumber: '',
     purchaseDate: '',
     paidAmount: '0',
     note: '',
-    items: [{ productId: '', quantity: '1', price: '0' }],
+    items: [{ productId: '', quantity: '1', price: '0', discount: '0' }],
   })
 
   const { data: suppliers = [] } = useSupplier()
@@ -84,13 +96,15 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
       return
     }
 
+    setSupplierMode('registered')
     setFormData({
       supplierId: '',
+      supplierName: '',
       invoiceNumber: '',
-      purchaseDate: '',
+      purchaseDate: getTodayDate(),
       paidAmount: '0',
       note: '',
-      items: [{ productId: '', quantity: '1', price: '0' }],
+      items: [{ productId: '', quantity: '1', price: '0', discount: '0' }],
     })
   }, [defaultValues, open])
 
@@ -98,7 +112,11 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
     const totalAmount = formData.items.reduce((sum, item) => {
       const qty = Number(item.quantity || 0)
       const price = Number(item.price || 0)
-      return sum + (Number.isFinite(qty) ? qty : 0) * (Number.isFinite(price) ? price : 0)
+      const discount = Number(item.discount || 0)
+      const safeQty = Number.isFinite(qty) ? qty : 0
+      const safePrice = Number.isFinite(price) ? price : 0
+      const safeDiscount = Number.isFinite(discount) ? discount : 0
+      return sum + safeQty * Math.max(0, safePrice - safeDiscount)
     }, 0)
 
     const paidAmount = Number(formData.paidAmount || 0)
@@ -118,7 +136,7 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
   function addItem() {
     setFormData((prev) => ({
       ...prev,
-      items: [...prev.items, { productId: '', quantity: '1', price: '0' }],
+      items: [...prev.items, { productId: '', quantity: '1', price: '0', discount: '0' }],
     }))
   }
 
@@ -131,7 +149,9 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
 
   function handleSubmit() {
     const payload = {
-      supplierId: formData.supplierId?.trim() || undefined,
+      ...(supplierMode === 'registered' && formData.supplierId
+        ? { supplierId: formData.supplierId }
+        : { supplierName: formData.supplierName?.trim() || 'Walk-in Supplier' }),
       invoiceNumber: formData.invoiceNumber?.trim() || undefined,
       purchaseDate: formData.purchaseDate || undefined,
       paidAmount: Number(formData.paidAmount || 0),
@@ -142,6 +162,7 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
           productId: item.productId,
           quantity: Number(item.quantity),
           price: Number(item.price || 0),
+          discount: Number(item.discount || 0),
         })),
     }
 
@@ -196,11 +217,25 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
               }}
             >
               <VStack align="stretch" gap={4}>
-                <HStack gap={3} align="start" flexWrap="wrap">
-                  <Field.Root flex="1" minW="220px">
-                    <Field.Label color="gray.700" fontWeight="600">
-                      Supplier
-                    </Field.Label>
+                {/* Supplier */}
+                <Box border="1px solid" borderColor="gray.200" borderRadius="14px" p={3} bg="white">
+                  <Text fontSize="sm" fontWeight="700" color="gray.800" mb={3}>
+                    Supplier
+                  </Text>
+                  <Tabs.Root
+                    value={supplierMode}
+                    onValueChange={(d) => setSupplierMode(d.value as 'registered' | 'walkin')}
+                    variant="enclosed"
+                    size="sm"
+                    mb={3}
+                  >
+                    <Tabs.List>
+                      <Tabs.Trigger value="registered">Registered</Tabs.Trigger>
+                      <Tabs.Trigger value="walkin">Walk-in</Tabs.Trigger>
+                    </Tabs.List>
+                  </Tabs.Root>
+
+                  {supplierMode === 'registered' ? (
                     <Select.Root
                       collection={supplierCollection}
                       value={formData.supplierId ? [formData.supplierId] : []}
@@ -212,7 +247,7 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                       <Select.HiddenSelect name="supplierId" />
                       <Select.Control>
                         <Select.Trigger>
-                          <Select.ValueText placeholder="Optional supplier" />
+                          <Select.ValueText placeholder="Select supplier" />
                         </Select.Trigger>
                         <Select.IndicatorGroup>
                           <Select.Indicator />
@@ -229,8 +264,20 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                         </Select.Content>
                       </Select.Positioner>
                     </Select.Root>
-                  </Field.Root>
+                  ) : (
+                    <Input
+                      value={formData.supplierName}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, supplierName: e.target.value }))
+                      }
+                      placeholder="Supplier name (or leave blank for Walk-in)"
+                      bg="white"
+                      borderColor="gray.200"
+                    />
+                  )}
+                </Box>
 
+                <HStack gap={3} align="start" flexWrap="wrap">
                   <Field.Root flex="1" minW="180px">
                     <Field.Label color="gray.700" fontWeight="600">
                       Invoice Number
@@ -250,14 +297,12 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                     <Field.Label color="gray.700" fontWeight="600">
                       Purchase Date
                     </Field.Label>
-                    <Input
-                      type="date"
-                      value={formData.purchaseDate}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, purchaseDate: e.target.value }))
+                    <DateInputWithIcon
+                      name="purchaseDate"
+                      value={formData.purchaseDate || getTodayDate()}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, purchaseDate: value }))
                       }
-                      bg="white"
-                      borderColor="gray.200"
                     />
                   </Field.Root>
                 </HStack>
@@ -267,7 +312,14 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                     <Text fontSize="sm" fontWeight="700" color="gray.800">
                       Purchase Items
                     </Text>
-                    <Button size="sm" variant="outline" onClick={addItem}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      color="black"
+                      borderColor="black"
+                      bg="white"
+                      onClick={addItem}
+                    >
                       <HStack gap={1}>
                         <Plus size={14} />
                         <Text fontSize="xs">Add Item</Text>
@@ -285,9 +337,20 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                           <Select.Root
                             collection={productCollection}
                             value={item.productId ? [item.productId] : []}
-                            onValueChange={(details) =>
-                              updateItem(index, 'productId', details.value[0] || '')
-                            }
+                            onValueChange={(details) => {
+                              const selectedProductId = details.value[0] || ''
+                              updateItem(index, 'productId', selectedProductId)
+
+                              // Auto-fill price from product's purchasePrice
+                              if (selectedProductId) {
+                                const product = products.find(
+                                  (p: any) => p._id === selectedProductId,
+                                )
+                                if (product) {
+                                  updateItem(index, 'price', String(product.purchasePrice || 0))
+                                }
+                              }
+                            }}
                             positioning={{ strategy: 'fixed', hideWhenDetached: true }}
                           >
                             <Select.HiddenSelect />
@@ -335,6 +398,20 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                             min={0}
                             value={item.price}
                             onChange={(e) => updateItem(index, 'price', e.target.value)}
+                            bg="white"
+                            borderColor="gray.200"
+                          />
+                        </Field.Root>
+
+                        <Field.Root minW="130px">
+                          <Field.Label fontSize="xs" color="gray.600">
+                            Discount
+                          </Field.Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={item.discount || '0'}
+                            onChange={(e) => updateItem(index, 'discount', e.target.value)}
                             bg="white"
                             borderColor="gray.200"
                           />
@@ -406,9 +483,9 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
                   variant="outline"
                   minW="120px"
                   width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
+                  color="black"
+                  borderColor="black"
+                  bg="white"
                 >
                   Cancel
                 </Button>
@@ -416,9 +493,8 @@ export default function PurchaseModal({ open, onClose, defaultValues }: Purchase
 
               <Button
                 width="50%"
-                bg="gray.950"
+                bg="black"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
                 loading={createPurchase.isPending}
                 onClick={handleSubmit}
               >

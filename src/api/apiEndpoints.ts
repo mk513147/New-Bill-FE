@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     DELETE: '/customers/deleteCustomer',
     IMPORT: '/customers/import',
     EXPORT: '/customers/export',
+    TEMPLATE: '/customers/template/sample',
   },
 
   PRODUCTS: {
@@ -48,6 +49,9 @@ export const API_ENDPOINTS = {
     CREATE: '/supplier/create',
     UPDATE: '/supplier/update',
     DELETE: '/supplier/delete',
+    EXPORT: '/supplier/export',
+    IMPORT: '/supplier/import',
+    TEMPLATE: '/supplier/template/sample',
   },
 
   STAFF: {
@@ -65,6 +69,9 @@ export const API_ENDPOINTS = {
     GET_BY_ID: '/purchase',
     UPDATE: '/purchase/update',
     DELETE: '/purchase/delete',
+    EXPORT: '/purchase/export',
+    IMPORT: '/purchase/import',
+    TEMPLATE: '/purchase/template/sample',
   },
 
   PURCHASE_RETURN: {

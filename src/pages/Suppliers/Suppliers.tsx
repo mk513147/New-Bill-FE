@@ -1,8 +1,11 @@
 import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack } from '@chakra-ui/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Plus } from 'lucide-react'
+import { Plus, Download, Upload } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { toaster } from '@/components/ui/toaster'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
@@ -13,6 +16,17 @@ import SupplierModal, { SupplierFormValues } from '@/components/modals/SupplierM
 
 import { useSupplier } from '@/hooks/useSupplier'
 import { useSupplierActions } from '@/hooks/useSupplierActions'
+
+const downloadFile = (blob: Blob, filename: string) => {
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', filename)
+  document.body.appendChild(link)
+  link.click()
+  link.parentNode?.removeChild(link)
+  window.URL.revokeObjectURL(url)
+}
 
 function Suppliers() {
   const dispatch = useDispatch()
@@ -36,8 +50,79 @@ function Suppliers() {
   const [page, setPage] = useState(1)
   const limit = 20
 
+  const [isExporting, setIsExporting] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const { data: suppliersData = [], isLoading } = useSupplier()
   const { deleteSupplier } = useSupplierActions()
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const res = await API.get(API_ENDPOINTS.SUPPLIERS.TEMPLATE, {
+        responseType: 'blob',
+      })
+      downloadFile(new Blob([res.data]), 'supplier_sample.xlsx')
+      toaster.success({ title: 'Template downloaded successfully' })
+    } catch (error) {
+      toaster.error({ title: 'Failed to download template' })
+    }
+  }
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true)
+      const res = await API.get(API_ENDPOINTS.SUPPLIERS.EXPORT, {
+        responseType: 'blob',
+      })
+      const filename = `suppliers_${new Date().toISOString().split('T')[0]}.xlsx`
+      downloadFile(new Blob([res.data]), filename)
+      toaster.success({ title: 'Suppliers exported successfully' })
+    } catch (error) {
+      toaster.error({ title: 'Failed to export suppliers' })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleImport = async (file: File) => {
+    try {
+      setIsImporting(true)
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await API.post(API_ENDPOINTS.SUPPLIERS.IMPORT, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      const { created = 0, updated = 0, failed = 0, errors = [] } = res.data?.data || {}
+
+      if (failed > 0) {
+        const errorMsg = errors.map((e: any) => `${e.supplier}: ${e.reason}`).join(', ')
+        toaster.error({
+          title: `Import completed with errors`,
+          description: `Created: ${created}, Updated: ${updated}, Failed: ${failed}`,
+        })
+      } else {
+        toaster.success({
+          title: 'Suppliers imported successfully',
+          description: `Created: ${created}, Updated: ${updated}`,
+        })
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+    } catch (error: any) {
+      toaster.error({
+        title: 'Import failed',
+        description: error.response?.data?.message || 'Please check the file format',
+      })
+    } finally {
+      setIsImporting(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 350)
@@ -151,6 +236,24 @@ function Suppliers() {
           maximumFractionDigits: 0,
         }).format(Number(s.pendingAmount || 0)),
     },
+    {
+      key: 'totalPurchaseAmount',
+      header: 'Total Purchased',
+      width: '180px',
+      render: (s: any) =>
+        new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          maximumFractionDigits: 0,
+        }).format(Number(s.totalPurchaseAmount || 0)),
+    },
+    {
+      key: 'lastTransactionDate',
+      header: 'Last Transaction',
+      width: '170px',
+      render: (s: any) =>
+        s.lastTransactionDate ? new Date(s.lastTransactionDate).toLocaleDateString('en-IN') : '—',
+    },
   ]
 
   const supplierActions = [
@@ -164,7 +267,6 @@ function Suppliers() {
           name: item.name,
           mobileNumber: item.mobileNumber,
           address: item.address,
-          pendingAmount: item.pendingAmount ?? 0,
         })
         setOpen(true)
       },
@@ -297,6 +399,57 @@ function Suppliers() {
             </Button>
 
             <Button
+              bg="blue.600"
+              color="white"
+              h="38px"
+              px={3}
+              isLoading={isImporting}
+              _hover={{ bg: 'blue.700' }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <HStack gap={1}>
+                <Upload size={16} />
+                <Text fontSize="sm" fontWeight="700">
+                  Import
+                </Text>
+              </HStack>
+            </Button>
+
+            <Button
+              bg="green.600"
+              color="white"
+              h="38px"
+              px={3}
+              isLoading={isExporting}
+              _hover={{ bg: 'green.700' }}
+              onClick={handleExport}
+            >
+              <HStack gap={1}>
+                <Download size={16} />
+                <Text fontSize="sm" fontWeight="700">
+                  Export
+                </Text>
+              </HStack>
+            </Button>
+
+            <Button
+              variant="outline"
+              bg="white"
+              borderColor="gray.300"
+              h="38px"
+              px={3}
+              _hover={{ bg: 'gray.50' }}
+              onClick={handleDownloadTemplate}
+            >
+              <HStack gap={1}>
+                <Download size={16} />
+                <Text fontSize="sm" fontWeight="700">
+                  Template
+                </Text>
+              </HStack>
+            </Button>
+
+            <Button
               variant="outline"
               bg="white"
               borderColor="gray.300"
@@ -305,6 +458,19 @@ function Suppliers() {
             >
               Refresh
             </Button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) {
+                  handleImport(file)
+                }
+              }}
+            />
           </HStack>
         </Flex>
 

@@ -102,13 +102,7 @@ export default function SalePaymentModal({
 
             <Dialog.Footer gap={3} justifyContent="flex-end">
               <Dialog.ActionTrigger asChild>
-                <Button
-                  variant="outline"
-                  width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
-                >
+                <Button variant="outline" width="50%" color="gray.700" borderColor="gray.300">
                   Cancel
                 </Button>
               </Dialog.ActionTrigger>
@@ -116,7 +110,6 @@ export default function SalePaymentModal({
                 width="50%"
                 bg="gray.950"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
                 loading={updateSale.isPending}
                 onClick={handleSubmit}
               >

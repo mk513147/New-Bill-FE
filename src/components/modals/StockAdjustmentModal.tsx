@@ -218,7 +218,6 @@ export default function StockAdjustmentModal({ open, onClose }: StockAdjustmentM
                   width="50%"
                   color="gray.700"
                   borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
                 >
                   Cancel
                 </Button>
@@ -229,7 +228,6 @@ export default function StockAdjustmentModal({ open, onClose }: StockAdjustmentM
                 bg="gray.950"
                 color="white"
                 width="50%"
-                _hover={{ bg: 'gray.800' }}
                 loading={createManualAdjustment.isPending}
                 onClick={handleSubmit}
               >

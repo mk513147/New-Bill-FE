@@ -7,7 +7,6 @@ export interface SupplierFormValues {
   name: string
   mobileNumber: string
   address?: string
-  pendingAmount?: number
 }
 
 interface SupplierDialogProps {
@@ -29,7 +28,6 @@ export default function SupplierModal({
     name: '',
     mobileNumber: '',
     address: '',
-    pendingAmount: 0,
   })
 
   const { createSupplier, updateSupplier } = useSupplierActions()
@@ -42,7 +40,6 @@ export default function SupplierModal({
         name: '',
         mobileNumber: '',
         address: '',
-        pendingAmount: 0,
       })
     }
   }, [defaultValues, mode])
@@ -57,7 +54,6 @@ export default function SupplierModal({
       name: formData.name.trim(),
       mobileNumber: formData.mobileNumber.trim(),
       address: formData.address?.trim() || '',
-      pendingAmount: formData.pendingAmount ?? 0,
     }
 
     if (mode === 'add') {
@@ -108,17 +104,7 @@ export default function SupplierModal({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  p={1}
-                  minW="auto"
-                  _hover={{
-                    bg: 'transparent',
-                    color: 'gray.600',
-                  }}
-                >
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -166,22 +152,6 @@ export default function SupplierModal({
                   borderColor="gray.200"
                 />
               </Field.Root>
-
-              <Field.Root>
-                <Field.Label color="gray.700" fontWeight="600">
-                  Pending Amount (₹)
-                </Field.Label>
-                <Input
-                  name="pendingAmount"
-                  type="number"
-                  value={formData.pendingAmount ?? 0}
-                  onChange={handleChange}
-                  placeholder="0"
-                  bg="white"
-                  borderColor="gray.200"
-                  min={0}
-                />
-              </Field.Root>
             </Dialog.Body>
 
             <Dialog.Footer gap={3} justifyContent="flex-end">
@@ -190,9 +160,9 @@ export default function SupplierModal({
                   variant="outline"
                   minW="120px"
                   width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
+                  color="black"
+                  borderColor="black"
+                  bg="white"
                 >
                   Cancel
                 </Button>
@@ -200,10 +170,9 @@ export default function SupplierModal({
 
               <Button
                 minW="160px"
-                bg="gray.950"
+                bg="black"
                 color="white"
                 width="50%"
-                _hover={{ bg: 'gray.800' }}
                 loading={createSupplier.isPending || updateSupplier.isPending}
                 onClick={handleSubmit}
               >

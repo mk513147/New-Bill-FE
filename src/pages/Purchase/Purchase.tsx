@@ -1,7 +1,10 @@
 import { Flex, HStack, Text, Button, Box, SimpleGrid, VStack, Badge } from '@chakra-ui/react'
 import { useEffect, useMemo, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Download } from 'lucide-react'
 import { useDispatch } from 'react-redux'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
+import { toaster } from '@/components/ui/toaster'
 
 import { setHeader, clearHeader } from '@/redux/slices/headerSlice'
 import { CommonTable } from '@/components/common/CommonTable'
@@ -41,8 +44,37 @@ function Purchase() {
   const [page, setPage] = useState(1)
   const limit = 20
 
+  const [isExporting, setIsExporting] = useState(false)
+
   const { data: purchaseData = [], isLoading } = usePurchase()
   const { deletePurchase } = usePurchaseActions()
+
+  const downloadFile = (blob: Blob, filename: string) => {
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', filename)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode?.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true)
+      const res = await API.get(API_ENDPOINTS.PURCHASE.EXPORT, {
+        responseType: 'blob',
+      })
+      const filename = `purchases_${new Date().toISOString().split('T')[0]}.xlsx`
+      downloadFile(new Blob([res.data]), filename)
+      toaster.success({ title: 'Purchases exported successfully' })
+    } catch (error) {
+      toaster.error({ title: 'Failed to export purchases' })
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 350)
@@ -257,21 +289,40 @@ function Purchase() {
             />
           </HStack>
 
-          <Button
-            bg="gray.950"
-            color="white"
-            h="38px"
-            px={4}
-            _hover={{ bg: 'gray.800' }}
-            onClick={() => setCreateOpen(true)}
-          >
-            <HStack gap={1.5}>
-              <Plus size={18} />
-              <Text fontSize="sm" fontWeight="700">
-                Add Purchase
-              </Text>
-            </HStack>
-          </Button>
+          <HStack gap={2}>
+            <Button
+              bg="gray.950"
+              color="white"
+              h="38px"
+              px={4}
+              _hover={{ bg: 'gray.800' }}
+              onClick={() => setCreateOpen(true)}
+            >
+              <HStack gap={1.5}>
+                <Plus size={18} />
+                <Text fontSize="sm" fontWeight="700">
+                  Add Purchase
+                </Text>
+              </HStack>
+            </Button>
+
+            <Button
+              bg="green.600"
+              color="white"
+              h="38px"
+              px={3}
+              isLoading={isExporting}
+              _hover={{ bg: 'green.700' }}
+              onClick={handleExport}
+            >
+              <HStack gap={1}>
+                <Download size={16} />
+                <Text fontSize="sm" fontWeight="700">
+                  Export
+                </Text>
+              </HStack>
+            </Button>
+          </HStack>
         </Flex>
 
         <Box

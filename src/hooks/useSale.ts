@@ -11,6 +11,7 @@ export type SaleItem = {
   quantity: number
   price: number
   discount: number
+  gst?: number
 }
 
 export type SaleRecord = {

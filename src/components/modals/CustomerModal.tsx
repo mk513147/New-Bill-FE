@@ -55,19 +55,25 @@ export default function CustomerDialog({
   }
 
   function handleSubmit() {
-    const payload = {
+    const basePayload = {
       name: formData.name.trim(),
       mobileNumber: formData.mobileNumber.trim(),
       email: formData.email?.trim() || '',
       address: formData.address?.trim() || '',
-      ...(formData.balance ? { balance: Number(formData.balance) } : {}),
     }
 
     if (mode === 'add') {
-      createCustomer.mutate(payload, {
+      createCustomer.mutate(basePayload, {
         onSuccess: onClose,
       })
       return
+    }
+
+    const payload = {
+      ...basePayload,
+      ...(formData.balance !== '' && formData.balance != null
+        ? { balance: Number(formData.balance) }
+        : {}),
     }
 
     if (!pubId) return
@@ -111,17 +117,7 @@ export default function CustomerDialog({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  p={1}
-                  minW="auto"
-                  _hover={{
-                    bg: 'transparent',
-                    color: 'gray.600',
-                  }}
-                >
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -170,19 +166,22 @@ export default function CustomerDialog({
                 />
               </Field.Root>
 
-              <Field.Root mb={3}>
-                <Field.Label color="gray.700" fontWeight="600">
-                  Balance
-                </Field.Label>
-                <Input
-                  name="balance"
-                  value={formData.balance}
-                  onChange={handleChange}
-                  placeholder="Enter Balance"
-                  bg="white"
-                  borderColor="gray.200"
-                />
-              </Field.Root>
+              {mode === 'edit' && (
+                <Field.Root mb={3}>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Balance
+                  </Field.Label>
+                  <Input
+                    name="balance"
+                    value={formData.balance}
+                    onChange={handleChange}
+                    placeholder="Enter Balance"
+                    type="number"
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+              )}
 
               <Field.Root flex={1}>
                 <Field.Label color="gray.700" fontWeight="600">
@@ -205,9 +204,9 @@ export default function CustomerDialog({
                   variant="outline"
                   minW="120px"
                   width={'50%'}
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
+                  color="black"
+                  borderColor="black"
+                  bg="white"
                 >
                   Cancel
                 </Button>
@@ -215,10 +214,9 @@ export default function CustomerDialog({
 
               <Button
                 minW="160px"
-                bg="gray.950"
+                bg="black"
                 color="white"
                 width={'50%'}
-                _hover={{ bg: 'gray.800' }}
                 loading={createCustomer.isPending || updateCustomer.isPending}
                 onClick={handleSubmit}
               >

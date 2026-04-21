@@ -47,15 +47,7 @@ export default function ConfirmDeleteDialog({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  color="gray.500"
-                  _hover={{
-                    bg: 'gray.100',
-                    color: 'gray.700',
-                  }}
-                >
+                <Button size="sm" variant="ghost" color="gray.500">
                   <X size={16} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -80,7 +72,6 @@ export default function ConfirmDeleteDialog({
                     borderRadius="md"
                     bg="gray.100"
                     color="gray.700"
-                    _hover={{ bg: 'gray.200' }}
                     _active={{ bg: 'gray.300' }}
                   >
                     {cancelText}
@@ -97,7 +88,6 @@ export default function ConfirmDeleteDialog({
                   color="white"
                   loading={loading}
                   onClick={onConfirm}
-                  _hover={{ bg: 'red.600' }}
                   _active={{ bg: 'red.700' }}
                   _disabled={{ bg: 'red.300', cursor: 'not-allowed' }}
                 >

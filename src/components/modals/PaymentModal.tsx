@@ -237,14 +237,7 @@ export default function PaymentModal({
                 Record Payment
               </Dialog.Title>
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  p={1}
-                  minW="auto"
-                  _hover={{ bg: 'transparent', color: 'gray.600' }}
-                >
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -555,7 +548,6 @@ export default function PaymentModal({
                   width="50%"
                   color="gray.700"
                   borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
                 >
                   Cancel
                 </Button>
@@ -566,7 +558,6 @@ export default function PaymentModal({
                 width="50%"
                 bg={paidToType === 'supplier' ? 'orange.500' : 'blue.600'}
                 color="white"
-                _hover={{ opacity: 0.9 }}
                 loading={createPayment.isPending}
                 onClick={handleSubmit}
                 disabled={

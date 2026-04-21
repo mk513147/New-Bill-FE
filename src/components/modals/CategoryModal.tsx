@@ -91,17 +91,7 @@ export default function CategoryModal({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  p={1}
-                  minW="auto"
-                  _hover={{
-                    bg: 'transparent',
-                    color: 'gray.600',
-                  }}
-                >
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -133,9 +123,9 @@ export default function CategoryModal({
                   variant="outline"
                   minW="120px"
                   width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
+                  color="black"
+                  borderColor="black"
+                  bg="white"
                 >
                   Cancel
                 </Button>
@@ -143,10 +133,9 @@ export default function CategoryModal({
 
               <Button
                 minW="160px"
-                bg="gray.950"
+                bg="black"
                 color="white"
                 width="50%"
-                _hover={{ bg: 'gray.800' }}
                 loading={createCategory.isPending || updateCategory.isPending}
                 onClick={handleSubmit}
               >

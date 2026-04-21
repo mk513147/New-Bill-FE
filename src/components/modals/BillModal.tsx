@@ -16,6 +16,7 @@ import { X } from 'lucide-react'
 
 import { useSupplier } from '@/hooks/useSupplier'
 import { useBillActions } from '@/hooks/useBillActions'
+import { DateInputWithIcon } from '@/components/common/DateInputWithIcon'
 
 export interface BillFormValues {
   billNumber: string
@@ -30,6 +31,12 @@ interface BillDialogProps {
   open: boolean
   onClose: () => void
   defaultValues?: BillFormValues & { _id?: string }
+}
+
+const getTodayDate = () => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  return now.toISOString().slice(0, 10)
 }
 
 export default function BillModal({ open, onClose, defaultValues }: BillDialogProps) {
@@ -73,8 +80,8 @@ export default function BillModal({ open, onClose, defaultValues }: BillDialogPr
       billNumber: '',
       supplierId: '',
       poNumber: '',
-      billDate: '',
-      dueDate: '',
+      billDate: getTodayDate(),
+      dueDate: getTodayDate(),
       amount: '',
     })
   }, [defaultValues, open])
@@ -205,13 +212,10 @@ export default function BillModal({ open, onClose, defaultValues }: BillDialogPr
                     <Field.Label color="gray.700" fontWeight="600">
                       Bill Date
                     </Field.Label>
-                    <Input
+                    <DateInputWithIcon
                       name="billDate"
-                      type="date"
-                      value={formData.billDate}
-                      onChange={handleChange}
-                      bg="white"
-                      borderColor="gray.200"
+                      value={formData.billDate || getTodayDate()}
+                      onChange={(value) => setFormData((prev) => ({ ...prev, billDate: value }))}
                     />
                   </Field.Root>
                 </HStack>
@@ -221,13 +225,10 @@ export default function BillModal({ open, onClose, defaultValues }: BillDialogPr
                     <Field.Label color="gray.700" fontWeight="600">
                       Due Date
                     </Field.Label>
-                    <Input
+                    <DateInputWithIcon
                       name="dueDate"
-                      type="date"
-                      value={formData.dueDate}
-                      onChange={handleChange}
-                      bg="white"
-                      borderColor="gray.200"
+                      value={formData.dueDate || getTodayDate()}
+                      onChange={(value) => setFormData((prev) => ({ ...prev, dueDate: value }))}
                     />
                   </Field.Root>
 
@@ -251,13 +252,7 @@ export default function BillModal({ open, onClose, defaultValues }: BillDialogPr
 
             <Dialog.Footer gap={3} justifyContent="flex-end">
               <Dialog.ActionTrigger asChild>
-                <Button
-                  variant="outline"
-                  width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
-                >
+                <Button variant="outline" width="50%" color="gray.700" borderColor="gray.300">
                   Cancel
                 </Button>
               </Dialog.ActionTrigger>
@@ -266,7 +261,6 @@ export default function BillModal({ open, onClose, defaultValues }: BillDialogPr
                 width="50%"
                 bg="gray.950"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
                 loading={isLoading}
                 onClick={handleSubmit}
               >

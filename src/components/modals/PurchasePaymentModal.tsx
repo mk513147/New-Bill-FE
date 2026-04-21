@@ -118,7 +118,6 @@ export default function PurchasePaymentModal({
                   width="50%"
                   color="gray.700"
                   borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
                 >
                   Cancel
                 </Button>
@@ -129,7 +128,6 @@ export default function PurchasePaymentModal({
                 bg="gray.950"
                 color="white"
                 width="50%"
-                _hover={{ bg: 'gray.800' }}
                 loading={updatePurchase.isPending}
                 onClick={handleSubmit}
               >

@@ -8,6 +8,10 @@ import {
   useMediaQuery,
   Select,
   SimpleGrid,
+  Checkbox,
+  Box,
+  HStack,
+  Text,
 } from '@chakra-ui/react'
 import { createListCollection } from '@chakra-ui/react'
 import { X } from 'lucide-react'
@@ -29,6 +33,13 @@ const unitCollection = createListCollection({
   ],
 })
 
+const discountTypeCollection = createListCollection({
+  items: [
+    { label: 'Percentage (%)', value: 'percentage' },
+    { label: 'Absolute (₹)', value: 'absolute' },
+  ],
+})
+
 export interface ProductFormValues {
   name: string
   brand?: string
@@ -39,6 +50,11 @@ export interface ProductFormValues {
   sellingPrice: string
   unit?: string
   stock?: string
+  gstPercentage?: string
+  gstInclusive?: boolean
+  discountType?: string
+  discountValue?: string
+  minimumStock?: string
 }
 
 interface ProductDialogProps {
@@ -66,6 +82,11 @@ export default function ProductDialog({
     sellingPrice: '',
     unit: 'pcs',
     stock: '0',
+    gstPercentage: '0',
+    gstInclusive: false,
+    discountType: 'percentage',
+    discountValue: '0',
+    minimumStock: '0',
   })
 
   const { createProduct, updateProduct } = useProductActions()
@@ -108,6 +129,11 @@ export default function ProductDialog({
         sellingPrice: '',
         unit: 'pcs',
         stock: '0',
+        gstPercentage: '0',
+        gstInclusive: false,
+        discountType: 'percentage',
+        discountValue: '0',
+        minimumStock: '0',
       })
     }
   }, [defaultValues, mode])
@@ -134,6 +160,11 @@ export default function ProductDialog({
       sellingPrice: Number(formData.sellingPrice || 0),
       unit: formData.unit?.trim() || 'pcs',
       stock: Number(formData.stock || 0),
+      gstPercentage: Number(formData.gstPercentage || 0),
+      gstInclusive: formData.gstInclusive || false,
+      discountType: formData.discountType?.trim() || 'percentage',
+      discountValue: Number(formData.discountValue || 0),
+      minimumStock: Number(formData.minimumStock || 0),
     }
 
     if (mode === 'add') {
@@ -183,17 +214,7 @@ export default function ProductDialog({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  p={1}
-                  minW="auto"
-                  _hover={{
-                    bg: 'transparent',
-                    color: 'gray.600',
-                  }}
-                >
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -369,6 +390,108 @@ export default function ProductDialog({
 
                 <Field.Root>
                   <Field.Label color="gray.700" fontWeight="600">
+                    Minimum Stock
+                  </Field.Label>
+                  <Input
+                    name="minimumStock"
+                    value={formData.minimumStock}
+                    onChange={handleChange}
+                    type="number"
+                    min={0}
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    GST Percentage (%)
+                  </Field.Label>
+                  <Input
+                    name="gstPercentage"
+                    value={formData.gstPercentage}
+                    onChange={handleChange}
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+
+                <Box display="flex" alignItems="center">
+                  <Checkbox.Root
+                    checked={formData.gstInclusive}
+                    onCheckedChange={(details) =>
+                      setFormData((prev) => ({ ...prev, gstInclusive: !!details.checked }))
+                    }
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control />
+                    <Checkbox.Label>
+                      <Text fontSize="sm" color="gray.700" fontWeight="600">
+                        Price includes GST
+                      </Text>
+                    </Checkbox.Label>
+                  </Checkbox.Root>
+                </Box>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Discount Type
+                  </Field.Label>
+                  <Select.Root
+                    collection={discountTypeCollection}
+                    value={formData.discountType ? [formData.discountType] : ['percentage']}
+                    onValueChange={(details) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        discountType: details.value[0] || 'percentage',
+                      }))
+                    }
+                    positioning={{ strategy: 'fixed', hideWhenDetached: true }}
+                  >
+                    <Select.HiddenSelect name="discountType" />
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select type" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content bg="white">
+                        {discountTypeCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
+                    Discount Value
+                  </Field.Label>
+                  <Input
+                    name="discountValue"
+                    value={formData.discountValue}
+                    onChange={handleChange}
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    bg="white"
+                    borderColor="gray.200"
+                  />
+                </Field.Root>
+
+                <Field.Root>
+                  <Field.Label color="gray.700" fontWeight="600">
                     Unit
                   </Field.Label>
 
@@ -411,18 +534,17 @@ export default function ProductDialog({
                   variant="outline"
                   minW="120px"
                   width="50%"
-                  color="gray.700"
-                  borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
+                  color="black"
+                  borderColor="black"
+                  bg="white"
                 >
                   Cancel
                 </Button>
               </Dialog.ActionTrigger>
               <Button
                 width="50%"
-                bg="gray.950"
+                bg="black"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
                 loading={createProduct.isPending || updateProduct.isPending}
                 onClick={handleSubmit}
               >

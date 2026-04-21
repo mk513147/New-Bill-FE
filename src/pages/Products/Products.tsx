@@ -147,6 +147,24 @@ function Products() {
       width: '110px',
       render: (p: any) => p.stock ?? 0,
     },
+    {
+      key: 'minimumStock',
+      header: 'Min Stock',
+      width: '110px',
+      render: (p: any) => p.minimumStock ?? 0,
+    },
+    {
+      key: 'gstPercentage',
+      header: 'GST %',
+      width: '100px',
+      render: (p: any) => `${Number(p.gstPercentage ?? 0).toFixed(2)}%`,
+    },
+    {
+      key: 'discountType',
+      header: 'Discount Type',
+      width: '130px',
+      render: (p: any) => (p.discountType === 'percentage' ? '%' : '₹'),
+    },
   ]
 
   const productActions = [
@@ -165,6 +183,11 @@ function Products() {
           sellingPrice: String(item.sellingPrice ?? 0),
           unit: item.unit || 'pcs',
           stock: String(item.stock ?? 0),
+          gstPercentage: String(item.gstPercentage ?? 0),
+          gstInclusive: item.gstInclusive ?? false,
+          discountType: item.discountType || 'percentage',
+          discountValue: String(item.discountValue ?? 0),
+          minimumStock: String(item.minimumStock ?? 0),
           newCategoryName: '',
         })
         setOpen(true)

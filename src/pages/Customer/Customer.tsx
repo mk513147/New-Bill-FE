@@ -18,6 +18,9 @@ import { useCustomerImport } from '@/hooks/useCustomerImport'
 import { useCustomerExport } from '@/hooks/useCustomerExport'
 import { useQueryClient } from '@tanstack/react-query'
 import { ExpandableSearch } from '@/components/common/ExpandableSearch'
+import { API } from '@/api/api'
+import API_ENDPOINTS from '@/api/apiEndpoints'
+import { toaster } from '@/components/ui/toaster'
 
 function Customers() {
   const [open, setOpen] = useState(false)
@@ -38,6 +41,7 @@ function Customers() {
   const queryClient = useQueryClient()
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false)
 
   const [page, setPage] = useState(1)
   const limit = 20
@@ -109,6 +113,17 @@ function Customers() {
             }).format(Number(c.balance))
           : 'INR 0',
     },
+    {
+      key: 'totalPurchases',
+      header: 'Total Purchases',
+      width: '160px',
+      render: (c: any) =>
+        new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          maximumFractionDigits: 0,
+        }).format(Number(c.totalPurchases || 0)),
+    },
   ]
 
   const customerActions = [
@@ -176,6 +191,28 @@ function Customers() {
       limit,
       ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
     })
+  }
+
+  const handleDownloadTemplate = async () => {
+    try {
+      setIsDownloadingTemplate(true)
+      const res = await API.get(API_ENDPOINTS.CUSTOMERS.TEMPLATE, {
+        responseType: 'blob',
+      })
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'customer_sample.xlsx')
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode?.removeChild(link)
+      window.URL.revokeObjectURL(url)
+      toaster.success({ title: 'Template downloaded successfully' })
+    } catch (error) {
+      toaster.error({ title: 'Failed to download template' })
+    } finally {
+      setIsDownloadingTemplate(false)
+    }
   }
 
   const summary = {
@@ -300,6 +337,7 @@ function Customers() {
               }}
               onImport={handleImportClick}
               onExport={handleExportClick}
+              onDownloadTemplate={handleDownloadTemplate}
               onRefresh={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}
             />
           </HStack>

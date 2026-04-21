@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Dialog, Portal, Button, Input, Field, useMediaQuery } from '@chakra-ui/react'
 import { X } from 'lucide-react'
 import { useStaffActions } from '@/hooks/useStaffActions'
+import { DateInputWithIcon } from '@/components/common/DateInputWithIcon'
 
 /* ---------------- TYPES ---------------- */
 
@@ -20,6 +21,12 @@ interface StaffDialogProps {
   mode: 'add' | 'edit'
   pubId?: string
   defaultValues?: StaffFormValues
+}
+
+const getTodayDate = () => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  return now.toISOString().slice(0, 10)
 }
 
 /* ---------------- COMPONENT ---------------- */
@@ -52,7 +59,7 @@ export default function StaffDialog({
         role: '',
         baseSalary: '',
         salaryPerWeek: '',
-        joinDate: '',
+        joinDate: getTodayDate(),
       })
     }
   }, [defaultValues, mode])
@@ -101,17 +108,7 @@ export default function StaffDialog({
               </Dialog.Title>
 
               <Dialog.CloseTrigger asChild>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  p={1}
-                  minW="auto"
-                  _hover={{
-                    bg: 'transparent',
-                    color: 'gray.600',
-                  }}
-                >
+                <Button size="xs" variant="ghost" color="gray.400" p={1} minW="auto">
                   <X size={14} />
                 </Button>
               </Dialog.CloseTrigger>
@@ -155,11 +152,10 @@ export default function StaffDialog({
 
               <Field.Root>
                 <Field.Label>Join Date</Field.Label>
-                <Input
+                <DateInputWithIcon
                   name="joinDate"
-                  type="date"
-                  value={formData.joinDate || ''}
-                  onChange={handleChange}
+                  value={formData.joinDate || getTodayDate()}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, joinDate: value }))}
                 />
               </Field.Root>
             </Dialog.Body>
@@ -172,7 +168,6 @@ export default function StaffDialog({
                   width="50%"
                   color="gray.700"
                   borderColor="gray.300"
-                  _hover={{ bg: 'gray.100' }}
                 >
                   Cancel
                 </Button>
@@ -183,7 +178,6 @@ export default function StaffDialog({
                 bg="#6730EC"
                 color="white"
                 width="50%"
-                _hover={{ bg: '#5b29d8' }}
                 loading={createStaff.isPending || updateStaff.isPending}
                 onClick={handleSubmit}
               >

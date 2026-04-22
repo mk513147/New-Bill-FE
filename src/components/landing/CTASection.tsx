@@ -110,8 +110,8 @@ export function CTASection() {
                 fontWeight="500"
                 lineHeight="1.7"
               >
-                Join thousands of businesses already using EBill to streamline their operations and
-                boost productivity.
+                Join thousands of retail shops, distributors, and businesses already using EBill to
+                automate billing, manage inventory, track sales, and grow profitably.
               </Text>
 
               {/* Features */}

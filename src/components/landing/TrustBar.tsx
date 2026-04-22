@@ -5,10 +5,10 @@ import { Award, Shield, Zap, Users, TrendingUp, CheckCircle2 } from 'lucide-reac
 const MotionBox = motion.create(Box)
 
 const stats = [
-  { icon: Users, value: '1,000+', label: 'Active Users', color: 'purple.400' },
-  { icon: TrendingUp, value: '99.9%', label: 'Uptime', color: 'purple.500' },
+  { icon: Users, value: '5,000+', label: 'Active Users', color: 'purple.400' },
+  { icon: TrendingUp, value: '₹100 Cr+', label: 'Managed Annually', color: 'purple.500' },
   { icon: Zap, value: '24/7', label: 'Support', color: 'purple.300' },
-  { icon: Shield, value: 'Secure', label: 'Data Protected', color: 'purple.400' },
+  { icon: Shield, value: 'Enterprise', label: 'Grade Security', color: 'purple.400' },
 ]
 
 export function TrustBar() {

@@ -1,5 +1,6 @@
 export * from './HeroSection'
 export * from './TrustBar'
+export * from './WhatWeDoSection'
 export * from './FeaturesSection'
 export * from './HowItWorks'
 export * from './AudienceSection'

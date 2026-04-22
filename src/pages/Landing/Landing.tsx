@@ -1,6 +1,7 @@
 import {
   HeroSection,
   TrustBar,
+  WhatWeDoSection,
   FeaturesSection,
   HowItWorks,
   AudienceSection,
@@ -27,6 +28,7 @@ export default function Landing() {
       <LandingHeader />
       <HeroSection />
       <TrustBar />
+      <WhatWeDoSection />
       <Box id="features">
         <FeaturesSection />
       </Box>

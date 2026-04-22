@@ -27,7 +27,8 @@ export function Footer() {
               </Heading>
             </HStack>
             <Text color="gray.400" fontSize="sm" maxW="250px" lineHeight="1.7">
-              Smart inventory, billing, and business tracking for modern businesses.
+              EBill is a complete billing, inventory, and business management platform designed for
+              retail shops, distributors, pharmacies, and growing businesses.
             </Text>
             <HStack gap={3} pt={2}>
               <FooterIconLink href="#" icon={<Twitter size={18} />} />

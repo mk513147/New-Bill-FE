@@ -15,43 +15,64 @@ type Feature = {
 const features: Feature[] = [
   {
     title: 'Real-Time Inventory Tracking',
-    desc: 'Always know what is in stock with automatic quantity updates and low-stock alerts.',
+    desc: 'Automatically track stock levels across all products, get alerts for low inventory, and manage stock history effortlessly.',
     icon: Package,
     color: 'purple.400',
     gradient: 'linear(to-br, purple.900, purple.800)',
   },
   {
-    title: 'Smart Billing System',
-    desc: 'Create professional invoices quickly with automatic tax calculations and discount handling.',
+    title: 'Smart Billing & Invoicing',
+    desc: 'Create professional invoices and bills instantly. Handle taxes, discounts, and multiple payment methods automatically.',
     icon: FileText,
     color: 'purple.500',
     gradient: 'linear(to-br, purple.900, purple.800)',
   },
   {
     title: 'Supplier Management',
-    desc: 'Maintain supplier records, track purchases, and manage outstanding payments effortlessly.',
+    desc: 'Maintain detailed supplier records, track purchases, manage purchase returns, and handle outstanding payments.',
     icon: Users,
     color: 'purple.300',
     gradient: 'linear(to-br, purple.900, purple.800)',
   },
   {
-    title: 'Customer Ledger',
-    desc: 'Track customer balances, payment history, and credit records in one place.',
+    title: 'Customer & Credit Management',
+    desc: 'Track customer balances, payment history, manage credits, and maintain customer ledgers effortlessly.',
     icon: CreditCard,
     color: 'purple.400',
     gradient: 'linear(to-br, purple.900, purple.800)',
   },
   {
-    title: 'Reports & Analytics',
-    desc: 'View comprehensive sales, profit, and stock reports to make data-driven decisions.',
+    title: 'Sales & Purchase Tracking',
+    desc: 'Record all sales and purchases in real-time. Handle sale returns, delivery receipts, and purchase orders seamlessly.',
     icon: BarChart3,
     color: 'purple.500',
     gradient: 'linear(to-br, purple.900, purple.800)',
   },
   {
-    title: 'Secure Role-Based Access',
-    desc: 'Control permissions and protect critical business data with advanced security features.',
+    title: 'Advanced Reports & Analytics',
+    desc: 'Get comprehensive insights with sales reports, profit analysis, stock reports, and attendance tracking for better decisions.',
+    icon: BarChart3,
+    color: 'purple.300',
+    gradient: 'linear(to-br, purple.900, purple.800)',
+  },
+  {
+    title: 'Multi-User Role Management',
+    desc: 'Create staff accounts with role-based access control. Manage permissions and protect sensitive business data.',
     icon: Shield,
+    color: 'purple.400',
+    gradient: 'linear(to-br, purple.900, purple.800)',
+  },
+  {
+    title: 'Staff & Payroll Management',
+    desc: 'Manage staff records, track attendance, monitor schedules, and streamline HR operations.',
+    icon: Users,
+    color: 'purple.500',
+    gradient: 'linear(to-br, purple.900, purple.800)',
+  },
+  {
+    title: 'Payment & Ledger Management',
+    desc: 'Record all payments, maintain detailed ledgers, track pending payments, and get financial summaries.',
+    icon: CreditCard,
     color: 'purple.300',
     gradient: 'linear(to-br, purple.900, purple.800)',
   },
@@ -97,11 +118,12 @@ export function FeaturesSection() {
             letterSpacing="tight"
             color="white"
           >
-            Everything You Need to Succeed
+            Powerful Features for Complete Business Control
           </Heading>
 
           <Text fontSize={{ base: 'md', md: 'xl' }} color="gray.600" maxW="3xl" fontWeight="500">
-            Powerful features designed to help you manage your business efficiently
+            Everything you need to manage billing, inventory, customers, suppliers, staff, and
+            finances in one integrated platform
           </Text>
         </VStack>
 

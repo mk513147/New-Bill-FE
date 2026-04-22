@@ -105,7 +105,7 @@ export function HeroSection() {
               mb={6}
               color={'white'}
             >
-              Smart Billing & Inventory Management
+              Complete Billing, Inventory & Business Management for Growing Businesses
             </Heading>
           </MotionBox>
 
@@ -120,8 +120,9 @@ export function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Streamline your business operations with our powerful, easy-to-use platform. Track
-            inventory, manage billing, and grow your business effortlessly.
+            One unified platform for billing, inventory tracking, customer management, supplier
+            management, and real-time analytics. Automate your business operations and make
+            data-driven decisions.
           </MotionText>
 
           {/* Features List */}

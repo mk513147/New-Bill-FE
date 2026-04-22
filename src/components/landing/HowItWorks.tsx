@@ -8,28 +8,38 @@ const MotionVStack = motion.create(VStack)
 const steps = [
   {
     number: '01',
-    title: 'Add Inventory',
+    title: 'Set Up Your Business Profile',
     description:
-      'Set up your products, suppliers, and initial stock in minutes with our intuitive interface.',
+      'Create your shop profile, add staff members with role-based access, and configure your business settings in minutes.',
     icon: Upload,
     color: 'purple.400',
     gradient: 'linear(to-br, purple.500, purple.700)',
   },
   {
     number: '02',
-    title: 'Track Transactions',
-    description: 'Sales and purchases automatically update your stock levels in real-time.',
+    title: 'Add Products, Suppliers & Customers',
+    description:
+      'Build your product catalog with categories and pricing, manage supplier details, and import customer information for easy management.',
     icon: Activity,
     color: 'purple.500',
     gradient: 'linear(to-br, purple.500, purple.700)',
   },
   {
     number: '03',
-    title: 'Monitor & Grow',
+    title: 'Process Sales & Purchases',
     description:
-      'Analyze comprehensive reports and make data-driven decisions to scale your business.',
+      'Create bills and invoices, record purchases, handle returns, and manage payments. All transactions automatically update your inventory.',
     icon: TrendingUp,
     color: 'purple.300',
+    gradient: 'linear(to-br, purple.500, purple.700)',
+  },
+  {
+    number: '04',
+    title: 'Monitor & Grow with Analytics',
+    description:
+      'View real-time dashboards, analyze sales trends, track profit margins, monitor stock levels, and make data-driven decisions to scale your business.',
+    icon: CheckCircle2,
+    color: 'purple.400',
     gradient: 'linear(to-br, purple.500, purple.700)',
   },
 ]
@@ -74,11 +84,11 @@ export function HowItWorks() {
             letterSpacing="tight"
             color="white"
           >
-            How EBill Works
+            Get Started in Just 4 Simple Steps
           </Heading>
 
           <Text fontSize={{ base: 'md', md: 'xl' }} color="gray.400" maxW="3xl" fontWeight="500">
-            Get started in minutes and transform your business operations
+            From setup to success: automate your business and start making data-driven decisions
           </Text>
         </VStack>
 
@@ -89,7 +99,11 @@ export function HowItWorks() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={{ base: 12, md: 8 }} position="relative">
+          <SimpleGrid
+            columns={{ base: 1, md: 2, lg: 4 }}
+            gap={{ base: 12, md: 8 }}
+            position="relative"
+          >
             {/* Connection Line for Desktop */}
             <Box
               display={{ base: 'none', md: 'block' }}

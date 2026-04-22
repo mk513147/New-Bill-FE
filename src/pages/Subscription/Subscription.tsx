@@ -31,23 +31,24 @@ const plans: Array<{
   {
     key: 'weekly',
     title: 'Weekly Plan',
-    priceLabel: '200 / week',
-    summary: 'Good for immediate restart with lower upfront cost.',
+    priceLabel: '₹200 / week',
+    summary: 'Perfect for testing or short-term needs. Full access with 7-day duration.',
     accent: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
   },
   {
     key: 'monthly',
     title: 'Monthly Plan',
-    priceLabel: '900 / month',
-    summary: 'Most chosen option for regular business operations.',
+    priceLabel: '₹900 / month',
+    summary:
+      'Most popular choice. Unlimited invoices, inventory, customers, suppliers & staff management.',
     accent: 'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)',
     highlight: 'Best value',
   },
   {
     key: 'yearly',
     title: 'Yearly Plan',
-    priceLabel: '10000 / year',
-    summary: 'Best for long-term continuity and fewer renewals.',
+    priceLabel: '₹10,000 / year',
+    summary: 'Maximum savings. Commit for a year and save ₹800+ compared to monthly plans.',
     accent: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
     highlight: 'Maximum savings',
   },
@@ -170,20 +171,27 @@ const Subscription = () => {
                     lineHeight="0.95"
                     letterSpacing="-0.04em"
                   >
-                    Restart your workspace in minutes.
+                    Unlock Your Business Potential with EBill
                   </Heading>
                   <Text fontSize={{ base: 'md', md: 'lg' }} color="whiteAlpha.800" maxW="620px">
-                    Plan purchase is now handled directly by our team for faster activation and
-                    support. Select your plan and send us your admin details on WhatsApp.
+                    Restart your subscription and get access to unlimited billing, real-time
+                    inventory tracking, customer management, supplier ledgers, and powerful
+                    analytics.
                   </Text>
                 </VStack>
 
                 <HStack wrap="wrap" gap={3}>
                   <HStack bg="whiteAlpha.100" px={4} py={2} borderRadius="full">
-                    <Text fontSize="sm">Contact support on WhatsApp</Text>
+                    <CheckCircle2 size={16} />
+                    <Text fontSize="sm">Unlimited invoices & bills</Text>
                   </HStack>
                   <HStack bg="whiteAlpha.100" px={4} py={2} borderRadius="full">
-                    <Text fontSize="sm">Activation after manual confirmation</Text>
+                    <CheckCircle2 size={16} />
+                    <Text fontSize="sm">Real-time inventory sync</Text>
+                  </HStack>
+                  <HStack bg="whiteAlpha.100" px={4} py={2} borderRadius="full">
+                    <CheckCircle2 size={16} />
+                    <Text fontSize="sm">All features included</Text>
                   </HStack>
                 </HStack>
 
@@ -230,10 +238,10 @@ const Subscription = () => {
                         fontSize="xs"
                         letterSpacing="0.12em"
                       >
-                        What to do now
+                        Next Steps
                       </Text>
                       <Heading size="md" mt={2}>
-                        Share details on WhatsApp to start your selected plan.
+                        Get started in 3 easy steps
                       </Heading>
                     </Box>
                     <Sparkles size={20} />
@@ -241,9 +249,9 @@ const Subscription = () => {
 
                   <VStack align="stretch" gap={3}>
                     {[
-                      'Select one plan on the right panel.',
-                      'Tap Contact on WhatsApp to send your admin details automatically.',
-                      'After plan activation, logout and login again to unlock access.',
+                      'Select the plan that works best for your business on the right.',
+                      'Click "Contact on WhatsApp" - it will automatically send your details to our team.',
+                      'Our support team will activate your plan within hours, then login again to access all features.',
                     ].map((item) => (
                       <HStack key={item} align="start" gap={3}>
                         <CheckCircle2 size={18} color="#fdba74" style={{ marginTop: 2 }} />
@@ -279,10 +287,11 @@ const Subscription = () => {
                     Plan Selection
                   </Text>
                   <Heading fontSize={{ base: '3xl', md: '4xl' }} color="gray.900" mt={2}>
-                    Choose your restart plan.
+                    Choose Your Plan
                   </Heading>
                   <Text color="gray.600" mt={2}>
-                    No direct in-app purchase. Contact support and we will activate manually.
+                    Select a plan below and contact our support team on WhatsApp to activate
+                    instantly. All plans include full access to all features.
                   </Text>
                 </Box>
 
@@ -356,10 +365,10 @@ const Subscription = () => {
                   >
                     <Box>
                       <Text fontWeight="700" color="gray.900">
-                        Buy Offer: Contact 9570036624
+                        Ready to activate your plan?
                       </Text>
                       <Text color="gray.600" fontSize="sm">
-                        We will open WhatsApp with selected plan, admin name, and admin id.
+                        Click below to contact our team on WhatsApp. We're available 24/7 to help.
                       </Text>
                     </Box>
                     <Button
